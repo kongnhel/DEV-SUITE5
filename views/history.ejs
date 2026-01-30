@@ -1,0 +1,162 @@
+<%- include('partials/header') %>
+
+<style>
+    :root { 
+        --primary: <%= theme || '#a855f7' %>; 
+        --bg: #020617; 
+    }
+    
+    /* Advanced Neural Glassmorphism */
+    .search-glass {
+        background: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 30px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .archive-card { 
+        background: rgba(15, 23, 42, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        border-radius: 40px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .archive-card:hover { 
+        border-color: var(--primary); 
+        background: rgba(15, 23, 42, 0.5);
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px -15px rgba(168, 85, 247, 0.15);
+    }
+
+    /* Shimmer Effect for Title */
+    .shimmer-text {
+        background: linear-gradient(90deg, #fff, var(--primary), #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 8s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+
+    .code-box {
+        background: rgba(0, 0, 0, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-left: 4px solid var(--primary);
+    }
+</style>
+
+<main class="max-w-6xl mx-auto p-6 md:p-12 relative">
+    <header class="text-center mb-20">
+        <h2 class="text-6xl md:text-8xl font-black shimmer-text italic uppercase tracking-tighter mb-4">Neural Archive</h2>
+        <p class="text-[10px] text-slate-500 font-black uppercase tracking-[0.5em] opacity-60">Decrypted Memories from MongoDB Atlas Hub</p>
+    </header>
+
+    <div class="search-glass p-6 mb-20 sticky top-6 z-40">
+        <form action="/history" method="GET" class="flex flex-col md:flex-row gap-4">
+            <div class="flex-1 relative">
+                <input type="text" name="search" value="<%= currentSearch %>"
+                    class="w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-5 outline-none focus:border-purple-500 transition-all text-white text-sm"
+                    placeholder="ស្វែងរកដានជើងមេរៀន (ឧ. Python, MLBB, Laravel)...">
+                <span class="absolute right-6 top-1/2 -translate-y-1/2 opacity-20 text-xs font-mono">SEARCH_CMD</span>
+            </div>
+            
+            <select name="tool" class="bg-black/40 border border-white/5 rounded-2xl px-8 py-5 outline-none focus:border-purple-500 text-slate-300 text-xs font-black uppercase tracking-widest">
+                <option value="ALL" <%= currentTool === 'ALL' ? 'selected' : '' %>>All Sectors</option>
+                <option value="AI_TUTOR" <%= currentTool === 'AI_TUTOR' ? 'selected' : '' %>>AI Tutor</option>
+                <option value="CODE_REVIEWER" <%= currentTool === 'CODE_REVIEWER' ? 'selected' : '' %>>Reviewer</option>
+                <option value="K_IDA" <%= currentTool === 'K_IDA' ? 'selected' : '' %>>K-IDA Chat</option>
+            </select>
+
+            <button type="submit" class="bg-white text-black px-12 py-5 rounded-2xl font-black text-xs transition-all active:scale-95 shadow-xl uppercase tracking-widest hover:bg-slate-200">
+                Execute Filter
+            </button>
+        </form>
+    </div>
+
+    <div class="space-y-12">
+        <% if (history.length > 0) { %>
+            <% history.forEach(item => { %>
+                <div class="archive-card p-10 md:p-16 group relative overflow-hidden">
+                    <div class="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/5 blur-[80px] rounded-full"></div>
+
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 border-b border-white/5 pb-10">
+                        <div class="flex items-center gap-5">
+                            <span class="px-5 py-2 bg-white text-black rounded-full text-[9px] font-black uppercase tracking-tighter">
+                                <%= item.toolName %>
+                            </span>
+                            <span class="text-slate-500 font-mono text-[9px] uppercase tracking-widest">
+                                Timestamp: <%= new Date(item.createdAt).toLocaleString('km-KH', { hour12: true }) %>
+                            </span>
+                        </div>
+                        <div class="flex gap-4">
+                            <button onclick="copyEntry('<%= item._id %>')" class="text-[9px] font-black text-slate-500 hover:text-white uppercase transition-all tracking-widest">Share Log</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-5 gap-16">
+                        <div class="lg:col-span-2">
+                            <h4 class="text-[9px] font-black text-slate-600 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                                <span class="h-px w-6 bg-slate-800"></span> Human Intent
+                            </h4>
+                            <p class="text-3xl text-white font-light italic leading-[1.2] tracking-tight">"<%= item.userInput %>"</p>
+                        </div>
+
+                        <div class="lg:col-span-3">
+                            <h4 class="text-[9px] font-black text-purple-400 uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
+                                <span class="h-px w-10 bg-purple-500"></span> Neural Response Output
+                            </h4>
+                            
+                            <div class="text-lg text-slate-300 leading-relaxed font-light space-y-6">
+                                <% if (typeof item.aiResponse === 'object') { %>
+                                    <p class="text-slate-200">
+                                        <%= item.aiResponse.explanation || item.aiResponse.answer || item.aiResponse.humorous_response || item.aiResponse.introduction || "Memory Decrypted Successfully" %>
+                                    </p>
+                                    
+                                    <% if (item.aiResponse.full_code_snippet || item.aiResponse.code_suggestion) { %>
+                                        <div class="code-box mt-8 p-6 rounded-2xl font-mono text-sm text-cyan-400 overflow-x-auto relative">
+                                            <div class="absolute top-4 right-4 text-[8px] font-black opacity-30 text-white uppercase">Neural_Code_V2.6</div>
+                                            <pre><code><%= item.aiResponse.full_code_snippet || item.aiResponse.code_suggestion %></code></pre>
+                                        </div>
+                                    <% } %>
+
+                                    <% if (item.aiResponse.conclusion || item.aiResponse.next_steps) { %>
+                                        <p class="text-slate-500 text-sm italic mt-6 border-t border-white/5 pt-6">
+                                            💡 <%= item.aiResponse.conclusion || item.aiResponse.next_steps %>
+                                        </p>
+                                    <% } %>
+                                <% } else { %>
+                                    <p><%= item.aiResponse %></p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="text-center py-40 bg-slate-900/20 rounded-[60px] border-2 border-dashed border-white/5">
+                <div class="text-9xl mb-10 opacity-20">🛸</div>
+                <p class="text-xl font-black uppercase tracking-[0.6em] text-slate-600 mb-8">Neural footprints not detected</p>
+                <p class="text-slate-500 italic max-w-md mx-auto text-sm">បងប្រូអើយ! ប្រព័ន្ធរកមិនឃើញដានជើងមេរៀនសោះ ប្រហែលជាបងប្រូទើបតែ "លាងខួរក្បាល" (Clear Data) មែនទេ? 😂</p>
+                <a href="/" class="mt-12 inline-block px-10 py-4 bg-purple-600/10 text-purple-400 border border-purple-500/20 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-purple-600 hover:text-white transition-all">Start New Mission</a>
+            </div>
+        <% } %>
+    </div>
+</main>
+
+<script>
+    async function copyEntry(id) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Neural Link',
+            text: 'កំពុងទាញយកតំណភ្ជាប់សម្រាប់ Log ID: ' + id,
+            background: '#020617',
+            color: '#fff',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Buddy 2026 | Wisdom Neural</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;700&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --primary: #6366f1; /* Indigo 500 */
+            --bg: #030712;
+        }
+        body {
+            font-family: 'Kantumruy Pro', sans-serif;
+            background-color: var(--bg);
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Universal Navbar Styling */
+        .nav-glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+        }
+        .nav-link {
+            position: relative;
+            color: #94a3b8;
+            transition: all 0.3s ease;
+        }
+        .nav-link.active { color: var(--primary); }
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.8);
+        }
+
+        /* Neural Star Background */
+        #neural-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .study-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            border-radius: 32px;
+        }
+
+        /* Big Input UX */
+        .big-input {
+            background: rgba(0, 0, 0, 0.3) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            font-size: 1.125rem !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .big-input:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.15);
+        }
+
+        .shimmer-text {
+            background: linear-gradient(90deg, #fff, var(--primary), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+    </style>
+</head>
+<body class="min-h-screen">
+    <canvas id="neural-bg"></canvas>
+
+    <nav class="sticky top-0 z-[100] nav-glass px-6 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/'">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <span class="text-black font-black text-xl italic">AI</span>
+                </div>
+                <h1 class="text-xl font-black tracking-tighter shimmer-text hidden sm:block">DEV SUITE</h1>
+            </div>
+
+            <div class="hidden md:flex items-center gap-10 text-[10px] font-bold uppercase tracking-[0.2em]">
+                <a href="/" class="nav-link" id="nav-reviewer">Reviewer</a>
+                <a href="/visualizer" class="nav-link" id="nav-visualizer">Visualizer</a>
+                <a href="/culture" class="nav-link" id="nav-culture">Culture</a>
+                <a href="/study-buddy" class="nav-link" id="nav-study">Study Buddy</a>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                <span class="text-[9px] text-indigo-400 font-mono">BRAIN_LINK: ACTIVE</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6 md:p-10">
+        <header class="text-center mb-16">
+            <h2 class="text-6xl md:text-8xl font-black tracking-tighter shimmer-text italic uppercase">Study Buddy</h2>
+            <p class="mt-4 text-slate-500 font-mono tracking-[0.5em] text-[10px] uppercase">Neural Learning & Research Assistant</p>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-10">
+            <div class="xl:col-span-6 space-y-8">
+                <div class="study-card p-10">
+                    <div class="flex items-center gap-3 mb-8">
+                        <span class="text-2xl">📚</span>
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">បញ្ចូលមេរៀនរបស់អ្នក</h3>
+                    </div>
+
+                    <textarea id="studyContent" 
+                        class="w-full big-input rounded-3xl p-8 h-[500px] outline-none transition-all resize-none text-slate-200" 
+                        placeholder="បិទអត្ថបទមេរៀន ឬចំណេះដឹងដែលប្អូនចង់ឱ្យបង AI សង្ខេបឱ្យ..."></textarea>
+
+                    <button onclick="processStudy()" id="btnAction" class="w-full mt-8 py-6 rounded-3xl font-black text-lg text-white bg-indigo-600 hover:bg-indigo-500 hover:scale-[1.01] active:scale-95 transition-all shadow-[0_0_30px_rgba(99,102,241,0.2)] uppercase tracking-widest flex justify-center items-center gap-4">
+                        <span>ចាប់ផ្ដើមរៀនឥឡូវនេះ</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke-width="2"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="xl:col-span-6">
+                <div id="loading" class="hidden study-card p-40 flex flex-col items-center justify-center">
+                    <div class="relative w-24 h-24 mb-8">
+                        <div class="absolute inset-0 border-2 border-indigo-500/20 rounded-full"></div>
+                        <div class="absolute inset-0 border-2 border-t-indigo-500 rounded-full animate-spin"></div>
+                    </div>
+                    <p class="text-indigo-400 font-mono text-[10px] tracking-widest animate-pulse">DOWNLOADING_KNOWLEDGE...</p>
+                </div>
+
+                <div id="resultArea" class="hidden space-y-8 animate-in slide-in-from-bottom-5 duration-500">
+                    <div class="study-card p-10 border-l-8 border-indigo-500">
+                        <h4 class="text-indigo-400 font-bold uppercase tracking-widest text-[10px] mb-6 flex items-center gap-2">
+                            <span>📜</span> សេចក្ដីសង្ខេបមេរៀន
+                        </h4>
+                        <div id="summaryText" class="text-slate-200 leading-[1.8] text-xl font-light"></div>
+                    </div>
+
+                    <div class="study-card p-10">
+                        <h4 class="text-yellow-400 font-bold uppercase tracking-widest text-[10px] mb-8 flex items-center gap-2">
+                            <span>📝</span> Brain Test (ស្ទង់កម្រិតយល់ដឹង)
+                        </h4>
+                        <div id="quizContainer" class="space-y-6"></div>
+                    </div>
+
+                    <div class="text-center p-8 bg-indigo-500/5 rounded-3xl border border-indigo-500/10 italic">
+                        <p id="motivationText" class="text-indigo-300 text-lg font-medium"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const socket = io();
+        
+        // Auto-Highlight Navbar Link
+        function setActiveLink() {
+            const path = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            if (path.includes('study-buddy')) document.getElementById('nav-study').classList.add('active');
+        }
+        window.addEventListener('DOMContentLoaded', setActiveLink);
+
+        function processStudy() {
+            const content = document.getElementById("studyContent").value.trim();
+            if (!content) return Swal.fire({ icon: 'info', title: 'ភ្លេចដាក់មេរៀន!', text: 'ដាក់មេរៀនឱ្យបងមើលសិនប្អូន កុំចង់រៀនកាត់!', background: '#030712', color: '#6366f1' });
+
+            document.getElementById("loading").classList.remove("hidden");
+            document.getElementById("resultArea").classList.add("hidden");
+            document.getElementById("btnAction").disabled = true;
+            document.getElementById("btnAction").style.opacity = "0.3";
+
+            socket.emit("study_assist", { content });
+        }
+
+        socket.on("study_result", (res) => {
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("resultArea").classList.remove("hidden");
+            document.getElementById("btnAction").disabled = false;
+            document.getElementById("btnAction").style.opacity = "1";
+
+            // Typewriter Summary
+            typeWriter("summaryText", res.summary);
+            document.getElementById("motivationText").innerText = "💬 " + res.funny_motivation;
+
+            // Generate Quiz Cards
+            const container = document.getElementById("quizContainer");
+            container.innerHTML = "";
+            res.quiz.forEach((q, idx) => {
+                const card = document.createElement("div");
+                card.className = "p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-indigo-500/30 transition-all";
+                card.innerHTML = `
+                    <p class="font-bold text-slate-100 mb-4 text-lg"><span class="text-indigo-500">Q${idx+1}:</span> ${q.question}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        ${q.options.map(opt => `
+                            <button class="text-left p-3 rounded-xl bg-black/40 border border-white/5 hover:bg-indigo-500 hover:text-black transition-all text-sm font-medium">
+                                ${opt}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        });
+
+        function typeWriter(id, text) {
+            let i = 0; const el = document.getElementById(id); el.innerHTML = "";
+            function type() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 20); } }
+            type();
+        }
+
+        // Starfield Background Animation
+        const canvas = document.getElementById('neural-bg');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        function init() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            dots = []; for(let i=0; i<70; i++) dots.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3});
+        }
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#6366f1'; ctx.strokeStyle = 'rgba(99,102,241,0.05)';
+            dots.forEach(d => {
+                d.x += d.vx; d.y += d.vy;
+                if(d.x<0 || d.x>canvas.width) d.vx *= -1; if(d.y<0 || d.y>canvas.height) d.vy *= -1;
+                ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI*2); ctx.fill();
+                dots.forEach(d2 => {
+                    let dist = Math.hypot(d.x-d2.x, d.y-d2.y);
+                    if(dist < 200) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d2.x, d2.y); ctx.stroke(); }
+                });
+            });
+            requestAnimationFrame(draw);
+        }
+        window.addEventListener('resize', init); init(); draw();
+
+        socket.on('error_occured', (msg) => {
+            Swal.fire({ icon: 'error', title: 'មានបញ្ហា!', text: msg });
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("btnAction").disabled = false;
+        });
+    </script>
+</body>
+</html>

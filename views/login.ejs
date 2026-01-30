@@ -1,0 +1,178 @@
+<%- include('partials/header') %>
+
+<style>
+    :root { --primary: <%= theme %>; --bg: #020617; }
+    
+    .neural-card {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .input-glow:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.15);
+    }
+
+    /* ស្ទីលសម្រាប់ប៊ូតុងបើកភ្នែក */
+    .pass-wrapper { position: relative; }
+    .toggle-eye {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        opacity: 0.5;
+        transition: 0.3s;
+    }
+    .toggle-eye:hover { opacity: 1; color: var(--primary); }
+
+    .btn-loading { pointer-events: none; opacity: 0.6; }
+</style>
+
+<main class="max-w-md mx-auto my-16 p-1 relative">
+    <div class="absolute -top-10 -left-10 w-32 h-32 bg-cyan-500/20 blur-[80px] rounded-full"></div>
+    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/20 blur-[80px] rounded-full"></div>
+
+    <div class="neural-card p-10 rounded-[45px] relative z-10">
+        <div class="text-center mb-10">
+            <h2 id="authTitle" class="text-4xl font-black text-white uppercase italic tracking-tighter">Neural Access</h2>
+            <p id="authDesc" class="text-[10px] text-slate-500 uppercase tracking-[0.3em] mt-3">Secure System Entry V2.8</p>
+        </div>
+
+        <div class="space-y-6">
+            <button onclick="signInWithGoogle()" id="googleBtn" class="w-full flex items-center justify-center gap-3 bg-white text-black py-4 rounded-2xl font-bold text-xs hover:bg-slate-200 transition-all active:scale-95 shadow-xl">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                CONTINUE WITH GOOGLE
+            </button>
+
+            <div class="flex items-center gap-4 py-2">
+                <div class="h-px flex-1 bg-white/5"></div>
+                <span class="text-[8px] text-slate-600 uppercase font-black tracking-widest">OR SECURE MAIL</span>
+                <div class="h-px flex-1 bg-white/5"></div>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Identity Path (Email)</label>
+                    <input type="email" id="email" class="input-glow w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none text-white transition-all text-sm" placeholder="name@neural.link">
+                </div>
+                <div>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Access Key (Password)</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="password" class="input-glow w-full bg-black/40 border border-white/5 rounded-2xl px-6 py-4 outline-none text-white transition-all text-sm" placeholder="••••••••">
+                        <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="handleAuth()" id="authBtn" class="w-full bg-cyan-400 text-black py-5 rounded-2xl font-black text-xs hover:bg-cyan-300 transition-all active:scale-95 shadow-lg shadow-cyan-500/20 uppercase tracking-widest">
+                Initialize Session
+            </button>
+
+            <p class="text-center text-[10px] text-slate-500">
+                <span id="toggleText">មិនទាន់មានគណនី?</span> 
+                <a href="/register" class="text-cyan-400 font-black hover:underline ml-1">ចុះឈ្មោះនៅទីនេះ</a>
+            </p>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = {
+        apiKey: "<%= firebaseConfig.apiKey %>",
+        authDomain: "<%= firebaseConfig.authDomain %>",
+        projectId: "<%= firebaseConfig.projectId %>"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    // មុខងារបើក/បិទ Password
+    window.togglePassword = () => {
+        const passInput = document.getElementById('password');
+        passInput.type = passInput.type === 'password' ? 'text' : 'password';
+    };
+
+    // មុខងារ Login ជាមួយ Google
+    window.signInWithGoogle = async () => {
+        const googleBtn = document.getElementById('googleBtn');
+        googleBtn.innerText = "CONNECTING...";
+        try {
+            const result = await signInWithPopup(auth, provider);
+            await sendTokenToBackend(result.user);
+        } catch (error) {
+            googleBtn.innerText = "CONTINUE WITH GOOGLE";
+            showError(error.message);
+        }
+    };
+
+    // មុខងារ Auth ចម្បង (Login ធម្មតា)
+    window.handleAuth = async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('authBtn');
+
+        if(!email || !password) return showError("សូមបំពេញទិន្នន័យឱ្យគ្រប់បងប្រូ!");
+
+        btn.classList.add('btn-loading');
+        btn.innerText = "PROCESSING...";
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            await sendTokenToBackend(userCredential.user);
+        } catch (error) {
+            btn.classList.remove('btn-loading');
+            btn.innerText = "Initialize Session";
+            showError(error.message);
+        }
+    };
+
+    async function sendTokenToBackend(user) {
+        const idToken = await user.getIdToken();
+        const res = await fetch('/api/auth/session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            window.location.href = '/dashboard';
+        } else {
+            // បើ Login ជាមួយ Google តែអត់ទាន់មាន Register ក្នុង MongoDB
+            if (res.status === 404 || data.message.includes("not found")) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'រកមិនឃើញគណនី!',
+                    text: 'បងប្រូអើយ! Email នេះមិនទាន់មានក្នុងប្រព័ន្ធទេ។ សូមទៅចុះឈ្មោះ (Register) សិនទៅបង!',
+                    background: '#0f172a',
+                    color: '#fff',
+                    confirmButtonText: 'ទៅចុះឈ្មោះឥឡូវនេះ',
+                    confirmButtonColor: '#a855f7'
+                }).then(() => {
+                    window.location.href = '/register';
+                });
+            } else {
+                showError(data.message || "Server Sync Failed!");
+            }
+        }
+    }
+
+    function showError(msg) {
+        Swal.fire({ 
+            icon: 'error', 
+            title: 'Neural Error', 
+            text: msg, 
+            background: '#0f172a', 
+            color: '#fff',
+            confirmButtonColor: '#22d3ee'
+        });
+    }
+</script>

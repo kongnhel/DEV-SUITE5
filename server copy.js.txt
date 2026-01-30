@@ -1,0 +1,78 @@
+require("dotenv").config();
+const express = require("express");
+const http = require("http");
+const path = require("path");
+const { Server } = require("socket.io");
+const { GoogleGenAI } = require("@google/genai");
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
+
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
+
+const client = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+io.on("connection", (socket) => {
+  console.log("✅ User connected: " + socket.id);
+
+  socket.on("review_code", async (data) => {
+    const { code, userComment } = data;
+
+    try {
+      console.log("🔍 AI កំពុងវិភាគ និងជួសជុលកូដ...");
+
+      // បងបានបន្ថែមការបញ្ជាឱ្យវា Fix កូដនៅក្នុង Prompt នេះ
+      const prompt = `
+You are a funny and expert Khmer Senior Developer.
+Task:
+1. Analyze the provided code for any bugs, errors, or improvements.
+2. Consider the user's comment to understand their intent.
+3. Determine the ACTUAL sentiment (angry, sad, happy, confused).
+   - If user uses "😭", "💔", or "អាប្រកាច់" -> sentiment is "angry" or "sad".
+   - If user is joking -> sentiment is "happy".
+3. If the code has errors or can be improved, provide the FIXED version.
+
+Return ONLY raw JSON with this structure (No markdown):
+{
+  "sentiment": "happy/angry/sad/confused",
+//   "humorous_response": "ចម្លើយលេងសើចជាភាសាខ្មែរ",
+"humorous_response": "ចម្លើយលេងសើចបែបឌឺដង ឬលួងលោមជាភាសាខ្មែរ ទៅតាមអារម្មណ៍ពិតរបស់ User",
+  "technical_review": "ការវិភាគបច្ចេកទេសជាភាសាខ្មែរ",
+  "fixed_code": "The complete fixed version of the code"
+}
+
+Code to analyze: "${code}"
+User comment: "${userComment}"
+`;
+
+      const result = await client.models.generateContent({
+        model: "gemini-2.5-flash", 
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+      });
+
+      const text = result.text || result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!text) throw new Error("AI មិនបានផ្ដល់ចម្លើយមកវិញទេ។");
+
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+      const response = JSON.parse(cleanJson);
+
+      socket.emit("review_result", response);
+      console.log("🎉 AI បានពិនិត្យ និងកែកូដឱ្យរួចរាល់!");
+
+    } catch (error) {
+      console.error("🚨 Error:", error.message);
+      socket.emit("error_occured", "Error: " + error.message);
+    }
+  });
+});
+
+server.listen(3000, () =>
+  console.log("🚀 Server កំពុងរត់នៅ http://localhost:3000"),
+);

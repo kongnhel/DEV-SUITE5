@@ -1,0 +1,400 @@
+<%- include('partials/header') %>
+
+<style>
+  :root {
+    --primary: #00f2ff;
+    --secondary: #7000ff;
+    --bg: #030712;
+  }
+  body {
+    background-color: var(--bg);
+    color: #e2e8f0;
+    font-size: 16px;
+    overflow-x: hidden;
+  }
+
+  /* Background Styles */
+  #neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
+    opacity: 0.15;
+  }
+  .hero-glow {
+    background: radial-gradient(
+      circle at center,
+      rgba(0, 242, 255, 0.08) 0%,
+      transparent 70%
+    );
+  }
+
+  /* Professional Cards */
+  .neural-card {
+    background: rgba(15, 23, 42, 0.5);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(0, 242, 255, 0.1);
+    border-radius: 40px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .neural-card:hover {
+    border-color: rgba(0, 242, 255, 0.25);
+    box-shadow: 0 0 40px rgba(0, 242, 255, 0.05);
+  }
+
+  /* Typography & Effects */
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  .status-badge {
+    background: rgba(0, 242, 255, 0.1);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    color: var(--primary);
+    padding: 4px 14px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
+</style>
+
+<canvas id="neural-bg"></canvas>
+<div class="hero-glow fixed inset-0 -z-10"></div>
+
+<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
+  <header
+    class="text-center mb-16 space-y-6 animate-in fade-in zoom-in duration-1000"
+  >
+    <div class="inline-flex items-center gap-2 mb-4">
+      <span class="status-badge uppercase">Diagnostic Neural Link Active</span>
+      <span class="text-slate-500 text-[10px] font-mono">PEER_REVIEW_V4.2</span>
+    </div>
+
+    <h2
+      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+    >
+      EVOLUTION
+    </h2>
+
+    <div class="max-w-3xl mx-auto space-y-4">
+      <p class="text-2xl md:text-4xl font-light text-white leading-tight">
+        "កុំឱ្យកូដដែលបែកថ្នាំ (Broken Code)
+        ធ្វើឱ្យបេះដូងប្អូនបែកបាក់ប្រេះឆាតាមវាដែរ (Broken Heart)!"
+      </p>
+      <p
+        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
+      >
+        ធុញនឹង Error មែនទេ? ឱ្យបង AI ជួយមើលឱ្យ! បងមិនត្រឹមតែ Fix ឱ្យស្អាតទេ
+        តែបងនឹងជួយ
+        <span class="text-cyan-400 font-bold">Review</span> ទាំងបច្ចេកទេស
+        និងទាំងអារម្មណ៍ប្អូនទៀត។ បោះកូដចូលមក រួចអង្គុយចាំសើចនឹងចម្លើយបងចុះ!
+        បងមិនចេះបោកអូនដូចអាសង្ហារនោះទេ គ្រាន់តែលួចដៀល😂
+      </p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-10 pt-8">
+      <div class="text-center">
+        <span class="text-3xl block mb-2">🔍</span>
+        <p
+          class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+        >
+          Deep Analysis
+        </p>
+      </div>
+      <div class="text-center border-x border-white/10 px-10">
+        <span class="text-3xl block mb-2">🎭</span>
+        <p
+          class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+        >
+          Sentiment Sync
+        </p>
+      </div>
+      <div class="text-center">
+        <span class="text-3xl block mb-2">✨</span>
+        <p
+          class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+        >
+          Auto Refactor
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-12 items-start">
+    <div class="xl:col-span-6 space-y-8">
+      <div class="neural-card p-8 md:p-14 shadow-2xl">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="p-3 bg-cyan-500/10 rounded-2xl">
+            <span class="text-3xl">🔌</span>
+          </div>
+          <div>
+            <h3
+              class="text-xl font-black text-white uppercase tracking-tighter"
+            >
+              Connect to Hub
+            </h3>
+            <p class="text-xs text-slate-500 uppercase font-mono">
+              Input_Logic_Streams
+            </p>
+          </div>
+        </div>
+
+        <div class="space-y-8">
+          <div>
+            <label
+              class="block text-[11px] font-black text-cyan-500 uppercase tracking-[0.3em] mb-4 ml-2"
+              >How do you feel? (Optional)</label
+            >
+            <textarea
+              id="userComment"
+              class="w-full h-32 bg-black/40 border border-white/5 rounded-[30px] p-6 outline-none text-xl text-slate-200 transition-all focus:border-cyan-500 placeholder:text-slate-800"
+              placeholder="តើប្អូនមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ? (ឧ. ជិតឆ្កួតហើយបង!)"
+            ></textarea>
+          </div>
+
+          <div>
+            <label
+              class="block text-[11px] font-black text-cyan-500 uppercase tracking-[0.3em] mb-4 ml-2"
+              >Broken Logic System</label
+            >
+            <textarea
+              id="code"
+              class="w-full h-[400px] md:h-[550px] bg-black/50 border border-white/5 rounded-[30px] p-8 outline-none font-mono text-base md:text-lg text-cyan-50 transition-all focus:border-cyan-500 no-scrollbar shadow-inner"
+              placeholder="// Paste your messy code here..."
+            ></textarea>
+          </div>
+
+          <button
+            onclick="sendCode()"
+            id="btnSend"
+            class="w-full py-6 rounded-[30px] font-black text-lg text-black bg-cyan-400 hover:bg-cyan-300 shadow-[0_0_30px_rgba(0,242,255,0.2)] active:scale-95 transition-all uppercase tracking-[0.2em] flex justify-center items-center gap-4"
+          >
+            <span>Execute Analysis</span>
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="3" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="xl:col-span-6">
+      <div
+        id="loading"
+        class="hidden neural-card p-32 flex flex-col items-center justify-center"
+      >
+        <div
+          class="w-20 h-20 border-8 border-white/5 border-t-cyan-500 rounded-full animate-spin"
+        ></div>
+        <p
+          class="mt-10 text-cyan-500 font-mono text-xs tracking-[0.5em] animate-pulse uppercase"
+        >
+          Neural_Syncing...
+        </p>
+      </div>
+
+      <div
+        id="aiSection"
+        class="hidden space-y-8 animate-in slide-in-from-bottom-10 duration-1000"
+      >
+        <div
+          class="neural-card p-10 md:p-14 border-l-[12px] border-cyan-500 bg-cyan-500/5 relative overflow-hidden"
+        >
+          <div
+            class="absolute -top-10 -right-10 text-[150px] opacity-[0.03] rotate-12"
+          >
+            🤖
+          </div>
+          <div
+            id="aiMood"
+            class="text-[10px] font-black tracking-[0.4em] uppercase mb-6 text-cyan-400/60 border-b border-cyan-500/10 pb-4 inline-block"
+          ></div>
+          <div
+            id="aiJoke"
+            class="text-2xl md:text-4xl font-light text-white italic leading-tight"
+          ></div>
+        </div>
+
+        <div class="neural-card p-10 md:p-14">
+          <h4
+            class="text-slate-500 font-black uppercase tracking-[0.4em] text-[10px] mb-8 flex items-center gap-3"
+          >
+            <span class="h-1 w-6 bg-slate-500 rounded-full"></span> Diagnostic
+            Summary
+          </h4>
+          <div
+            id="aiReview"
+            class="text-slate-300 leading-relaxed space-y-6 font-light text-lg md:text-2xl"
+          ></div>
+        </div>
+
+        <div class="neural-card overflow-hidden border border-white/5">
+          <div
+            class="px-10 py-5 bg-white/5 border-b border-white/5 flex justify-between items-center"
+          >
+            <span
+              class="text-[10px] font-black tracking-widest text-slate-500 uppercase"
+              >Optimized_Result.js</span
+            >
+            <button
+              onclick="copyCode()"
+              class="text-xs font-black text-cyan-400 uppercase hover:text-white transition-all tracking-widest border border-cyan-500/20 px-6 py-2 rounded-full"
+            >
+              Copy_Unit
+            </button>
+          </div>
+          <pre
+            class="p-8 md:p-12 overflow-x-auto no-scrollbar bg-black/20"
+          ><code id="fixedCode" class="language-javascript text-sm md:text-xl"></code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+
+<script>
+  const socket = io();
+  const btnSend = document.getElementById("btnSend");
+  const loading = document.getElementById("loading");
+  const aiSection = document.getElementById("aiSection");
+
+  function sendCode() {
+    const code = document.getElementById("code").value.trim();
+    if (!code)
+      return Swal.fire({
+        icon: "info",
+        title: "Empty Data",
+        text: "ដាក់កូដមកអាអូន កុំទុកឱ្យបងនៅទំនេរ! 😂",
+        background: "#030712",
+        color: "#00f2ff",
+      });
+
+    loading.classList.remove("hidden");
+    aiSection.classList.add("hidden");
+    btnSend.disabled = true;
+    btnSend.style.opacity = "0.3";
+    socket.emit("review_code", {
+      code,
+      userComment: document.getElementById("userComment").value,
+    });
+  }
+
+  socket.on("review_result", (res) => {
+    loading.classList.add("hidden");
+    aiSection.classList.remove("hidden");
+    btnSend.disabled = false;
+    btnSend.style.opacity = "1";
+
+    document.getElementById("aiMood").innerText =
+      "Sentiment_Detected: " + res.sentiment;
+    typeWriter("aiJoke", "“" + res.humorous_response + "”");
+
+    // Format review text
+    document.getElementById("aiReview").innerHTML =
+      res.technical_review.replace(/\n/g, "<br>");
+
+    const codeContainer = document.getElementById("fixedCode");
+    codeContainer.textContent =
+      res.fixed_code || "// Logic verified. No changes needed.";
+    Prism.highlightElement(codeContainer);
+  });
+
+  function typeWriter(id, text) {
+    let i = 0;
+    const el = document.getElementById(id);
+    el.innerHTML = "";
+    function type() {
+      if (i < text.length) {
+        el.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(type, 15);
+      }
+    }
+    type();
+  }
+
+  function copyCode() {
+    navigator.clipboard.writeText(
+      document.getElementById("fixedCode").textContent,
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Unit Synced",
+      toast: true,
+      position: "top-end",
+      showConfirmButton: false,
+      timer: 2000,
+      background: "#030712",
+      color: "#00f2ff",
+    });
+  }
+
+  // Neural Star Background logic
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    const count = window.innerWidth < 768 ? 30 : 50;
+    for (let i = 0; i < count; i++)
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+      });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#00f2ff";
+    ctx.strokeStyle = "rgba(0,242,255,0.03)";
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 1, 0, Math.PI * 2);
+      ctx.fill();
+      dots.forEach((d2) => {
+        if (Math.hypot(d.x - d2.x, d.y - d2.y) < 200) {
+          ctx.beginPath();
+          ctx.moveTo(d.x, d.y);
+          ctx.lineTo(d2.x, d2.y);
+          ctx.stroke();
+        }
+      });
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener("resize", init);
+  init();
+  draw();
+</script>

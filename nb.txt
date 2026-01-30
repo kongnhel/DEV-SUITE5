@@ -1,0 +1,38 @@
+socket.on("study_assist", async (data) => {
+  const { content } = data;
+  try {
+    console.log("📚 AI កំពុងរៀបចំមេរៀនឱ្យប្អូន...");
+    
+    const prompt = `
+      You are a brilliant and helpful Khmer Study Companion. 
+      Analyze this educational content: "${content}"
+
+      Task:
+      1. Provide a concise SUMMARY of the content in Khmer.
+      2. Extract 3 KEY CONCEPTS that the user must remember.
+      3. Generate 3 Multiple Choice Questions (MCQ) based on the content to test the user.
+
+      Return ONLY raw JSON:
+      {
+        "summary": "សេចក្ដីសង្ខេបមេរៀនជាភាសាខ្មែរ",
+        "key_concepts": ["ចំនុចទី១", "ចំនុចទី២", "ចំនុចទី៣"],
+        "quiz": [
+          {"question": "សំណួរទី១", "options": ["A", "B", "C", "D"], "answer": "A"},
+          ...
+        ],
+        "funny_motivation": "ពាក្យលើកទឹកចិត្តបែបកំប្លែងៗជាភាសាខ្មែរ"
+      }
+    `;
+
+    // ប្រើម៉ូដែល Gemini 2.5 Flash ដែលប្អូនបានឆែកឃើញពីមុន
+    const result = await client.models.generateContent({
+      model: "gemini-2.5-flash", 
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+    });
+
+    const response = JSON.parse(result.text.replace(/```json|```/g, "").trim());
+    socket.emit("study_result", response);
+  } catch (error) {
+    socket.emit("error_occured", "AI វិលមុខនឹងមេរៀនបន្តិចហើយ! " + error.message);
+  }
+});

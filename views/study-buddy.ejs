@@ -1,0 +1,264 @@
+<%- include('partials/header') %>
+
+<style>
+  :root {
+    --primary: <%= theme %>; /* Indigo/Purple from Controller */
+    --bg: #030712;
+  }
+  body {
+    background-color: var(--bg);
+    color: #e2e8f0;
+    font-size: 16px;
+  }
+
+  /* Marketing & Visual Overhaul */
+  .study-gradient {
+    background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent 70%);
+  }
+  
+  .study-card {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 40px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .study-card:hover {
+    border-color: rgba(99, 102, 241, 0.3);
+    box-shadow: 0 0 40px rgba(99, 102, 241, 0.05);
+  }
+
+  .big-input {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    transition: all 0.4s ease;
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  .big-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+  }
+
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 4s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+
+  #neural-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -20;
+    opacity: 0.2;
+  }
+</style>
+
+<canvas id="neural-bg"></canvas>
+<div class="study-gradient fixed inset-0 -z-10"></div>
+
+<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
+  
+  <section class="text-center mb-16 space-y-6 animate-in fade-in zoom-in duration-1000">
+    <div class="inline-block px-4 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black tracking-[0.3em] uppercase">
+      🧠 Neural Learning Assistant
+    </div>
+    
+    <h2 class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none">
+      STUDY BUDDY
+    </h2>
+    
+    <div class="max-w-3xl mx-auto">
+      <p class="text-2xl md:text-4xl font-light text-white leading-tight mb-4">
+        "រៀនឱ្យឆ្លាត មិនមែនរៀនឱ្យហត់!"
+      </p>
+      <p class="text-lg md:text-xl text-slate-400 font-light italic">
+        បោះអត្ថបទមេរៀនដែលប្អូនមិនយល់ចូលមក! បង AI នឹងជួយ <span class="text-indigo-400 font-bold">សង្ខេបចំណុចសំខាន់ៗ</span> និងបង្កើត <span class="text-yellow-500 font-bold">Quiz</span> ដើម្បីតេស្តខួរក្បាលប្អូនភ្លាមៗ។ ធានាថារៀនចប់ ភ្លឺភ្នែកហ្មង! 💡
+      </p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-10 pt-8">
+      <div class="text-center">
+        <span class="text-3xl block mb-2">📜</span>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Instant Summary</p>
+      </div>
+      <div class="text-center border-x border-white/10 px-10">
+        <span class="text-3xl block mb-2">🧩</span>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Active Recall Quiz</p>
+      </div>
+      <div class="text-center">
+        <span class="text-3xl block mb-2">🔥</span>
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Daily Motivation</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-12 items-start">
+    
+    <div class="xl:col-span-5 space-y-8">
+      <div class="study-card p-10 md:p-14">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="p-3 bg-indigo-500/10 rounded-2xl">
+            <span class="text-3xl">📥</span>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-white uppercase tracking-tighter">Knowledge Input</h3>
+            <p class="text-xs text-slate-500">បញ្ចូលខ្លឹមសារមេរៀនខាងក្រោម</p>
+          </div>
+        </div>
+
+        <textarea
+          id="studyContent"
+          class="w-full big-input rounded-[30px] p-8 h-80 md:h-[500px] outline-none text-slate-200 resize-none placeholder:text-slate-800 shadow-inner"
+          placeholder="បិទភ្ជាប់អត្ថបទមេរៀនដែលប្អូនចង់ឱ្យបងសង្ខេបឱ្យ... (ឧទាហរណ៍៖ ច្បាប់ញូតុន)"></textarea>
+
+        <button
+          onclick="processStudy()"
+          id="btnAction"
+          class="w-full mt-10 py-6 rounded-[30px] font-black text-lg text-white transition-all shadow-2xl uppercase tracking-[0.2em] flex justify-center items-center gap-4 hover:scale-[1.02] active:scale-95"
+          style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);"
+        >
+          <span>ចាប់ផ្ដើមបេសកកម្ម</span>
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-width="2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="xl:col-span-7">
+      
+      <div id="loading" class="hidden study-card p-32 flex flex-col items-center justify-center">
+        <div class="relative w-20 h-20 mb-10">
+          <div class="absolute inset-0 border-4 border-white/5 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-t-indigo-500 rounded-full animate-spin"></div>
+        </div>
+        <p class="text-indigo-400 font-mono text-xs tracking-[0.5em] animate-pulse uppercase">
+          Synthesizing_Knowledge...
+        </p>
+      </div>
+
+      <div id="resultArea" class="hidden space-y-10 animate-in slide-in-from-bottom-10 duration-1000">
+        
+        <div class="study-card p-10 md:p-14 border-l-[12px]" style="border-color: var(--primary);">
+          <h4 class="text-indigo-400 font-black uppercase tracking-[0.4em] text-[10px] mb-8 flex items-center gap-3">
+            <span class="h-1 w-6 bg-indigo-500 rounded-full"></span> សេចក្ដីសង្ខេបមេរៀន (Summary)
+          </h4>
+          <div id="summaryText" class="text-2xl md:text-3xl font-light text-slate-100 leading-relaxed italic"></div>
+        </div>
+
+        <div class="study-card p-10 md:p-14 border-t border-white/5">
+          <h4 class="text-yellow-500 font-black uppercase tracking-[0.4em] text-[10px] mb-10 flex items-center gap-3">
+             <span class="h-1 w-6 bg-yellow-500 rounded-full"></span> Brain Test (Quiz)
+          </h4>
+          <div id="quizContainer" class="space-y-6"></div>
+        </div>
+
+        <div class="p-10 bg-indigo-500/5 rounded-[40px] border border-indigo-500/10 text-center relative overflow-hidden">
+          <div class="absolute -top-10 -left-10 text-8xl opacity-10 uppercase font-black">Boost</div>
+          <p id="motivationText" class="text-xl md:text-2xl text-indigo-300 font-medium italic relative z-10"></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+  const socket = io();
+
+  function processStudy() {
+    const content = document.getElementById("studyContent").value.trim();
+    if (!content) return Swal.fire({ 
+        icon: "info", 
+        title: "ភ្លេចដាក់មេរៀន!", 
+        text: "ដាក់មេរៀនឱ្យបងមើលសិនប្អូន កុំចង់រៀនកាត់! 😂", 
+        background: "#030712", 
+        color: "#818cf8" 
+    });
+
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("resultArea").classList.add("hidden");
+    document.getElementById("btnAction").disabled = true;
+    document.getElementById("btnAction").style.opacity = "0.5";
+
+    socket.emit("study_assist", { content });
+  }
+
+  socket.on("study_result", (res) => {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("resultArea").classList.remove("hidden");
+    document.getElementById("btnAction").disabled = false;
+    document.getElementById("btnAction").style.opacity = "1";
+
+    // Typewriter for summary with professional size
+    typeWriter("summaryText", res.summary);
+    document.getElementById("motivationText").innerText = "“ " + res.funny_motivation + " ”";
+
+    const container = document.getElementById("quizContainer");
+    container.innerHTML = "";
+    res.quiz.forEach((q, idx) => {
+      const card = document.createElement("div");
+      card.className = "p-8 bg-white/5 rounded-[30px] border border-white/5 hover:border-indigo-500/30 transition-all";
+      card.innerHTML = `
+        <p class="font-black text-white mb-6 text-xl md:text-2xl italic"><span class="text-indigo-500 font-mono tracking-tighter mr-2">Q${idx + 1}:</span> ${q.question}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          ${q.options.map(opt => `
+            <button onclick="checkAnswer(this, '${opt}', '${q.answer}')" class="text-left p-5 rounded-2xl bg-black/40 border border-white/5 hover:bg-indigo-600 hover:text-white transition-all text-sm md:text-base font-medium">
+              ${opt}
+            </button>
+          `).join("")}
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  });
+
+  function checkAnswer(btn, selected, correct) {
+      if (selected === correct) {
+          btn.classList.add("bg-emerald-500", "text-black", "border-emerald-400");
+          btn.innerText += " ✅";
+      } else {
+          btn.classList.add("bg-red-500", "text-white", "border-red-400");
+          btn.innerText += " ❌";
+      }
+      // Disable other buttons in the same group
+      const parent = btn.parentElement;
+      parent.querySelectorAll('button').forEach(b => b.disabled = true);
+  }
+
+  function typeWriter(id, text) {
+    let i = 0;
+    const el = document.getElementById(id);
+    el.innerHTML = "";
+    function type() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 15); } }
+    type();
+  }
+
+  // Optimized Neural BG
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  function init() {
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    dots = [];
+    const count = window.innerWidth < 768 ? 30 : 60;
+    for (let i = 0; i < count; i++) dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2 });
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "<%= theme %>";
+    dots.forEach((d) => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      ctx.beginPath(); ctx.arc(d.x, d.y, 1, 0, Math.PI * 2); ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener("resize", init); init(); draw();
+</script>

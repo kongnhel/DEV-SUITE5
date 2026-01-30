@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Royal Cyber 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Freehand&family=Kantumruy+Pro:wght@300;400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --primary-color: <%= theme || '#22d3ee' %>; 
+            --bg-dark: #020617;
+        }
+        body {
+            font-family: "Kantumruy Pro", sans-serif;
+            background: var(--bg-dark);
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+        .active-link {
+            color: var(--primary-color) !important;
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+        .nav-glass {
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .user-avatar {
+            border: 2px solid var(--primary-color);
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .user-avatar:hover { 
+            transform: rotate(5deg) scale(1.1); 
+            box-shadow: 0 0 25px var(--primary-color);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            padding-top: 15px;
+            min-width: 220px;
+            z-index: 100;
+            background: transparent;
+        }
+        .dropdown-inner {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .profile-group:hover .dropdown-content {
+            display: block;
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,#0f172a_0%,#020617_100%)] -z-20"></div>
+
+    <nav class="sticky top-0 z-50 nav-glass px-4 py-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="/" class="group">
+                    <h1 class="text-xl md:text-2xl font-black tracking-tighter" style="color: var(--primary-color)">
+                        AI DEV SUITE <span class="text-[10px] font-mono opacity-50 group-hover:opacity-100 transition-opacity">V2.6</span>
+                    </h1>
+                </a>
+            </div>
+
+            <div class="hidden lg:flex justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
+                <% 
+                const tools = [
+                    { name: 'Reviewer', path: '/', key: 'reviewer' },
+                    { name: 'Culture', path: '/culture', key: 'culture' },
+                    { name: 'Visualizer', path: '/visualizer', key: 'visualizer' },
+                    { name: 'Study', path: '/study-buddy', key: 'study' },
+                    { name: 'K-IDA', path: '/kida', key: 'kida' },
+                    { name: 'Tutor', path: '/tutor', key: 'tutor' }
+                ];
+                %>
+
+                <% tools.forEach(tool => { %>
+                    <% if (locals.user) { %>
+                        <a href="<%= tool.path %>" class="<%= pageKey === tool.key ? 'active-link' : 'text-slate-500 hover:text-white' %> transition"><%= tool.name %></a>
+                    <% } else { %>
+                        <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500 hover:text-white transition"><%= tool.name %></a>
+                    <% } %>
+                <% }); %>
+                
+                <% if (locals.user) { %>
+                    <a href="/history" class="<%= pageKey === 'history' ? 'active-link' : 'text-slate-500 hover:text-white' %> transition">Archive</a>
+                <% } else { %>
+                    <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500 hover:text-white transition">Archive</a>
+                <% } %>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <% if (locals.user) { %>
+                    <div class="relative profile-group">
+                        <div class="flex items-center gap-4 cursor-pointer">
+                            <div class="hidden md:flex flex-col items-end">
+                                <span class="text-[10px] font-black text-white uppercase tracking-widest"><%= user.displayName %></span>
+                                <span class="text-[8px] text-cyan-400 font-mono uppercase tracking-tighter">Verified Identity</span>
+                            </div>
+                            <img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>" 
+                                 class="w-10 h-10 rounded-2xl user-avatar object-cover" alt="Profile">
+                        </div>
+
+                        <div class="dropdown-content">
+                            <div class="dropdown-inner">
+                                <div class="space-y-1">
+                                    <a href="/dashboard" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-all">
+                                        <span>📊</span> Dashboard
+                                    </a>
+                                    <a href="/user/profile" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-all">
+                                        <span>⚙️</span> Profile Settings
+                                    </a>
+                                    <div class="h-px bg-white/5 my-2"></div>
+                                    <a href="/logout" class="flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-400 transition-all">
+                                        <span>🚪</span> Destroy Session
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="px-6 py-2.5 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 transition-all shadow-xl">
+                        Access System
+                    </a>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="flex lg:hidden gap-6 mt-6 overflow-x-auto pb-2 text-[9px] font-black uppercase tracking-widest no-scrollbar border-t border-white/5 pt-4">
+            <% tools.forEach(tool => { %>
+                <% if (locals.user) { %>
+                    <a href="<%= tool.path %>" class="<%= pageKey === tool.key ? 'active-link' : 'text-slate-500' %>"><%= tool.name %></a>
+                <% } else { %>
+                    <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500"><%= tool.name %></a>
+                <% } %>
+            <% }); %>
+            
+            <% if (locals.user) { %>
+                <a href="/history" class="<%= pageKey === 'history' ? 'active-link' : 'text-slate-500' %>">Archive</a>
+                <a href="/dashboard" class="<%= pageKey === 'dashboard' ? 'active-link' : 'text-slate-500' %>">Dash</a>
+            <% } else { %>
+                <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500">Archive</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <script>
+    /**
+     * Neural Access Guard - ជំនួសអោយពាក្យដេញដោល មកជាការអញ្ជើញយ៉ាងផ្អែមល្ហែម
+     */
+    function checkAuthBeforeAI() {
+        Swal.fire({
+            title: '🔑 តំបន់សមាជិក VIP!',
+            text: "សួស្តីអតិថិជនជាទីស្រឡាញ់ពេញបេះដូង🤭! ដើម្បីការពារសុវត្ថិភាព និងរក្សាទុកប្រវត្តិនៃការសួរ AI (History) សម្រាប់អ្នកមើលឡើងវិញ សូមមេត្តាចូលប្រើប្រាស់គណនីរបស់អ្នកជាមុនសិនមកណា🙏!",
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'ចុះឈ្មោះ / ចូលប្រើ',
+            cancelButtonText: 'ចាំបន្តិចសិន',
+            background: '#020617',
+            color: '#fff',
+            confirmButtonColor: '#a855f7', // ពណ៌ស្វាយរបស់បងប្រូ
+            cancelButtonColor: '#334155',
+            customClass: {
+                popup: 'rounded-[35px] border border-white/10 shadow-2xl shadow-purple-500/20'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '/login';
+            }
+        });
+    }
+    </script>

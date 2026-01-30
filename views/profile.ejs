@@ -1,0 +1,295 @@
+<%- include('partials/header') %>
+
+<style>
+  :root {
+    --primary: <%= theme || "#a855f7" %>;
+    --bg: #020617;
+    --danger: #ef4444;
+  }
+
+  /* ស្ទីលកាតបែបកញ្ចក់ថ្លាទំនើប (Advanced Glassmorphism) */
+  .profile-card {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Identity Chip Effect សម្រាប់រូប Profile */
+  .avatar-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+  }
+
+  #avatarPreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 40px;
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .avatar-container::after {
+    content: "ID-VERIFIED";
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    background: var(--primary);
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    padding: 4px 8px;
+    border-radius: 6px;
+    letter-spacing: 1px;
+  }
+
+  /* Input Styling */
+  .input-group input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 1.2rem 1.5rem;
+    width: 100%;
+    color: white;
+    transition: all 0.3s ease;
+    font-size: 13px;
+  }
+
+  .input-group input:focus {
+    border-color: var(--primary);
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+    outline: none;
+  }
+
+  /* Button Styling */
+  .btn-sync {
+    background: linear-gradient(135deg, var(--primary), #6366f1);
+    transition: 0.3s;
+  }
+
+  .btn-sync:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Danger Zone Styling */
+  .danger-zone {
+    background: rgba(239, 68, 68, 0.03);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+    border-radius: 35px;
+  }
+</style>
+
+<main class="max-w-2xl mx-auto p-6 md:p-12 relative">
+  <div
+    class="absolute top-1/4 -left-20 w-64 h-64 bg-purple-500/10 blur-[100px] -z-10"
+  ></div>
+  <div
+    class="absolute bottom-1/4 -right-20 w-64 h-64 bg-blue-500/10 blur-[100px] -z-10"
+  ></div>
+
+  <div class="profile-card p-10 md:p-16 space-y-12 shadow-2xl">
+    <div class="text-center">
+      <div class="avatar-container mb-8 group">
+        <img
+          id="avatarPreview"
+          src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>"
+          alt="Profile"
+        />
+      </div>
+      <h2
+        class="text-4xl font-black text-white uppercase italic tracking-tighter"
+      >
+        Neural Profile
+      </h2>
+      <p class="text-[10px] text-slate-500 uppercase tracking-[0.4em] mt-3">
+        Identity Management System V2.7
+      </p>
+    </div>
+
+    <form id="profileForm" class="space-y-8">
+      <div class="grid grid-cols-1 gap-8">
+        <div class="input-group">
+          <label
+            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2"
+            >Display Name</label
+          >
+          <input
+            type="text"
+            id="displayName"
+            value="<%= user.displayName %>"
+            placeholder="បញ្ចូលឈ្មោះហៅក្រៅ..."
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label
+            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2"
+            >Neural Avatar URL (Anime/MLBB)</label
+          >
+          <input
+            type="text"
+            id="photoURL"
+            value="<%= user.photoURL %>"
+            oninput="updatePreview(this.value)"
+            placeholder="បិទភ្ជាប់ Link រូបភាពទីនេះ..."
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        id="submitBtn"
+        class="btn-sync w-full text-black py-5 rounded-[22px] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20 active:scale-95"
+      >
+        Update Identity Sync
+      </button>
+    </form>
+
+    <div class="danger-zone p-8 space-y-6">
+      <div class="flex items-center gap-3">
+        <span class="p-2 bg-red-500/10 rounded-lg text-red-500 text-xs"
+          >⚠️</span
+        >
+        <div>
+          <h3
+            class="text-red-500 font-black uppercase text-[10px] tracking-widest"
+          >
+            Danger Zone
+          </h3>
+          <p class="text-slate-500 text-[9px] uppercase tracking-tighter">
+            កម្ទេចអត្តសញ្ញាណ និងទិន្នន័យចោលជារៀងរហូត
+          </p>
+        </div>
+      </div>
+
+      <button
+        onclick="confirmDelete()"
+        class="w-full py-4 border border-red-500/20 bg-red-500/5 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95"
+      >
+        Destroy My Identity
+      </button>
+    </div>
+
+    <div class="text-center pt-6 border-t border-white/5">
+      <a
+        href="/dashboard"
+        class="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest transition-all italic"
+      >
+        ← Return to Control Center
+      </a>
+    </div>
+  </div>
+</main>
+
+<script>
+  function updatePreview(url) {
+    const preview = document.getElementById("avatarPreview");
+    if (url) {
+      preview.src = url;
+      preview.onerror = () => {
+        preview.src =
+          "https://api.dicebear.com/7.x/adventurer/svg?seed=fallback";
+      };
+    }
+  }
+
+  // មុខងារលុបគណនីចោលទាំងស្រុង
+  function confirmDelete() {
+    Swal.fire({
+      title: "⚠️ តើបងប្រូប្រាកដទេ?",
+      text: "រាល់ដានជើងមេរៀន និងគណនីរបស់បងនឹងត្រូវលុបចោលជារៀងរហូត!",
+      icon: "warning",
+      background: "#020617",
+      color: "#fff",
+      showCancelButton: true,
+      confirmButtonColor: "#ef4444",
+      cancelButtonColor: "#334155",
+      confirmButtonText: "បាទ! លុបចោលទៅ",
+      cancelButtonText: "អត់ទេ! ទុកសិន",
+      customClass: {
+        popup: "rounded-[30px] border border-white/10",
+      },
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const res = await fetch("/user/delete-account", { method: "POST" });
+          const data = await res.json();
+
+          if (res.ok) {
+            Swal.fire({
+              title: "រួចរាល់!",
+              text: "គណនីត្រូវបានកម្ទេចចោលជោគជ័យ។ លាហើយបង!",
+              icon: "success",
+              background: "#020617",
+              color: "#fff",
+            }).then(() => (window.location.href = "/login"));
+          } else {
+            throw new Error(data.message);
+          }
+        } catch (err) {
+          Swal.fire({ icon: "error", title: "Error", text: err.message });
+        }
+      }
+    });
+  }
+
+  document
+    .getElementById("profileForm")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submitBtn");
+      const originalText = btn.innerText;
+
+      btn.disabled = true;
+      btn.innerText = "SYNCING TO NEURAL NETWORK...";
+
+      const data = {
+        displayName: document.getElementById("displayName").value,
+        photoURL: document.getElementById("photoURL").value,
+      };
+
+      try {
+        const res = await fetch("/user/update-profile", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "IDENTITY SYNCED!",
+            text: "ព័ត៌មានរបស់អ្នកត្រូវបានអាប់ដេតរួចរាល់!",
+            background: "#020617",
+            color: "#fff",
+            confirmButtonColor: "#a855f7",
+            customClass: { popup: "rounded-[30px] border border-white/10" },
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "SYNC ERROR!",
+          text: error.message,
+          background: "#020617",
+          color: "#fff",
+        });
+      } finally {
+        btn.disabled = false;
+        btn.innerText = originalText;
+      }
+    });
+</script>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,212 @@
+<%- include('partials/header') %>
+
+<style>
+    :root { --primary: <%= theme %>; --bg: #030712; }
+    body { background-color: var(--bg); color: #f3f4f6; font-size: 16px; }
+
+    /* Marketing Hero Style */
+    .marketing-gradient {
+        background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent);
+    }
+    .feature-badge {
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        color: #38bdf8;
+        padding: 4px 12px;
+        border-radius: 99px;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+    }
+
+    /* Layout Style */
+    .tutor-card { 
+        background: rgba(15, 23, 42, 0.4); 
+        backdrop-filter: blur(25px); 
+        border: 1px solid rgba(255, 255, 255, 0.05); 
+        border-radius: 40px; 
+    }
+    
+    .mode-btn { 
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        border: 1px solid rgba(255,255,255,0.05); 
+    }
+    .mode-btn.active { 
+        background: var(--primary); 
+        color: #000; 
+        font-weight: 800;
+        box-shadow: 0 0 25px var(--primary);
+    }
+
+    .point-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2rem;
+        transition: 0.4s;
+    }
+    .point-card:hover {
+        border-color: var(--primary);
+        transform: scale(1.02);
+    }
+
+    .shimmer-text {
+        background: linear-gradient(90deg, #fff, var(--primary), #fff);
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shine 4s linear infinite;
+    }
+    @keyframes shine { to { background-position: 200% center; } }
+</style>
+
+<div class="marketing-gradient fixed inset-0 -z-10"></div>
+
+<main class="max-w-6xl mx-auto p-4 md:p-12 relative">
+    
+    <section class="text-center mb-16 space-y-6 animate-in fade-in zoom-in duration-1000">
+        <div class="inline-flex items-center gap-2 mb-4">
+            <span class="feature-badge">NEXT-GEN LEARNING</span>
+            <span class="text-slate-500 text-[10px] font-bold italic">V.2.6.0 Stable</span>
+        </div>
+        
+        <h1 class="text-6xl md:text-9xl font-black shimmer-text italic uppercase leading-none">
+            AI TUTOR
+        </h1>
+        
+        <p class="text-xl md:text-3xl font-light text-slate-300 max-w-3xl mx-auto leading-relaxed">
+            ឈប់បារម្ភរឿងមេរៀនស្មុគស្មាញ! បច្ចេកវិទ្យា <span class="text-cyan-400 font-bold italic">Neural-Sync</span> របស់យើង នឹងបំប្លែងចំណេះដឹងពិបាកៗ ឱ្យក្លាយជាចំណីខួរក្បាលដ៏ងាយស្រួល។
+        </p>
+
+        <div class="flex flex-wrap justify-center gap-8 pt-6">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">⚡</span>
+                <div class="text-left">
+                    <p class="text-xs font-black text-white uppercase">Fast Learning</p>
+                    <p class="text-[10px] text-slate-500">សង្ខេបមេរៀនក្នុង ៣ វិនាទី</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🧸</span>
+                <div class="text-left">
+                    <p class="text-xs font-black text-white uppercase">Kid-Friendly</p>
+                    <p class="text-[10px] text-slate-500">ពន្យល់ងាយយល់ដល់ក្មេងមត្តេយ្យ</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🎯</span>
+                <div class="text-left">
+                    <p class="text-xs font-black text-white uppercase">Point Focus</p>
+                    <p class="text-[10px] text-slate-500">សម្រាំងយកតែចំណុចសំខាន់</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="tutor-card p-6 md:p-16 space-y-12 shadow-2xl relative overflow-hidden">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-cyan-500/5 blur-[100px] -z-10"></div>
+
+        <div class="space-y-8">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="text-left w-full md:w-auto">
+                    <h2 class="text-xl font-black text-white uppercase tracking-tighter">ចាប់ផ្ដើមបេសកកម្មរៀនសូត្រ</h2>
+                    <p class="text-xs text-slate-500">ជ្រើសរើសរបៀបដែលអ្នកចង់ឱ្យបង AI ពន្យល់</p>
+                </div>
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="setMode('kid', this)" class="mode-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest active">👶 Kid Mode</button>
+                    <button onclick="setMode('simple', this)" class="mode-btn flex-1 md:flex-none px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest">💡 Simple Mode</button>
+                </div>
+            </div>
+
+            <div class="relative">
+                <input type="text" id="topicInput" 
+                    class="w-full bg-black/60 border border-white/5 rounded-3xl px-10 py-8 outline-none focus:border-cyan-400 text-xl transition-all placeholder:text-slate-700" 
+                    placeholder="បញ្ចូលប្រធានបទដែលអ្នកចង់ចេះ... (ឧទាហរណ៍៖ Quantum Physics)">
+                <button onclick="askTutor()" 
+                    class="md:absolute right-4 top-4 bottom-4 mt-4 md:mt-0 w-full md:w-auto bg-cyan-400 text-black px-12 rounded-2xl font-black text-sm hover:bg-cyan-300 transition-all active:scale-95 shadow-lg tracking-widest">
+                    GENERATE WISDOM
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden flex flex-col items-center py-24">
+            <div class="w-20 h-20 border-8 border-cyan-500/10 border-t-cyan-500 rounded-full animate-spin"></div>
+            <p class="mt-8 text-cyan-500 font-mono text-xs tracking-[0.4em] animate-pulse uppercase">Syncing_Knowledge_Database...</p>
+        </div>
+
+        <div id="answerArea" class="hidden space-y-12 animate-in slide-in-from-bottom-10 duration-1000">
+            <div class="p-10 md:p-14 bg-white/5 rounded-[50px] border-l-[12px] border-cyan-400">
+                <h3 id="resTitle" class="text-4xl md:text-7xl font-black text-cyan-400 mb-8 uppercase italic leading-none"></h3>
+                <div id="resDesc" class="text-2xl md:text-4xl font-light text-slate-200 leading-relaxed italic"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="pointsContainer"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-8 border-t border-white/5">
+                <div class="lg:col-span-2 space-y-8">
+                    <h4 class="text-xs font-black text-yellow-500 uppercase tracking-[0.5em] flex items-center gap-4">
+                        <span class="h-px flex-1 bg-yellow-500/20"></span> Case Studies
+                    </h4>
+                    <ul id="resExamples" class="space-y-8"></ul>
+                </div>
+                <div class="p-10 bg-cyan-400/5 rounded-[40px] border border-cyan-400/20 flex items-center text-center">
+                    <div>
+                        <span class="text-6xl mb-6 block">🤩</span>
+                        <p id="resFunFact" class="text-lg text-cyan-200 italic font-medium leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+    // JS Logic (ដូចកូដមុនទាំងអស់)
+    const socket = io();
+    let currentMode = 'kid';
+
+    function setMode(mode, btn) {
+        currentMode = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    function askTutor() {
+        const topic = document.getElementById('topicInput').value.trim();
+        if (!topic) return Swal.fire({ icon: 'info', title: 'ប្រាប់បងមកថាចង់រៀនអី? 😂', background: '#030712', color: '#00f2ff' });
+        document.getElementById('loading').classList.remove('hidden');
+        document.getElementById('answerArea').classList.add('hidden');
+        socket.emit("ask_tutor", { topic, mode: currentMode });
+    }
+
+    socket.on("tutor_result", (data) => {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('answerArea').classList.remove('hidden');
+        document.getElementById('resTitle').innerText = data.title;
+        typeWriter("resDesc", data.explanation);
+
+        const pointsBox = document.getElementById('pointsContainer');
+        pointsBox.innerHTML = data.key_points.map(p => `
+            <div class="point-card">
+                <div class="text-cyan-400 font-black text-2xl uppercase italic mb-4 underline decoration-cyan-500/20 underline-offset-8">${p.label}</div>
+                <p class="text-xl text-slate-400 font-light leading-relaxed">${p.desc}</p>
+            </div>
+        `).join('');
+
+        document.getElementById('resExamples').innerHTML = data.examples.map(ex => `
+            <li class="flex items-start gap-6 text-slate-100 text-2xl">
+                <div class="mt-3 h-4 w-4 rounded-full bg-cyan-400 shadow-[0_0_20px_#06b6d4]"></div>
+                <span class="font-light leading-tight">${ex}</span>
+            </li>
+        `).join('');
+        document.getElementById('resFunFact').innerText = "ដឹងអត់ថា? " + data.fun_fact;
+    });
+
+    function typeWriter(id, text) {
+        let i = 0; const el = document.getElementById(id); el.innerHTML = "";
+        function type() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 15); } }
+        type();
+    }
+</script>

@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<style>
+    :root { --primary: #a855f7; --bg: #020617; }
+    body { background-color: var(--bg); color: #f8fafc; }
+    .stat-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(168, 85, 247, 0.1); border-radius: 30px; transition: 0.3s; }
+    .stat-card:hover { transform: scale(1.05); border-color: var(--primary); }
+    .avatar-glow { box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); border: 4px solid var(--primary); }
+</style>
+
+<main class="max-w-6xl mx-auto p-4 md:p-12">
+    <section class="flex flex-col md:flex-row items-center gap-8 mb-16 p-10 archive-card">
+<img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>" 
+     class="w-32 h-32 rounded-[30px] avatar-glow object-cover" 
+     alt="Profile">
+        <div class="text-center md:text-left">
+            <h2 class="text-4xl md:text-6xl font-black text-white italic uppercase tracking-tighter">
+                សួស្តី, <%= user.displayName %>!
+            </h2>
+            <p class="text-purple-400 font-mono text-xs tracking-widest mt-2 uppercase">Neural Rank: Master Learner</p>
+        </div>
+    </section>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        <div class="stat-card p-10 text-center">
+            <span class="text-5xl mb-4 block">📚</span>
+            <h3 class="text-4xl font-black text-white"><%= totalWisdom %></h3>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-2">Total Lessons Learned</p>
+        </div>
+        <div class="stat-card p-10 text-center border-cyan-500/20">
+            <span class="text-5xl mb-4 block">🤖</span>
+            <h3 class="text-4xl font-black text-white"><%= tutorCount %></h3>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-2">AI Tutor Sessions</p>
+        </div>
+        <div class="stat-card p-10 text-center">
+            <span class="text-5xl mb-4 block">⚡</span>
+            <h3 class="text-4xl font-black text-white">Active</h3>
+            <p class="text-[10px] text-slate-500 uppercase tracking-widest mt-2">Neural Status</p>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <h4 class="text-xs font-black text-slate-500 uppercase tracking-[0.4em] mb-8 flex items-center gap-4">
+            <span class="h-px flex-1 bg-white/5"></span> Recent Neural Syncs
+        </h4>
+        <% recentActivity.forEach(act => { %>
+            <div class="p-6 bg-white/5 border border-white/5 rounded-2xl flex justify-between items-center">
+                <div>
+                    <p class="text-white font-medium italic">"<%= act.userInput %>"</p>
+                    <p class="text-[10px] text-slate-500 uppercase mt-1"><%= act.toolName %></p>
+                </div>
+                <a href="/history" class="text-purple-400 text-xs hover:underline">View Log →</a>
+            </div>
+        <% }) %>
+    </div>
+</main>
+
+<%- include('partials/footer') %>
