@@ -13,14 +13,27 @@ const userRoutes = require("./routes/userRoutes");
 const aiHandler = require("./controllers/aiController");
 const User = require("./models/User");
 
-// --- ១. កំណត់រចនាសម្ព័ន្ធ Firebase Admin (សំខាន់បំផុតដើម្បីបំបាត់ Error 401) ---
-// បងត្រូវទាញយក file JSON ពី Firebase Console > Project Settings > Service Accounts
-const serviceAccount = require("./config/firebase-service-key.json");
+// --- ១. កំណត់រចនាសម្ព័ន្ធ Firebase Admin (ប្តូរមកប្រើ Environment Variables) ---
+// ឈប់ប្រើ require File JSON ទៀតហើយ ដើម្បីការពារការ Crash
+
+const firebaseConfig = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  // 💡 ចំណុចសំខាន់៖ ត្រូវប្តូរ \\n ទៅជា \n ពិតប្រាកដ ដើម្បីឱ្យ Firebase ស្គាល់ Key
+  privateKey: process.env.FIREBASE_PRIVATE_KEY
+    ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+    : undefined,
+};
 
 if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(firebaseConfig),
+    });
+    console.log("✅ Firebase Admin Initialized via Environment Variables");
+  } catch (error) {
+    console.error("❌ Firebase Initialization Error:", error.message);
+  }
 }
 
 const app = express();
