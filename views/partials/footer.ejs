@@ -1,9 +1,60 @@
-<footer class="bg-gray-800 text-white py-6 mt-12">
-        <div class="text-center">
-            <p>&copy; 2026 AI Assistant Project - រៀបចំដោយ Prompt Dev វ័យក្មេង 😂</p>
+<footer class="relative mt-24 border-t border-white/5 bg-black/20 backdrop-blur-30 overflow-hidden">
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent opacity-50 shadow-[0_0_20px_var(--primary)]"></div>
+
+        <div class="max-w-7xl mx-auto px-8 py-12 md:py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-center">
+                <div class="space-y-4 text-center md:text-left">
+                    <h3 class="text-xl font-black tracking-tighter text-white italic uppercase">
+                        Royal <span class="text-[var(--primary)]">Suite</span>
+                    </h3>
+                    <div class="flex items-center justify-center md:justify-start gap-3">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[9px] font-mono text-slate-500 uppercase tracking-widest">Global Neural Node Active</span>
+                    </div>
+                </div>
+
+                <div class="text-center space-y-2">
+                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Crafted with Magic & Caffeine</p>
+                    <p class="text-sm text-slate-500 italic">
+                        "កូដឱ្យដើរ រឿង Error ទុកឱ្យ AI! 😂"
+                    </p>
+                </div>
+
+                <div class="text-center md:text-right space-y-2">
+                    <p class="text-xs text-slate-400">
+                        &copy; 2026 AI Assistant Project
+                    </p>
+                    <p class="text-[10px] font-black uppercase tracking-widest">
+                        រៀបចំដោយ <span class="text-[var(--primary)] shimmer-gold">Prompt Dev វ័យក្មេង</span> 🤭
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-12 flex justify-center gap-8 opacity-30 hover:opacity-100 transition-opacity duration-500">
+                <a href="#" class="text-[9px] font-black uppercase tracking-widest hover:text-[var(--primary)] transition-colors">Github</a>
+                <a href="#" class="text-[9px] font-black uppercase tracking-widest hover:text-[var(--primary)] transition-colors">Neural_Network</a>
+                <a href="#" class="text-[9px] font-black uppercase tracking-widest hover:text-[var(--primary)] transition-colors">Core_Logic</a>
+            </div>
         </div>
     </footer>
-    
+
     <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+        /* Shimmer Effect សម្រាប់ Footer Credits */
+        .shimmer-gold {
+            background: linear-gradient(90deg, #fff, var(--primary), #fff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: footerShine 4s linear infinite;
+        }
+        @keyframes footerShine {
+            to { background-position: 200% center; }
+        }
+    </style>
 </body>
 </html>

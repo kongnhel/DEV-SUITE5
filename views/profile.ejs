@@ -1,242 +1,426 @@
 <%- include('partials/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
   :root {
-    --primary: <%= theme || "#a855f7" %>;
+    --primary: #ff4d00; /* ពណ៌ភ្លើងក្ដៅខ្លាំង */
+    --secondary: #ff9100;
     --bg: #020617;
-    --danger: #ef4444;
+    --danger: #ff0000;
+    --robot-glow: rgba(255, 77, 0, 0.4);
+    --metal-plate: rgba(30, 41, 59, 0.7);
+  }
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg);
+    color: #f3f4f6;
+    overflow-x: hidden;
   }
 
-  /* ស្ទីលកាតបែបកញ្ចក់ថ្លាទំនើប (Advanced Glassmorphism) */
-  .profile-card {
-    background: rgba(15, 23, 42, 0.4);
-    backdrop-filter: blur(30px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50px;
+  /* ១. Fiery Neural Background */
+  #neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
+    opacity: 0.4;
+  }
+  .heat-haze {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 77, 0, 0.05) 0%,
+      transparent 80%
+    );
+    z-index: -10;
+    pointer-events: none;
+  }
+
+  /* ២. Robotic Plating Card */
+  .robot-card {
     position: relative;
+    background: var(--metal-plate);
+    backdrop-filter: blur(25px);
+    border-radius: 40px;
+    z-index: 1;
     overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
   }
 
-  /* Identity Chip Effect សម្រាប់រូប Profile */
-  .avatar-container {
+  /* ៣. Fire Border Animation */
+  .robot-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      var(--primary),
+      var(--secondary),
+      transparent 40%
+    );
+    animation: rotateFire 4s linear infinite;
+    z-index: -1;
+    opacity: 0.5;
+  }
+  @keyframes rotateFire {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ៤. Robot Scanning Effect */
+  .scan-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--primary),
+      transparent
+    );
+    animation: scanMove 3s linear infinite;
+    opacity: 0.3;
+    z-index: 2;
+  }
+  @keyframes scanMove {
+    0% {
+      top: -10%;
+    }
+    100% {
+      top: 110%;
+    }
+  }
+
+  /* ៥. Infernal Avatar Shield */
+  .avatar-inferno {
     position: relative;
-    width: 160px;
-    height: 160px;
+    width: 180px;
+    height: 180px;
     margin: 0 auto;
+    padding: 8px;
+    background: linear-gradient(45deg, var(--primary), #fff, var(--secondary));
+    border-radius: 45px;
+    box-shadow: 0 0 30px var(--robot-glow);
+    animation: pulseFire 2s infinite alternate;
+  }
+  @keyframes pulseFire {
+    from {
+      transform: scale(1);
+      box-shadow: 0 0 20px var(--robot-glow);
+    }
+    to {
+      transform: scale(1.05);
+      box-shadow: 0 0 40px var(--primary);
+    }
   }
 
+  .avatar-inner {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    border-radius: 38px;
+    overflow: hidden;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+  }
   #avatarPreview {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 40px;
-    border: 2px solid var(--primary);
-    box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
-    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: contrast(1.1);
   }
 
-  .avatar-container::after {
-    content: "ID-VERIFIED";
-    position: absolute;
-    bottom: -10px;
-    right: -10px;
-    background: var(--primary);
-    color: #000;
-    font-size: 8px;
-    font-weight: 900;
-    padding: 4px 8px;
-    border-radius: 6px;
-    letter-spacing: 1px;
+  /* ៦. Burning UI Elements */
+  .shimmer-fire {
+    background: linear-gradient(
+      90deg,
+      #fff,
+      var(--primary),
+      var(--secondary),
+      #fff
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fireShine 3s linear infinite;
+  }
+  @keyframes fireShine {
+    to {
+      background-position: 200% center;
+    }
   }
 
-  /* Input Styling */
-  .input-group input {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+  .input-robot {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(255, 77, 0, 0.2) !important;
     border-radius: 20px;
-    padding: 1.2rem 1.5rem;
-    width: 100%;
     color: white;
     transition: all 0.3s ease;
-    font-size: 13px;
+  }
+  .input-robot:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 25px var(--robot-glow);
   }
 
-  .input-group input:focus {
-    border-color: var(--primary);
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
-    outline: none;
+  .btn-ignite {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #000;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 20px var(--robot-glow);
   }
-
-  /* Button Styling */
-  .btn-sync {
-    background: linear-gradient(135deg, var(--primary), #6366f1);
-    transition: 0.3s;
-  }
-
-  .btn-sync:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  /* Danger Zone Styling */
-  .danger-zone {
-    background: rgba(239, 68, 68, 0.03);
-    border: 1px solid rgba(239, 68, 68, 0.1);
-    border-radius: 35px;
+  .btn-ignite:hover:not(:disabled) {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 0 50px var(--primary);
   }
 </style>
 
-<main class="max-w-2xl mx-auto p-6 md:p-12 relative">
-  <div
-    class="absolute top-1/4 -left-20 w-64 h-64 bg-purple-500/10 blur-[100px] -z-10"
-  ></div>
-  <div
-    class="absolute bottom-1/4 -right-20 w-64 h-64 bg-blue-500/10 blur-[100px] -z-10"
-  ></div>
+<canvas id="neural-bg"></canvas>
+<div class="heat-haze"></div>
 
-  <div class="profile-card p-10 md:p-16 space-y-12 shadow-2xl">
-    <div class="text-center">
-      <div class="avatar-container mb-8 group">
-        <img
-          id="avatarPreview"
-          src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>"
-          alt="Profile"
-        />
-      </div>
-      <h2
-        class="text-4xl font-black text-white uppercase italic tracking-tighter"
+<main class="max-w-7xl mx-auto p-6 md:p-12 relative">
+  <header
+    class="text-center mb-20 space-y-8 animate-in fade-in zoom-in duration-1000"
+  >
+    <div
+      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-orange-500/10 border border-orange-500/20"
+    >
+      <span class="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></span>
+      <span class="text-orange-500 text-xs font-black tracking-widest uppercase"
+        >System Status: Overheating 🔥</span
       >
-        Neural Profile
-      </h2>
-      <p class="text-[10px] text-slate-500 uppercase tracking-[0.4em] mt-3">
-        Identity Management System V2.7
+    </div>
+
+    <h2
+      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-fire leading-none italic uppercase"
+    >
+      ROBOT PROFILE
+    </h2>
+
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-2xl md:text-4xl font-light text-white leading-tight">
+        "បញ្ជា Robot របស់ប្អូន ជាមួយ
+        <span class="text-orange-500 font-bold">ថាមពលភ្លើងនរក</span>!"
+      </p>
+      <p class="text-lg text-slate-400 italic leading-relaxed px-4">
+        តើប្អូនចង់ឱ្យ Identity របស់ប្អូនឆេះសន្ធោសន្ធៅក្នុងពិភព AI មែនទេ? បងរៀបចំ
+        Engine ថ្មីឱ្យហើយ! ការអាប់ដេត Profile នៅទីនេះ នឹងធ្វើឱ្យ AI ស្គាល់ពី
+        "កម្ដៅ" នៃចំណេះដឹងប្អូនកាន់តែច្បាស់! បញ្ចូលទិន្នន័យមកមេកុលសម្ព័ន្ធ! 😂
       </p>
     </div>
+  </header>
 
-    <form id="profileForm" class="space-y-8">
-      <div class="grid grid-cols-1 gap-8">
-        <div class="input-group">
-          <label
-            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2"
-            >Display Name</label
+  <div class="max-w-2xl mx-auto">
+    <div class="robot-card p-10 md:p-16 space-y-12 shadow-2xl">
+      <div class="scan-line"></div>
+
+      <div class="text-center relative z-10">
+        <div class="avatar-inferno mb-10 group">
+          <div class="avatar-inner">
+            <img
+              id="avatarPreview"
+              src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.displayName %>"
+              alt="Robot Profile"
+            />
+          </div>
+          <div
+            class="absolute -top-4 -right-4 bg-orange-600 text-white text-[8px] font-black px-3 py-1 rounded-md rotate-12 shadow-lg"
           >
-          <input
-            type="text"
-            id="displayName"
-            value="<%= user.displayName %>"
-            placeholder="បញ្ចូលឈ្មោះហៅក្រៅ..."
-            required
-          />
+            CORE_ACTIVE
+          </div>
         </div>
-
-        <div class="input-group">
-          <label
-            class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-2"
-            >Neural Avatar URL (Anime/MLBB)</label
-          >
-          <input
-            type="text"
-            id="photoURL"
-            value="<%= user.photoURL %>"
-            oninput="updatePreview(this.value)"
-            placeholder="បិទភ្ជាប់ Link រូបភាពទីនេះ..."
-          />
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        id="submitBtn"
-        class="btn-sync w-full text-black py-5 rounded-[22px] font-black text-xs uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20 active:scale-95"
-      >
-        Update Identity Sync
-      </button>
-    </form>
-
-    <div class="danger-zone p-8 space-y-6">
-      <div class="flex items-center gap-3">
-        <span class="p-2 bg-red-500/10 rounded-lg text-red-500 text-xs"
-          >⚠️</span
+        <p
+          class="text-[10px] text-orange-500 font-black uppercase tracking-[0.5em]"
         >
-        <div>
-          <h3
-            class="text-red-500 font-black uppercase text-[10px] tracking-widest"
-          >
-            Danger Zone
-          </h3>
-          <p class="text-slate-500 text-[9px] uppercase tracking-tighter">
-            កម្ទេចអត្តសញ្ញាណ និងទិន្នន័យចោលជារៀងរហូត
-          </p>
-        </div>
+          Neural Identity Processor
+        </p>
       </div>
 
-      <button
-        onclick="confirmDelete()"
-        class="w-full py-4 border border-red-500/20 bg-red-500/5 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all active:scale-95"
-      >
-        Destroy My Identity
-      </button>
-    </div>
+      <form id="profileForm" class="space-y-10 relative z-10">
+        <div class="space-y-8">
+          <div class="relative group">
+            <label
+              class="block text-[10px] font-black text-orange-400 uppercase tracking-widest mb-3 ml-2"
+              >Pilot Display Name</label
+            >
+            <input
+              type="text"
+              id="displayName"
+              value="<%= user.displayName %>"
+              class="input-robot w-full px-6 py-5 outline-none text-base"
+              placeholder="ឈ្មោះអ្នកបញ្ជា Robot..."
+              required
+            />
+          </div>
 
-    <div class="text-center pt-6 border-t border-white/5">
-      <a
-        href="/dashboard"
-        class="text-[10px] text-slate-500 hover:text-white uppercase tracking-widest transition-all italic"
+          <div class="relative group">
+            <label
+              class="block text-[10px] font-black text-orange-400 uppercase tracking-widest mb-3 ml-2"
+              >Neural Skin URL (Photo)</label
+            >
+            <input
+              type="text"
+              id="photoURL"
+              value="<%= user.photoURL %>"
+              oninput="updatePreview(this.value)"
+              class="input-robot w-full px-6 py-5 outline-none text-base"
+              placeholder="បិទភ្ជាប់ Link រូបភាព Epic..."
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          id="submitBtn"
+          class="btn-ignite w-full py-6 rounded-[25px] text-[11px] active:scale-95 shadow-lg"
+        >
+          Sync Core with Infernal Energy
+        </button>
+      </form>
+
+      <div
+        class="bg-red-950/20 border border-red-500/20 rounded-[35px] p-8 space-y-6 relative z-10"
       >
-        ← Return to Control Center
-      </a>
+        <div class="flex items-center gap-4">
+          <span class="text-3xl animate-bounce">☢️</span>
+          <div>
+            <h3
+              class="text-red-500 font-black uppercase text-[10px] tracking-widest"
+            >
+              Self-Destruct Zone
+            </h3>
+            <p class="text-slate-500 text-[9px] uppercase tracking-tighter">
+              កម្ទេចរាល់ទិន្នន័យ Robot របស់ប្អូនចោលទាំងស្រុង
+            </p>
+          </div>
+        </div>
+
+        <button
+          onclick="confirmDelete()"
+          class="w-full py-4 border border-red-500/40 bg-red-600/10 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all"
+        >
+          Initiate Self-Destruction
+        </button>
+      </div>
+
+      <div class="text-center pt-6 border-t border-white/5 relative z-10">
+        <a
+          href="/dashboard"
+          class="text-[10px] text-orange-500/50 hover:text-orange-400 uppercase tracking-widest transition-all italic"
+        >
+          ← Return to Command Center
+        </a>
+      </div>
     </div>
   </div>
 </main>
 
+<%- include('partials/footer') %>
+
 <script>
+  const socket = io();
+
+  // ១. Interactive Fire Particles (Mouse Follow)
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  let mouse = { x: null, y: null };
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+  });
+
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 80; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 1) * 0.8, // ហោះឡើងលើដូចផ្សែង
+        size: Math.random() * 3,
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.y < 0) d.y = canvas.height; // ចេញពីលើចូលក្រោមវិញ
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+
+      // Connect points with Fire lines
+      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
+      if (dist < 120) {
+        ctx.strokeStyle = `rgba(255, 77, 0, ${1 - dist / 120})`;
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = d.size > 2 ? "#ff4d00" : "#ff9100";
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init();
+  draw();
+  window.addEventListener("resize", init);
+
+  // ២. Logic ប្អូនដូចមុន គ្រាន់តែប្តូរពណ៌
   function updatePreview(url) {
     const preview = document.getElementById("avatarPreview");
     if (url) {
       preview.src = url;
       preview.onerror = () => {
-        preview.src =
-          "https://api.dicebear.com/7.x/adventurer/svg?seed=fallback";
+        preview.src = "https://api.dicebear.com/7.x/bottts/svg?seed=fire-robot";
       };
     }
   }
 
-  // មុខងារលុបគណនីចោលទាំងស្រុង
   function confirmDelete() {
     Swal.fire({
-      title: "⚠️ តើបងប្រូប្រាកដទេ?",
-      text: "រាល់ដានជើងមេរៀន និងគណនីរបស់បងនឹងត្រូវលុបចោលជារៀងរហូត!",
+      title: "☢️ ប្រយ័ត្នមេ!",
+      text: "Robot ប្អូននឹងត្រូវរលាយជាផេះជារៀងរហូត! តើប្អូនប្រាកដទេ?",
       icon: "warning",
       background: "#020617",
       color: "#fff",
       showCancelButton: true,
-      confirmButtonColor: "#ef4444",
-      cancelButtonColor: "#334155",
-      confirmButtonText: "បាទ! លុបចោលទៅ",
-      cancelButtonText: "អត់ទេ! ទុកសិន",
-      customClass: {
-        popup: "rounded-[30px] border border-white/10",
-      },
+      confirmButtonColor: "#ff4d00",
+      cancelButtonText: "ទុកសិនបង!",
+      confirmButtonText: "កម្ទេចវាទៅ!",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           const res = await fetch("/user/delete-account", { method: "POST" });
-          const data = await res.json();
-
           if (res.ok) {
-            Swal.fire({
-              title: "រួចរាល់!",
-              text: "គណនីត្រូវបានកម្ទេចចោលជោគជ័យ។ លាហើយបង!",
-              icon: "success",
-              background: "#020617",
-              color: "#fff",
-            }).then(() => (window.location.href = "/login"));
-          } else {
-            throw new Error(data.message);
+            window.location.href = "/login";
           }
         } catch (err) {
-          Swal.fire({ icon: "error", title: "Error", text: err.message });
+          showError(err.message);
         }
       }
     });
@@ -247,11 +431,8 @@
     .addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("submitBtn");
-      const originalText = btn.innerText;
-
       btn.disabled = true;
-      btn.innerText = "SYNCING TO NEURAL NETWORK...";
-
+      btn.innerText = "IGNITING CORE...";
       const data = {
         displayName: document.getElementById("displayName").value,
         photoURL: document.getElementById("photoURL").value,
@@ -263,33 +444,32 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
-
         const result = await res.json();
-
         if (result.status === "success") {
           Swal.fire({
             icon: "success",
-            title: "IDENTITY SYNCED!",
-            text: "ព័ត៌មានរបស់អ្នកត្រូវបានអាប់ដេតរួចរាល់!",
+            title: "CORE SYNCED!",
+            text: "Robot ប្អូនត្រូវបាន Upgrade រួចរាល់!",
             background: "#020617",
             color: "#fff",
-            confirmButtonColor: "#a855f7",
-            customClass: { popup: "rounded-[30px] border border-white/10" },
+            confirmButtonColor: "#ff4d00",
           });
         }
       } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "SYNC ERROR!",
-          text: error.message,
-          background: "#020617",
-          color: "#fff",
-        });
+        showError(error.message);
       } finally {
         btn.disabled = false;
-        btn.innerText = originalText;
+        btn.innerText = "Sync Core with Infernal Energy";
       }
     });
-</script>
 
-<%- include('partials/footer') %>
+  function showError(msg) {
+    Swal.fire({
+      icon: "error",
+      title: "System Error",
+      text: msg,
+      background: "#020617",
+      color: "#fff",
+    });
+  }
+</script>

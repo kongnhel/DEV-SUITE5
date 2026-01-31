@@ -1,245 +1,495 @@
 <%- include('partials/header') %>
 
-<style>
-    :root { 
-        --primary: <%= theme %>; 
-        --bg: #030712; 
-    }
-    body { background-color: var(--bg); color: #f3f4f6; font-size: 16px; }
-
-    /* Marketing & Visual Style */
-    .hero-gradient {
-        background: radial-gradient(circle at center, rgba(239, 68, 68, 0.1) 0%, transparent 70%);
-    }
-    .neural-card {
-        background: rgba(15, 23, 42, 0.5);
-        backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 40px;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .neural-card:hover {
-        border-color: rgba(239, 68, 68, 0.2);
-        box-shadow: 0 0 30px rgba(239, 68, 68, 0.05);
-    }
-
-    .shimmer-text {
-        background: linear-gradient(90deg, #fff, var(--primary), #fff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: shine 4s linear infinite;
-    }
-    @keyframes shine { to { background-position: 200% center; } }
-
-    .pulse-glow { animation: pulseGlow 2s infinite; }
-    @keyframes pulseGlow {
-        0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.1); }
-        50% { box-shadow: 0 0 40px rgba(239, 68, 68, 0.2); }
-    }
-
-    #neural-bg {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        z-index: -20;
-        opacity: 0.15;
-    }
-</style>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+  :root {
+    --primary: <%= theme || "#ef4444" %>;
+    --secondary: #ff8c00;
+    --bg: #030712;
+    --magic-glow: rgba(239, 68, 68, 0.3);
+  }
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg);
+    color: #e2e8f0;
+    overflow-x: hidden;
+  }
+
+  /* ១. Interactive Magic Background */
+  #neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
+    opacity: 0.25;
+  }
+  .hero-gradient {
+    background: radial-gradient(
+      circle at 50% 50%,
+      rgba(239, 68, 68, 0.1) 0%,
+      transparent 80%
+    );
+  }
+
+  /* ២. Magic Border Animation (កូដមកពីអនាគត) */
+  .magic-card {
+    position: relative;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(30px);
+    border-radius: 40px;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .magic-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      var(--primary),
+      transparent 30%
+    );
+    animation: rotateMagic 6s linear infinite;
+    z-index: -1;
+    opacity: 0.2;
+  }
+  @keyframes rotateMagic {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ៣. Shimmer & Glow Effects */
+  .shimmer-text {
+    background: linear-gradient(
+      90deg,
+      #fff,
+      var(--primary),
+      var(--secondary),
+      #fff
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+  }
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  /* ៤. Hover & Floating Animation */
+  .float-ui {
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .status-badge {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--primary);
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+    text-shadow: 0 0 10px var(--magic-glow);
+  }
+
+  .prose-kida {
+    line-height: 1.8;
+    font-size: 1.15rem;
+    color: #cbd5e1;
+  }
+  .prose-kida strong {
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--magic-glow);
+  }
+
+  .btn-magic {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff;
+    font-weight: 900;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 20px var(--magic-glow);
+  }
+  .btn-magic:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px var(--primary);
+  }
+</style>
 
 <canvas id="neural-bg"></canvas>
 <div class="hero-gradient fixed inset-0 -z-10"></div>
 
 <main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-    
-    <header class="text-center mb-16 space-y-6 animate-in fade-in zoom-in duration-1000">
-        <div class="inline-block px-4 py-1 rounded-full bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black tracking-widest uppercase">
-            🚀 Supercharged by Gemini 1.5 Flash
-        </div>
-        
-        <h2 class="text-7xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none">
-            K-IDA
-        </h2>
-        
-        <div class="max-w-3xl mx-auto space-y-4">
-            <p class="text-2xl md:text-4xl font-light text-white leading-tight">
-                "កុំឱ្យការអាន PDF រាប់រយទំព័រ ក្លាយជាសុបិនអាក្រក់របស់បងឯង!" 
-            </p>
-            <p class="text-lg md:text-xl text-slate-400 font-light italic">
-                K-IDA មិនមែនគ្រាន់តែជាកន្លែងទុកឯកសារទេ តែជា <span class="text-red-500 font-bold">"ខួរក្បាលទី២"</span> ដែលចាំឆ្លើយរាល់ចម្ងល់ក្នុង PDF បងឯង។ 
-                បោះវាចូលមក រួចសួរចង់ដឹងអីក៏បាន ធានាថាឆ្លើយលឿនជាងបងឯងញ៉ាំបាយស្រូបទៀត! 😂
-            </p>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-10 pt-8">
-            <div class="text-center">
-                <p class="text-3xl font-black text-white">100%</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Khmer Accuracy</p>
-            </div>
-            <div class="text-center border-x border-white/10 px-10">
-                <p class="text-3xl font-black text-white">Ultra</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Fast Ingest</p>
-            </div>
-            <div class="text-center">
-                <p class="text-3xl font-black text-white">Smart</p>
-                <p class="text-[10px] text-slate-500 uppercase tracking-widest">Context Search</p>
-            </div>
-        </div>
-    </header>
-
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-12 items-start">
-        
-        <section class="xl:col-span-5 space-y-8">
-            <div class="neural-card p-10 md:p-14 pulse-glow">
-                <h3 class="text-[11px] font-black text-red-400 uppercase tracking-widest mb-10 flex items-center gap-4">
-                    <span class="h-1 w-6 bg-red-500 rounded-full"></span> 01. Sync Memory Block
-                </h3>
-
-                <div id="dropZone" class="border-2 border-dashed border-white/5 rounded-[40px] p-12 md:p-20 text-center cursor-pointer hover:border-red-500/50 hover:bg-red-500/5 transition-all duration-500 group relative">
-                    <div class="text-7xl mb-8 group-hover:scale-110 group-hover:rotate-6 transition-transform">📄</div>
-                    <p class="text-lg md:text-xl text-slate-300 font-bold uppercase tracking-tighter">
-                        Drop PDF or Click to Scan
-                    </p>
-                    <p class="text-xs text-slate-500 mt-2">បោះឯកសារមក ចាំបងអានឱ្យ!</p>
-                    <input type="file" id="fileInput" class="hidden" accept=".pdf" />
-                </div>
-
-                <div id="textPreview" class="hidden neural-card p-8 mt-10 bg-emerald-500/5 border-emerald-500/10">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Neural Data Extracted</span>
-                        <span id="pageCount" class="text-xs font-mono bg-emerald-500/20 px-3 py-1.5 rounded-full text-white italic">0 Units Sync</span>
-                    </div>
-                    <div id="previewContent" class="text-base text-slate-400 h-40 overflow-y-auto no-scrollbar italic leading-relaxed border-t border-white/5 pt-6"></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="xl:col-span-7 space-y-8">
-            <div class="neural-card p-10 md:p-14">
-                <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-4">
-                    <span class="h-1 w-6 bg-slate-500 rounded-full"></span> 02. Neural Query Hub
-                </h3>
-                <div class="flex flex-col md:flex-row gap-4">
-                    <input type="text" id="userQuery" 
-                        class="flex-1 bg-black/40 border border-white/5 rounded-3xl px-10 py-7 outline-none focus:border-red-500 transition-all text-xl text-white placeholder:text-slate-700" 
-                        placeholder="សួរមកប្អូន! ចង់ដឹងអីក្នុង PDF ហ្នឹង?" />
-                    <button onclick="askKIDA()" id="btnAsk" 
-                        class="bg-red-500 hover:bg-red-400 text-white px-14 py-7 rounded-3xl font-black text-sm uppercase tracking-widest transition-all active:scale-95 shadow-2xl">
-                        EXECUTE
-                    </button>
-                </div>
-            </div>
-
-            <div id="responseContainer" class="hidden animate-in slide-in-from-bottom-5 duration-700">
-                <div class="neural-card p-10 md:p-16 border-l-[12px] border-red-500 bg-red-600/5 relative overflow-hidden">
-                    <div id="pageBadge" class="absolute top-8 right-12 bg-red-500/10 border border-red-500/30 px-6 py-4 rounded-3xl flex items-center gap-4 opacity-0 transition-all duration-1000">
-                        <div class="h-4 w-4 rounded-full bg-red-400 animate-pulse"></div>
-                        <div class="flex flex-col">
-                            <span class="text-[9px] font-black text-red-500 uppercase tracking-widest">Source_Location</span>
-                            <span id="pageSource" class="text-xl font-black text-white leading-none">N/A</span>
-                        </div>
-                    </div>
-                    
-                    <div class="text-[10px] font-black tracking-[0.5em] text-red-400/40 uppercase mb-10">Intelligence Extraction Result</div>
-                    <div id="aiAnswer" class="text-2xl md:text-3xl font-light text-slate-100 italic leading-[1.7] md:pr-24"></div>
-                </div>
-            </div>
-
-            <div id="loading" class="hidden neural-card p-32 flex flex-col items-center justify-center">
-                <div class="w-20 h-20 border-8 border-white/5 border-t-red-500 rounded-full animate-spin"></div>
-                <p class="mt-10 text-red-500 font-mono text-xs tracking-[0.5em] uppercase animate-pulse">Scanning_Memory_Blocks...</p>
-            </div>
-        </section>
+  <header
+    class="text-center mb-20 space-y-10 animate-in fade-in slide-in-from-top-10 duration-1000"
+  >
+    <div
+      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-red-500/10 border border-red-500/20 float-ui"
+    >
+      <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+      <span
+        class="text-red-500 text-xs font-black tracking-widest uppercase text-shadow"
+        >K-IDA Neural Ingest V2.6</span
+      >
     </div>
+
+    <h2
+      class="text-7xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+    >
+      K-IDA
+    </h2>
+
+    <div class="max-w-4xl mx-auto space-y-8">
+      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
+        "ឈប់ស៊ូទ្រាំនឹង PDF រាប់រយទំព័រ! ឱ្យ K-IDA ក្លាយជា
+        <span class="text-red-500 font-bold">មន្តអាគម</span> នៃចំណេះដឹងប្អូន!"
+      </p>
+      <p
+        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
+      >
+        ប្អូនធុញនឹងការអង្គុយអានឯកសារមែនទេ?
+        <strong class="text-red-500">K-IDA</strong> នឹងប្រើប្រាស់
+        <span class="underline decoration-red-500/30"
+          >Intelligence Extraction</span
+        >
+        ដើម្បីអាន និងយល់គ្រប់ចំណុចក្នុង PDF ប្អូន។ បោះឯកសារចូលមក
+        រួចសួរចង់ដឹងអីក៏បាន
+        វានឹងឆ្លើយយ៉ាងលម្អិតដូចមានអ្នកជំនាញនៅក្បែរខ្លួនអ៊ីចឹង! 😂
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🔍
+        </div>
+        <h4 class="text-red-500 font-black uppercase mb-3">Instant Scan</h4>
+        <p class="text-sm text-slate-400 italic">
+          ទាញយកទិន្នន័យយ៉ាងហ្មត់ចត់ពី PDF គ្រប់ប្រភេទក្នុងវិនាទី។
+        </p>
+      </div>
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🧠
+        </div>
+        <h4 class="text-red-500 font-black uppercase mb-3">Deep Context</h4>
+        <p class="text-sm text-slate-400 italic">
+          យល់ពីខ្លឹមសារមេរៀនទាំងមូល និងរកឃើញប្រភពយ៉ាងច្បាស់។
+        </p>
+      </div>
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🇰🇭
+        </div>
+        <h4 class="text-red-500 font-black uppercase mb-3">Khmer Native AI</h4>
+        <p class="text-sm text-slate-400 italic">
+          បកស្រាយជាភាសាខ្មែរយ៉ាងរលូន ងាយយល់ និងកំប្លែងៗ។
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-16 items-start">
+    <section class="xl:col-span-5 space-y-10">
+      <div class="magic-card p-10 md:p-14">
+        <h3
+          class="text-[11px] font-black text-red-400 uppercase tracking-widest mb-10 flex items-center gap-4"
+        >
+          <span class="h-1 w-6 bg-red-500 rounded-full"></span> 01. Sync Memory
+          Block
+        </h3>
+        <div
+          id="dropZone"
+          class="border-2 border-dashed border-white/5 rounded-[40px] p-12 text-center cursor-pointer hover:border-red-500/50 hover:bg-red-500/5 transition-all group"
+        >
+          <div
+            class="text-7xl mb-8 group-hover:scale-110 group-hover:rotate-6 transition-transform"
+          >
+            📄
+          </div>
+          <p
+            class="text-lg md:text-xl text-slate-300 font-bold uppercase tracking-tighter"
+          >
+            Drop PDF or Click to Scan
+          </p>
+          <input type="file" id="fileInput" class="hidden" accept=".pdf" />
+        </div>
+
+        <div
+          id="textPreview"
+          class="hidden magic-card p-8 mt-10 bg-emerald-500/5 border-emerald-500/10"
+        >
+          <div class="flex justify-between items-center mb-6">
+            <span
+              class="text-[11px] font-black text-emerald-400 uppercase tracking-widest"
+              >Neural Data Extracted</span
+            >
+            <span
+              id="pageCount"
+              class="text-xs font-mono bg-emerald-500/20 px-3 py-1.5 rounded-full text-white"
+              >0 Units Sync</span
+            >
+          </div>
+          <div
+            id="previewContent"
+            class="text-base text-slate-400 h-40 overflow-y-auto no-scrollbar italic leading-relaxed border-t border-white/5 pt-6"
+          ></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="xl:col-span-7 space-y-10">
+      <div class="magic-card p-10 md:p-14">
+        <h3
+          class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-4"
+        >
+          <span class="h-1 w-6 bg-slate-500 rounded-full"></span> 02. Neural
+          Query Hub
+        </h3>
+        <div class="flex flex-col md:flex-row gap-5">
+          <input
+            type="text"
+            id="userQuery"
+            class="flex-1 bg-black/40 border border-white/5 rounded-3xl px-10 py-7 outline-none focus:border-red-500 transition-all text-xl text-white shadow-inner"
+            placeholder="សួរមកប្អូន! ចង់ដឹងអីក្នុង PDF ហ្នឹង?"
+          />
+          <button
+            onclick="askKIDA()"
+            id="btnAsk"
+            class="btn-magic px-14 py-7 rounded-3xl font-black text-sm uppercase tracking-widest active:scale-90"
+          >
+            EXECUTE
+          </button>
+        </div>
+      </div>
+
+      <div
+        id="responseContainer"
+        class="hidden animate-in zoom-in-95 duration-700"
+      >
+        <div
+          class="magic-card p-10 md:p-16 border-l-[15px] border-red-500 bg-red-600/5 relative"
+        >
+          <div
+            id="pageBadge"
+            class="absolute top-8 right-12 bg-red-500/10 border border-red-500/30 px-6 py-4 rounded-3xl flex items-center gap-4 opacity-0 transition-all duration-1000"
+          >
+            <div class="flex flex-col text-right">
+              <span
+                class="text-[9px] font-black text-red-500 uppercase tracking-widest"
+                >Source_Location</span
+              >
+              <span id="pageSource" class="text-xl font-black text-white"
+                >N/A</span
+              >
+            </div>
+          </div>
+          <div
+            class="text-[10px] font-black tracking-[0.5em] text-red-400 opacity-40 uppercase mb-10"
+          >
+            Extraction_Result_Ready
+          </div>
+          <div
+            id="aiAnswer"
+            class="prose-kida text-2xl md:text-3xl font-light text-slate-100 italic"
+          ></div>
+        </div>
+      </div>
+
+      <div
+        id="loading"
+        class="hidden magic-card p-32 flex flex-col items-center justify-center"
+      >
+        <div class="relative w-24 h-24 mb-10">
+          <div
+            class="absolute inset-0 border-8 border-white/5 rounded-full"
+          ></div>
+          <div
+            class="absolute inset-0 border-8 border-t-red-500 rounded-full animate-spin"
+          ></div>
+        </div>
+        <p
+          class="text-red-500 font-mono text-sm tracking-[0.6em] uppercase animate-pulse"
+        >
+          Scanning_Memory_Blocks...
+        </p>
+      </div>
+    </section>
+  </div>
 </main>
 
 <%- include('partials/footer') %>
 
 <script>
-    const socket = io();
-    const dropZone = document.getElementById("dropZone");
-    const fileInput = document.getElementById("fileInput");
-    let pdfPagesData = [];
+  const socket = io();
+  const fileInput = document.getElementById("fileInput");
+  let pdfPagesData = [];
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
-    dropZone.onclick = () => fileInput.click();
-    fileInput.onchange = (e) => handleFile(e.target.files[0]);
+  // ១. Interactive Magic Background (Mouse Follow)
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  let mouse = { x: null, y: null };
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+  });
 
-    async function handleFile(file) {
-        if (!file || file.type !== "application/pdf") {
-            return Swal.fire({ icon: "error", title: "Format Error", text: "បងសុំតែ File PDF ទេអាអូន! កុំមកលេងសើច! 😂", background: "#030712", color: "#ef4444" });
-        }
-
-        pdfPagesData = [];
-        const reader = new FileReader();
-        reader.onload = async function () {
-            const typedarray = new Uint8Array(this.result);
-            const pdf = await pdfjsLib.getDocument(typedarray).promise;
-
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                const text = content.items.map((s) => s.str).join(" ");
-                pdfPagesData.push({ page: i, text: text });
-            }
-
-            document.getElementById("previewContent").innerText = pdfPagesData.slice(0, 2).map(p => `[UNIT_${p.page}]: ${p.text.substring(0, 150)}...`).join("\n\n");
-            document.getElementById("pageCount").innerText = `${pdf.numPages} Units Sync`;
-            document.getElementById("textPreview").classList.remove("hidden");
-
-            Swal.fire({ icon: "success", title: "Memory Sync", text: `បងអានចប់ហើយ! ឯកសារទាំង ${pdf.numPages} ទំព័រ នៅក្នុងខួរក្បាលបងហើយ!`, background: "#030712", color: "#22c55e" });
-        };
-        reader.readAsArrayBuffer(file);
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 70; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 1.5,
+      });
     }
+  }
 
-    function askKIDA() {
-        const query = document.getElementById("userQuery").value.trim();
-        if (!query || pdfPagesData.length === 0) {
-            return Swal.fire({ icon: "warning", title: "Missing Data", text: "បោះឯកសារឱ្យបងសិន រួចចាំសួរ! កុំចង់ញ៉ាំបាយមិនដាំ! 😂", background: "#030712", color: "#ef4444" });
-        }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "<%= theme || '#ef4444' %>";
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.05)";
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
 
-        document.getElementById("loading").classList.remove("hidden");
-        document.getElementById("responseContainer").classList.add("hidden");
-        socket.emit("ask_kida", { userQuery: query, pages: pdfPagesData.slice(0, 50) });
-    }
+      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+      }
 
-    socket.on("kida_result", (data) => {
-        document.getElementById("loading").classList.add("hidden");
-        document.getElementById("responseContainer").classList.remove("hidden");
-        typeWriter("aiAnswer", data.answer);
-
-        const badge = document.getElementById("pageBadge");
-        if (data.page_found) {
-            document.getElementById("pageSource").innerText = data.page_found;
-            badge.classList.replace("opacity-0", "opacity-100");
-        }
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+      ctx.fill();
     });
+    requestAnimationFrame(draw);
+  }
+  init();
+  draw();
 
-    function typeWriter(id, text) {
-        let i = 0; const el = document.getElementById(id); el.innerHTML = "";
-        function type() { if (i < text.length) { el.innerHTML += text.charAt(i); i++; setTimeout(type, 15); } }
-        type();
-    }
+  // ២. Application Logic
+  document.getElementById("dropZone").onclick = () => fileInput.click();
+  fileInput.onchange = (e) => handleFile(e.target.files[0]);
 
-    const canvas = document.getElementById("neural-bg");
-    const ctx = canvas.getContext("2d");
-    let dots = [];
-    function init() {
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        dots = [];
-        for (let i = 0; i < 40; i++) dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2 });
+  async function handleFile(file) {
+    if (!file || file.type !== "application/pdf") {
+      return Swal.fire({
+        icon: "error",
+        title: "Format Error",
+        text: "បងសុំតែ PDF ទេប្អូន! 😂",
+        background: "#030712",
+        color: "#ef4444",
+      });
     }
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "<%= theme %>";
-        dots.forEach((d) => {
-            d.x += d.vx; d.y += d.vy;
-            if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-            ctx.beginPath(); ctx.arc(d.x, d.y, 1.2, 0, Math.PI * 2); ctx.fill();
+    pdfPagesData = [];
+    const reader = new FileReader();
+    reader.onload = async function () {
+      const typedarray = new Uint8Array(this.result);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        pdfPagesData.push({
+          page: i,
+          text: content.items.map((s) => s.str).join(" "),
         });
-        requestAnimationFrame(draw);
+      }
+      document.getElementById("previewContent").innerText =
+        pdfPagesData[0].text.substring(0, 300) + "...";
+      document.getElementById("pageCount").innerText =
+        `${pdf.numPages} Units Sync`;
+      document.getElementById("textPreview").classList.remove("hidden");
+      Swal.fire({
+        icon: "success",
+        title: "Memory Sync",
+        text: "បងអានចប់ហើយ សួរមកប្អូន!",
+        background: "#030712",
+        color: "#22c55e",
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  function askKIDA() {
+    const query = document.getElementById("userQuery").value.trim();
+    const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
+
+    if (!query || pdfPagesData.length === 0)
+      return Swal.fire({
+        icon: "warning",
+        title: "Empty Memory",
+        text: "បោះឯកសារឱ្យបងអានសិន! 😂",
+        background: "#030712",
+        color: "#ef4444",
+      });
+    if (!firebaseUid)
+      return Swal.fire({
+        icon: "warning",
+        title: "Identity Unknown",
+        text: "សូម Login ដើម្បីរក្សាទុកប្រវត្តិ!",
+        background: "#030712",
+        color: "#ef4444",
+      });
+
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("responseContainer").classList.add("hidden");
+
+    socket.emit("ask_kida", {
+      userQuery: query,
+      pages: pdfPagesData.slice(0, 50),
+      firebaseUid: firebaseUid,
+    });
+  }
+
+  socket.on("kida_result", (data) => {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("responseContainer").classList.remove("hidden");
+    document.getElementById("aiAnswer").innerHTML = marked.parse(data.answer);
+
+    const badge = document.getElementById("pageBadge");
+    if (data.page_found) {
+      document.getElementById("pageSource").innerText =
+        "Page " + data.page_found;
+      badge.classList.replace("opacity-0", "opacity-100");
     }
-    window.addEventListener("resize", init); init(); draw();
+    document
+      .getElementById("responseContainer")
+      .scrollIntoView({ behavior: "smooth" });
+  });
 </script>

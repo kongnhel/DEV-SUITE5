@@ -1,117 +1,229 @@
 <%- include('partials/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+  :root {
+    --primary: <%= theme || "#8b5cf6" %>;
+    --secondary: #06b6d4;
+    --bg-dark: #020617;
+    --magic-glow: rgba(139, 92, 246, 0.3);
+  }
 
-    :root {
-        --primary: #8b5cf6;
-        --primary-glow: rgba(139, 92, 246, 0.3);
-        --bg-dark: #0f172a;
-        --card-bg: rgba(30, 41, 59, 0.7);
-    }
+  body {
+    font-family: 'Plus Jakarta Sans', "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
 
-    body {
-        background-color: var(--bg-dark);
-        background-image: 
-            radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 100% 100%, rgba(6, 182, 212, 0.1) 0%, transparent 50%);
-        color: #f1f5f9;
-        font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-        min-height: 100-vh;
-    }
+  /* ២. Interactive Magic Background */
+  #neural-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -20; opacity: 0.25; }
+  .hero-glow { background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 70%); }
 
-    .glass-card {
-        background: var(--card-bg);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    }
+  /* ៣. Magic Card Architecture */
+  .magic-card {
+    position: relative;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(30px);
+    border-radius: 40px;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .magic-card::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, var(--primary), transparent 30%);
+    animation: rotateMagic 10s linear infinite;
+    z-index: -1;
+    opacity: 0.15;
+  }
+  @keyframes rotateMagic { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    .stat-card-glow:hover {
-        border-color: var(--primary);
-        box-shadow: 0 0 20px var(--primary-glow);
-        transform: translateY(-5px);
-    }
+  /* ៤. Shimmer & UI Animations */
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), var(--secondary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
 
-    .avatar-ring {
-        position: relative;
-        padding: 5px;
-        background: linear-gradient(135deg, var(--primary), #06b6d4);
-        border-radius: 2rem;
-    }
+  .float-ui { animation: float 4s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-    .text-gradient {
-        background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
+  .avatar-ring {
+    position: relative;
+    padding: 6px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 2.5rem;
+    box-shadow: 0 0 30px var(--magic-glow);
+  }
+
+  /* Status Badges */
+  .neural-badge {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    color: var(--primary);
+    padding: 6px 16px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+  }
 </style>
 
-<main class="max-w-6xl mx-auto px-5 py-8 md:py-16">
-    <section class="glass-card rounded-[2.5rem] p-8 md:p-12 mb-10 transition-all duration-500">
-        <div class="flex flex-col md:flex-row items-center gap-8">
-            <div class="avatar-ring shadow-2xl">
-                <img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>" 
-                     class="w-28 h-28 md:w-36 md:h-36 rounded-[1.7rem] object-cover bg-slate-800" 
-                     alt="Profile">
-            </div>
-            
-            <div class="text-center md:text-left">
-                <span class="px-4 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest">
-                    Neural Rank: Master Learner
-                </span>
-                <h2 class="text-4xl md:text-6xl font-extrabold text-white mt-4 tracking-tight">
-                    សួស្តី, <span class="text-gradient"><%= user.displayName %></span>!
-                </h2>
-                <p class="text-slate-400 mt-2 font-light text-lg">រីករាយដែលបានជួបមេម្ដងទៀត! តោះបន្តការរៀនសូត្រ...</p>
-            </div>
-        </div>
-    </section>
+<canvas id="neural-bg"></canvas>
+<div class="hero-glow fixed inset-0 -z-10"></div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
-        <div class="glass-card stat-card-glow p-8 rounded-[2rem] transition-all duration-300 group">
-            <div class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">📚</div>
-            <h3 class="text-4xl font-bold text-white mb-1"><%= totalWisdom %></h3>
-            <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">មេរៀនសរុប</p>
+<main class="max-w-7xl mx-auto px-6 py-12 relative">
+  <section class="magic-card rounded-[3rem] p-10 md:p-16 mb-12 animate-in fade-in slide-in-from-top-10 duration-1000">
+    <div class="flex flex-col lg:flex-row items-center gap-12">
+      <div class="avatar-ring float-ui">
+        <img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>" 
+             class="w-32 h-32 md:w-44 md:h-44 rounded-[2rem] object-cover bg-slate-800" alt="Profile">
+      </div>
+      
+      <div class="text-center lg:text-left space-y-6">
+        <div class="flex flex-wrap justify-center lg:justify-start gap-4">
+            <span class="neural-badge uppercase">Neural Rank: Elite Architect</span>
+            <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">System Online</span>
         </div>
+        <h2 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none">
+          សួស្តី, <span class="shimmer-text italic"><%= user.displayName %></span>!
+        </h2>
+        <div class="max-w-2xl">
+            <p class="text-xl md:text-2xl text-slate-300 font-light italic leading-relaxed">
+              "សូមស្វាគមន៍មកកាន់ <strong class="text-purple-400">Neural Control Center</strong>! រាល់ការជជែក គ្រប់ដានជើងមេរៀន និងកូដដែលប្អូនបានបំប្លែង សុទ្ធតែត្រូវបានរក្សាទុកក្នុងក្រាំងមាសឌីជីថលជារៀងរហូត។"
+            </p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="glass-card stat-card-glow p-8 rounded-[2rem] transition-all duration-300 group">
-            <div class="w-14 h-14 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">🤖</div>
-            <h3 class="text-4xl font-bold text-white mb-1"><%= tutorCount %></h3>
-            <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">ការពិភាក្សាជាមួយ AI</p>
-        </div>
-
-        <div class="glass-card stat-card-glow p-8 rounded-[2rem] transition-all duration-300 group sm:col-span-2 md:col-span-1">
-            <div class="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform">⚡</div>
-            <h3 class="text-4xl font-bold text-emerald-400 mb-1">Active</h3>
-            <p class="text-slate-500 text-sm font-medium uppercase tracking-wider">ស្ថានភាពបច្ចុប្បន្ន</p>
-        </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+    <div class="magic-card p-10 group hover:scale-105 transition-all">
+      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">📚</div>
+      <h3 class="text-5xl font-black text-white mb-2"><%= totalWisdom %></h3>
+      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Knowledge Base Sync</p>
+      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-purple-500 w-3/4 animate-pulse"></div>
+      </div>
     </div>
 
-    <div class="space-y-6">
-        <div class="flex items-center gap-4 mb-8">
-            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-[0.3em] whitespace-nowrap">សកម្មភាពចុងក្រោយ</h4>
-            <div class="h-px w-full bg-gradient-to-r from-slate-800 to-transparent"></div>
-        </div>
+    <div class="magic-card p-10 group hover:scale-105 transition-all">
+      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">🤖</div>
+      <h3 class="text-5xl font-black text-white mb-2"><%= tutorCount %></h3>
+      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Neural Interactions</p>
+      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-cyan-400 w-1/2 animate-pulse"></div>
+      </div>
+    </div>
 
-        <div class="grid gap-4">
-            <% recentActivity.forEach(act => { %>
-                <div class="glass-card p-5 md:p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:bg-white/5 transition-colors border-l-4 border-l-purple-500">
-                    <div class="flex-1">
-                        <p class="text-slate-200 font-medium text-lg leading-relaxed">"<%= act.userInput %>"</p>
-                        <div class="flex items-center gap-3 mt-2">
-                            <span class="text-[11px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 border border-slate-700 font-mono uppercase"><%= act.toolName %></span>
-                            <span class="text-[11px] text-slate-500 italic">Neural Sync Complete</span>
-                        </div>
-                    </div>
-                    <a href="/history" class="w-full md:w-auto text-center px-6 py-2 rounded-xl bg-white/5 hover:bg-purple-500 hover:text-white border border-white/10 text-purple-400 text-sm font-bold transition-all">
-                        មើលលម្អិត →
-                    </a>
-                </div>
-            <% }) %>
+    <div class="magic-card p-10 group hover:scale-105 transition-all sm:col-span-2 lg:col-span-1">
+      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">⚡</div>
+      <h3 class="text-5xl font-black text-emerald-400 mb-2 italic">Active</h3>
+      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Neural Link Protocol</p>
+      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+          <div class="h-full bg-emerald-500 w-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="mb-16">
+    <div class="flex items-center gap-6 mb-10">
+        <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em] whitespace-nowrap">System Capabilities</h4>
+        <div class="h-px w-full bg-gradient-to-r from-slate-800 to-transparent"></div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="magic-card p-8 bg-purple-500/5">
+            <h5 class="text-purple-400 font-bold mb-3 uppercase text-xs">🚀 Ultra-Fast Analysis</h5>
+            <p class="text-sm text-slate-400 italic font-light">រាល់សំណួររបស់ប្អូន ត្រូវបានវិភាគដោយ Gemini 1.5 Flash ដែលផ្ដល់ចម្លើយលឿនបំផុត មិនឱ្យប្អូនចាំយូរឡើយ!</p>
+        </div>
+        <div class="magic-card p-8 bg-cyan-500/5">
+            <h5 class="text-cyan-400 font-bold mb-3 uppercase text-xs">🧠 Memory Persistence</h5>
+            <p class="text-sm text-slate-400 italic font-light">ប្រព័ន្ធ Dashboard នេះនឹងរៀបរាប់ពីគ្រប់សកម្មភាពប្អូន ជួយឱ្យប្អូនងាយស្រួលស្វែងរកមេរៀនដែលបានរៀនរួច។</p>
         </div>
     </div>
+  </section>
+
+  <div class="space-y-8">
+    <div class="flex justify-between items-center mb-10">
+        <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em]">Neural Footprints (Recent)</h4>
+        <a href="/history" class="text-[10px] font-black text-purple-400 uppercase tracking-widest hover:text-white transition-all">View Full Archive →</a>
+    </div>
+
+    <div class="grid gap-6">
+      <% recentActivity.forEach(act => { %>
+        <div class="magic-card p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-l-[10px] border-purple-500/30 hover:border-purple-500 transition-all">
+          <div class="flex-1 space-y-3">
+            <p class="text-white font-light text-2xl italic leading-relaxed">"<%= act.userInput %>"</p>
+            <div class="flex items-center gap-4">
+              <span class="text-[9px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/10 font-mono uppercase tracking-widest"><%= act.toolName %></span>
+              <span class="text-[9px] text-slate-500 uppercase font-bold tracking-tighter">Sync Date: <%= new Date(act.createdAt).toLocaleDateString() %></span>
+            </div>
+          </div>
+          <a href="/history" class="w-full md:w-auto text-center px-10 py-4 rounded-2xl bg-white/5 hover:bg-purple-600 hover:text-white border border-white/10 text-purple-400 text-xs font-black transition-all active:scale-90 uppercase tracking-widest shadow-xl">
+            Analyze Log
+          </a>
+        </div>
+      <% }) %>
+      
+      <% if (recentActivity.length === 0) { %>
+        <div class="text-center py-20 opacity-30">
+            <p class="text-xl font-black italic uppercase tracking-[0.3em]">No Activity Detected in Neural Node</p>
+            <p class="text-sm mt-2">តោះចាប់ផ្ដើមបេសកកម្មរៀនសូត្រជាមួយ AI ទាំងអស់គ្នា!</p>
+        </div>
+      <% } %>
+    </div>
+  </div>
 </main>
 
 <%- include('partials/footer') %>
+
+<script>
+  // ១. Interactive Particle Background (Mouse Follow)
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  let mouse = { x: null, y: null };
+  window.addEventListener("mousemove", (e) => { mouse.x = e.x; mouse.y = e.y; });
+
+  function init() {
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 80; i++) {
+      dots.push({ 
+          x: Math.random() * canvas.width, 
+          y: Math.random() * canvas.height, 
+          vx: (Math.random() - 0.5) * 0.5, 
+          vy: (Math.random() - 0.5) * 0.5, 
+          size: Math.random() * 2 
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "<%= theme || '#8b5cf6' %>";
+    ctx.strokeStyle = "rgba(139, 92, 246, 0.05)";
+    dots.forEach(d => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      
+      // Connect to mouse
+      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
+      if (dist < 150) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); }
+      
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init(); draw();
+  window.addEventListener("resize", init);
+</script>

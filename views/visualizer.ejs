@@ -3,257 +3,435 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 
 <style>
-    :root {
-        --primary: <%= theme %>; /* Matrix Green from Controller */
-        --bg: #020617;
-    }
-    body {
-        background-color: var(--bg);
-        color: #f8fafc;
-        font-size: 16px;
-    }
+  :root {
+    --primary: <%= theme || "#00ff41" %>;
+    --secondary: #059669;
+    --bg: #020617;
+    --magic-glow: rgba(0, 255, 65, 0.2);
+  }
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg);
+    color: #f8fafc;
+    overflow-x: hidden;
+  }
 
-    /* Marketing & Visual Overhaul */
-    .bg-grid {
-        position: fixed;
-        inset: 0;
-        background-image: 
-            linear-gradient(to right, rgba(0, 255, 65, 0.04) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(0, 255, 65, 0.04) 1px, transparent 1px);
-        background-size: 40px 40px;
-        mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
-        z-index: -20;
-    }
+  /* ១. Interactive Magic Background */
+  #neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
+    opacity: 0.2;
+  }
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
+    z-index: -10;
+  }
 
-    .glass-panel {
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(25px);
-        border: 1px solid rgba(0, 255, 65, 0.1);
-        border-radius: 40px;
-        transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  /* ២. Magic Card Architecture */
+  .magic-card {
+    position: relative;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(30px);
+    border-radius: 40px;
+    z-index: 1;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 65, 0.1);
+  }
+  .magic-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      from 0deg,
+      transparent,
+      var(--primary),
+      transparent 30%
+    );
+    animation: rotateMagic 8s linear infinite;
+    z-index: -1;
+    opacity: 0.15;
+  }
+  @keyframes rotateMagic {
+    from {
+      transform: rotate(0deg);
     }
-    .glass-panel:hover {
-        border-color: rgba(0, 255, 65, 0.3);
-        box-shadow: 0 0 50px rgba(0, 255, 65, 0.05);
+    to {
+      transform: rotate(360deg);
     }
+  }
 
-    .btn-logic {
-        background: linear-gradient(135deg, #059669 0%, var(--primary) 100%);
-        box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
-        transition: 0.3s;
+  /* ៣. Shimmer & UI Effects */
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+  }
+  @keyframes shine {
+    to {
+      background-position: 200% center;
     }
-    .btn-logic:hover {
-        box-shadow: 0 0 40px rgba(0, 255, 65, 0.4);
-        transform: translateY(-2px);
-    }
+  }
 
-    #diagramContainer {
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 24px;
-        border: 1px dashed rgba(0, 255, 65, 0.2);
-        min-height: 500px;
+  .float-ui {
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
     }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
 
-    .shimmer-text {
-        background: linear-gradient(90deg, #fff, var(--primary), #fff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: shine 4s linear infinite;
-    }
-    @keyframes shine { to { background-position: 200% center; } }
+  .btn-magic {
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    color: #000;
+    font-weight: 900;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 0 20px var(--magic-glow);
+  }
+  .btn-magic:hover {
+    transform: scale(1.05) translateY(-3px);
+    box-shadow: 0 0 40px var(--primary);
+  }
+
+  /* Diagram Custom Styles */
+  #diagramContainer {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 30px;
+    border: 1px dashed rgba(0, 255, 65, 0.2);
+  }
 </style>
 
+<canvas id="neural-bg"></canvas>
 <div class="bg-grid"></div>
 
 <main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-    
-    <header class="text-center mb-16 space-y-6 animate-in fade-in zoom-in duration-1000">
-        <div class="inline-block px-4 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black tracking-[0.4em] uppercase">
-            ⚡ Code-to-Logic Protocol Activated
-        </div>
-        
-        <h2 class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none">
-            LOGIC <span class="underline decoration-emerald-500/30">VISUALIZER</span>
-        </h2>
-        
-        <div class="max-w-3xl mx-auto">
-            <p class="text-2xl md:text-4xl font-light text-white leading-tight mb-6">
-                "កុំឱ្យកូដរាប់ពាន់បន្ទាត់ ធ្វើឱ្យប្អូនវង្វេងផ្លូវ!"
-            </p>
-            <p class="text-lg md:text-xl text-slate-400 font-light italic">
-                បំប្លែងកូដដ៏ស្មុគស្មាញ ឱ្យក្លាយជា <span class="text-emerald-500 font-bold">Flowchart</span> ដ៏ច្បាស់លាស់ត្រឹមតែមួយពព្រិចភ្នែក។ ជួយឱ្យប្អូនយល់ពីដំណើរការកូដ (Logic Flow) និងរកឃើញ Bug បានលឿនជាងមុន ១០ដង! 🚀
-            </p>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-10 pt-8">
-            <div class="text-center">
-                <span class="text-3xl block mb-2">🗺️</span>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Auto Mapping</p>
-            </div>
-            <div class="text-center border-x border-white/10 px-10">
-                <span class="text-3xl block mb-2">🕵️</span>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logic Debugging</p>
-            </div>
-            <div class="text-center">
-                <span class="text-3xl block mb-2">🖼️</span>
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">SVG Export</p>
-            </div>
-        </div>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
-        
-        <div class="lg:col-span-5 space-y-6">
-            <div class="glass-panel p-8 md:p-12 relative overflow-hidden">
-                <div class="flex items-center gap-4 mb-10">
-                    <div class="p-3 bg-emerald-500/10 rounded-2xl">
-                        <span class="text-3xl">💻</span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-black text-white uppercase tracking-tighter">Source Code Ingest</h3>
-                        <p class="text-xs text-slate-500">បញ្ចូលកូដដែលប្អូនចង់បំប្លែង</p>
-                    </div>
-                </div>
-
-                <textarea 
-                    id="codeInput" 
-                    class="w-full h-64 md:h-[500px] bg-black/40 border border-white/5 rounded-[30px] p-8 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-mono text-base leading-relaxed text-emerald-400 no-scrollbar shadow-inner"
-                    placeholder="ឧទាហរណ៍៖&#10;if (userIsRich) {&#10;  buyTesla();&#10;} else {&#10;  buyBicycle();&#10;}"></textarea>
-                
-                <button 
-                    onclick="visualize()" 
-                    id="btnAction"
-                    class="btn-logic w-full mt-10 py-6 rounded-[30px] font-black text-lg text-white tracking-[0.2em] uppercase flex justify-center items-center gap-4 active:scale-95">
-                    <span>GENERATE FLOW</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <div class="lg:col-span-7">
-            <div class="glass-panel p-4 md:p-10 flex flex-col min-h-[600px] md:min-h-[800px]">
-                <div class="p-6 border-b border-white/5 flex justify-between items-center mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Neural Logic Diagram Output</span>
-                    </div>
-                    <div id="controlPanel" class="hidden flex gap-4">
-                        <button onclick="downloadSVG()" class="text-xs bg-white/5 hover:bg-emerald-500 hover:text-black px-6 py-2.5 rounded-full border border-white/10 transition-all font-black uppercase tracking-widest shadow-lg">Export_SVG</button>
-                    </div>
-                </div>
-
-                <div class="flex-grow flex items-center justify-center relative overflow-hidden">
-                    <div id="loading" class="hidden text-center">
-                        <div class="relative w-24 h-24 mx-auto mb-10">
-                            <div class="absolute inset-0 border-4 border-emerald-500/10 rounded-full"></div>
-                            <div class="absolute inset-0 border-4 border-t-emerald-500 rounded-full animate-spin"></div>
-                        </div>
-                        <p class="text-emerald-500 font-mono text-xs animate-pulse tracking-[0.5em] uppercase">Mapping_Neural_Logic...</p>
-                    </div>
-
-                    <div id="resultContainer" class="hidden w-full h-full flex flex-col items-center">
-                        <div id="diagramContainer" class="p-8 md:p-14 no-scrollbar w-full flex justify-center">
-                            <div id="mermaidGraph" class="mermaid scale-110 md:scale-125"></div>
-                        </div>
-                        <div class="mt-10 p-6 bg-emerald-500/5 rounded-3xl border border-emerald-500/10 text-center w-full">
-                            <p class="text-base text-slate-400 italic">💡 គន្លឹះ៖ ប្អូនអាច Export ជា SVG ដើម្បីដាក់ក្នុង Report ឬ Presentation ឱ្យមើលទៅឡូយជាងគេ!</p>
-                        </div>
-                    </div>
-
-                    <div id="placeholder" class="text-center space-y-6 opacity-30">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 002-2h-2a2 2 0 00-2 2" />
-                        </svg>
-                        <p class="text-xs font-mono uppercase tracking-[0.5em]">Waiting for neural input...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <header
+    class="text-center mb-20 space-y-10 animate-in fade-in zoom-in duration-1000"
+  >
+    <div
+      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 float-ui"
+    >
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span
+        class="text-emerald-400 text-xs font-black tracking-widest uppercase"
+        >System Logic Engine V2.6</span
+      >
     </div>
+
+    <h2
+      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+    >
+      LOGIC VISUALIZER
+    </h2>
+
+    <div class="max-w-4xl mx-auto space-y-8">
+      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
+        "ឈប់វង្វេងក្នុងកូដរាប់ពាន់បន្ទាត់! ឱ្យបង AI បំប្លែងវាទៅជា
+        <span class="text-emerald-400 font-bold">ផែនទីមន្តអាគម</span> វិញ!"
+      </p>
+      <p
+        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
+      >
+        តើប្អូនធ្លាប់វិលមុខនឹងការអាន Logic ស្មុគស្មាញមែនទេ?
+        <strong class="text-emerald-400">Logic Visualizer</strong> នឹងប្រើប្រាស់
+        <span class="underline decoration-emerald-500/30">Neural Mapping</span>
+        ដើម្បីបំប្លែងកូដប្អូនឱ្យក្លាយជា Flowchart ដ៏ស្រស់ស្អាតភ្លាមៗ។
+        ជួយឱ្យយល់ពីដំណើរការកូដ និងរកឃើញ Bug បានលឿនជាងមុន ១០ដង! 🚀
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🗺️
+        </div>
+        <h4 class="text-emerald-400 font-black uppercase mb-3">
+          Instant Mapping
+        </h4>
+        <p class="text-sm text-slate-400 italic">
+          គ្រាន់តែបោះកូដចូលមក ផែនទី Logic នឹងលេចឡើងក្នុងមួយពព្រិចភ្នែក។
+        </p>
+      </div>
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🕵️
+        </div>
+        <h4 class="text-emerald-400 font-black uppercase mb-3">Logic Debug</h4>
+        <p class="text-sm text-slate-400 italic">
+          មើលឃើញរាល់លក្ខខណ្ឌ (If/Else, Loops) យ៉ាងច្បាស់លាស់បំផុត។
+        </p>
+      </div>
+      <div class="magic-card p-10 text-center group">
+        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
+          🖼️
+        </div>
+        <h4 class="text-emerald-400 font-black uppercase mb-3">Pro Export</h4>
+        <p class="text-sm text-slate-400 italic">
+          Export ជា SVG គុណភាពខ្ពស់សម្រាប់ដាក់ក្នុង Report ឬ Presentation។
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16 items-start">
+    <div class="lg:col-span-5 space-y-10">
+      <div class="magic-card p-8 md:p-12 shadow-2xl">
+        <div class="flex items-center gap-4 mb-10">
+          <div class="p-3 bg-emerald-500/10 rounded-2xl">
+            <span class="text-3xl">💻</span>
+          </div>
+          <div>
+            <h3
+              class="text-lg font-black text-white uppercase tracking-tighter"
+            >
+              Source Ingest
+            </h3>
+            <p class="text-xs text-slate-500">បញ្ចូលកូដប្អូនខាងក្រោម</p>
+          </div>
+        </div>
+
+        <textarea
+          id="codeInput"
+          class="w-full h-64 md:h-[500px] bg-black/40 border border-white/5 rounded-[30px] p-8 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-mono text-base leading-relaxed text-emerald-400 no-scrollbar shadow-inner"
+          placeholder="ឧទាហរណ៍៖&#10;if (userIsRich) {&#10;  buyTesla();&#10;} else {&#10;  buyBicycle();&#10;}"
+        ></textarea>
+
+        <button
+          onclick="visualize()"
+          id="btnAction"
+          class="btn-magic w-full mt-10 py-7 rounded-[35px] text-xl uppercase tracking-[0.3em] flex justify-center items-center gap-5 active:scale-90"
+        >
+          <span>Generate Flow</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="lg:col-span-7">
+      <div
+        class="magic-card p-6 md:p-12 flex flex-col min-h-[600px] md:min-h-[800px]"
+      >
+        <div
+          class="p-6 border-b border-white/5 flex justify-between items-center mb-8"
+        >
+          <div class="flex items-center gap-3">
+            <div class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
+            <span
+              class="text-[11px] font-black text-slate-400 uppercase tracking-widest"
+              >Neural Diagram Output</span
+            >
+          </div>
+          <div id="controlPanel" class="hidden flex gap-4">
+            <button
+              onclick="downloadSVG()"
+              class="text-xs bg-white/5 hover:bg-emerald-500 hover:text-black px-6 py-2.5 rounded-full border border-white/10 transition-all font-black uppercase tracking-widest shadow-lg"
+            >
+              Export_SVG
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="flex-grow flex items-center justify-center relative overflow-hidden"
+        >
+          <div id="loading" class="hidden text-center">
+            <div class="relative w-24 h-24 mx-auto mb-10">
+              <div
+                class="absolute inset-0 border-8 border-white/5 rounded-full"
+              ></div>
+              <div
+                class="absolute inset-0 border-8 border-t-emerald-500 rounded-full animate-spin"
+              ></div>
+            </div>
+            <p
+              class="text-emerald-500 font-mono text-xs animate-pulse tracking-[0.5em] uppercase"
+            >
+              Mapping_Logic...
+            </p>
+          </div>
+
+          <div
+            id="resultContainer"
+            class="hidden w-full h-full flex flex-col items-center"
+          >
+            <div
+              id="diagramContainer"
+              class="p-10 no-scrollbar w-full flex justify-center overflow-x-auto"
+            >
+              <div
+                id="mermaidGraph"
+                class="mermaid scale-110 md:scale-125"
+              ></div>
+            </div>
+            <div
+              class="mt-10 p-8 bg-emerald-500/5 rounded-3xl border border-emerald-500/10 text-center w-full"
+            >
+              <p class="text-base text-slate-400 italic">
+                💡 គន្លឹះ៖ Logic នេះត្រូវបានវិភាគដោយ AI
+                ដើម្បីឱ្យប្អូនងាយស្រួលយល់បំផុត!
+              </p>
+            </div>
+          </div>
+
+          <div id="placeholder" class="text-center space-y-6 opacity-30">
+            <p class="text-xs font-mono uppercase tracking-[0.5em]">
+              Waiting for logic signals...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
 
 <%- include('partials/footer') %>
 
 <script>
-    const socket = io();
-    
-    mermaid.initialize({ 
-        startOnLoad: false, 
-        theme: 'dark',
-        securityLevel: 'loose',
-        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
-        themeVariables: {
-            fontSize: '16px',
-            fontFamily: 'Kantumruy Pro',
-            primaryColor: '#00ff41',
-            edgeLabelBackground: '#020617',
-            nodeTextColor: '#ffffff'
-        }
-    });
+  const socket = io();
 
-    async function visualize() {
-        const code = document.getElementById("codeInput").value;
-        if (!code) return Swal.fire({ 
-            icon: 'warning', 
-            title: 'ដាក់កូដមកប្អូន!', 
-            text: 'បងគ្មានមន្តអាគមគូររូបចេញពីខ្យល់ទេណា! 😂', 
-            background: '#020617', 
-            color: '#00ff41',
-            confirmButtonColor: '#059669'
-        });
+  // ១. Interactive Magic Background (Mouse Follow)
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  let mouse = { x: null, y: null };
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.x;
+    mouse.y = e.y;
+  });
 
-        document.getElementById("placeholder").classList.add("hidden");
-        document.getElementById("loading").classList.remove("hidden");
-        document.getElementById("resultContainer").classList.add("hidden");
-        document.getElementById("controlPanel").classList.add("hidden");
-        document.getElementById("btnAction").disabled = true;
-        document.getElementById("btnAction").style.opacity = "0.5";
-
-        socket.emit("visualize_logic", { code });
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 70; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 1.5,
+      });
     }
+  }
 
-    socket.on("visualize_result", async (data) => {
-        const { mermaidCode } = data;
-        const container = document.getElementById("mermaidGraph");
-        
-        document.getElementById("loading").classList.add("hidden");
-        document.getElementById("resultContainer").classList.remove("hidden");
-        document.getElementById("controlPanel").classList.remove("hidden");
-        document.getElementById("btnAction").disabled = false;
-        document.getElementById("btnAction").style.opacity = "1";
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "<%= theme || '#00ff41' %>";
+    ctx.strokeStyle = "rgba(0, 255, 65, 0.05)";
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
 
-        container.removeAttribute("data-processed");
-        container.innerHTML = mermaidCode;
-        
-        try {
-            await mermaid.run({ nodes: [container] });
-        } catch (err) {
-            container.innerHTML = "<div class='text-red-400 p-10 bg-red-500/10 rounded-[30px] border border-red-500/20 text-center text-xl italic'>💀 អូយ! កូដនេះស្មុគស្មាញដល់ថ្នាក់បងវិលមុខគូរអត់ចេញទេ! សុំកូដស្រួលៗបន្តិចមក!</div>";
-        }
+      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
+      }
+
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+      ctx.fill();
     });
+    requestAnimationFrame(draw);
+  }
+  init();
+  draw();
 
-    function downloadSVG() {
-        const svg = document.querySelector("#mermaidGraph svg");
-        if (!svg) return;
-        const svgData = new XMLSerializer().serializeToString(svg);
-        const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `neural_logic_flow_${Date.now()}.svg`;
-        link.click();
-        
-        Swal.fire({ icon: 'success', title: 'រួចរាល់!', text: 'រូប Logic ត្រូវបានទម្លាក់ចូលក្នុងម៉ាស៊ីនប្អូនហើយ! ✅', timer: 2000, showConfirmButton: false, background: '#020617', color: '#fff' });
+  // ២. Mermaid Interaction Logic
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "dark",
+    flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
+    themeVariables: {
+      fontFamily: "Kantumruy Pro",
+      primaryColor: "#00ff41",
+      nodeTextColor: "#ffffff",
+    },
+  });
+
+  async function visualize() {
+    const code = document.getElementById("codeInput").value.trim();
+    const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
+
+    if (!code)
+      return Swal.fire({
+        icon: "warning",
+        title: "Empty Logic",
+        text: "ដាក់កូដមកប្អូន!",
+        background: "#020617",
+        color: "#00ff41",
+      });
+    if (!firebaseUid)
+      return Swal.fire({
+        icon: "warning",
+        title: "Identity Unknown",
+        text: "សូម Login សិន ដើម្បីរក្សាទុក History!",
+        background: "#020617",
+        color: "#00ff41",
+      });
+
+    document.getElementById("placeholder").classList.add("hidden");
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("resultContainer").classList.add("hidden");
+    document.getElementById("btnAction").disabled = true;
+
+    socket.emit("visualize_logic", { code, firebaseUid });
+  }
+
+  socket.on("visualize_result", async (data) => {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("resultContainer").classList.remove("hidden");
+    document.getElementById("controlPanel").classList.remove("hidden");
+    document.getElementById("btnAction").disabled = false;
+
+    const container = document.getElementById("mermaidGraph");
+    container.removeAttribute("data-processed");
+    container.innerHTML = data.mermaidCode;
+
+    try {
+      await mermaid.run({ nodes: [container] });
+      document
+        .getElementById("resultContainer")
+        .scrollIntoView({ behavior: "smooth" });
+    } catch (err) {
+      container.innerHTML =
+        "<div class='text-red-400 p-10 bg-red-500/10 rounded-[30px] text-center'>💀 បងគូរអត់ចេញទេ កូដនេះស្មុគស្មាញពេក!</div>";
     }
+  });
 
-    socket.on('error_occured', (msg) => {
-        Swal.fire({ icon: 'error', title: 'Error', text: msg, background: '#020617', color: '#fff' });
-        document.getElementById("loading").classList.add("hidden");
-        document.getElementById("placeholder").classList.remove("hidden");
-        document.getElementById("btnAction").disabled = false;
-        document.getElementById("btnAction").style.opacity = "1";
-    });
+  function downloadSVG() {
+    const svg = document.querySelector("#mermaidGraph svg");
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `logic_flow_${Date.now()}.svg`;
+    link.click();
+  }
+
+  window.addEventListener("resize", init);
 </script>

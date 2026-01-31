@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const ChatHistorySchema = new mongoose.Schema({
     // ១. នេះគឺជា "ខ្សែចម្លងវិញ្ញាណ" ភ្ជាប់ទៅកាន់ User
     userId: { 
-        type: mongoose.Schema.Types.ObjectId, 
+        type:String,
         ref: 'User', 
         required: true 
     }, 
