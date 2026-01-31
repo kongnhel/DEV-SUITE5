@@ -8,13 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Freehand&family=Kantumruy+Pro:wght@300;400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         :root {
-            --primary: <%= theme || '#22d3ee' %>; 
+            --primary: <%= theme || '#ff4d00' %>; /* Robot Fire Orange */
+            --secondary: #ff9100;
             --bg-dark: #020617;
-            --magic-glow: rgba(34, 211, 238, 0.3);
+            --robot-glow: rgba(255, 77, 0, 0.4);
         }
         
         body {
@@ -24,124 +26,119 @@
             overflow-x: hidden;
         }
 
-        /* ២. Magic Shimmer & Text Effects */
-        .shimmer-text {
-            background: linear-gradient(90deg, #fff, var(--primary), #fff);
+        /* --- ROBOT FIRE STYLES --- */
+        .shimmer-fire {
+            background: linear-gradient(90deg, #fff, var(--primary), var(--secondary), #fff);
             background-size: 200% auto;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: shine 5s linear infinite;
+            animation: fireShine 4s linear infinite;
         }
-        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes fireShine { to { background-position: 200% center; } }
 
         .active-link {
             color: var(--primary) !important;
-            text-shadow: 0 0 15px var(--primary);
+            text-shadow: 0 0 20px var(--primary);
             position: relative;
         }
         .active-link::after {
             content: '';
             position: absolute;
-            bottom: -8px; left: 0; width: 100%; height: 2px;
-            background: var(--primary);
-            box-shadow: 0 0 10px var(--primary);
+            bottom: -8px; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            box-shadow: 0 0 15px var(--primary);
             border-radius: 99px;
         }
 
-        /* ៣. Premium Nav Glassmorphism */
         .nav-glass {
-            background: rgba(2, 6, 23, 0.7);
-            backdrop-filter: blur(30px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(40px);
+            border-bottom: 2px solid rgba(255, 77, 0, 0.15);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
         .user-avatar {
             border: 2px solid var(--primary);
-            box-shadow: 0 0 20px var(--magic-glow);
+            box-shadow: 0 0 25px var(--robot-glow);
             transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .user-avatar:hover { transform: rotate(10deg) scale(1.1); box-shadow: 0 0 30px var(--primary); }
+        .user-avatar:hover { transform: rotate(15deg) scale(1.15); box-shadow: 0 0 50px var(--primary); }
 
-        /* ៤. Magic Dropdown Logic */
+        /* --- MOBILE DROPDOWN FIX --- */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            padding-top: 15px;
+            min-width: 240px;
+            z-index: 100;
+        }
         .dropdown-inner {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 30px;
-            padding: 12px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-            transform: translateY(10px);
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(50px);
+            border: 2px solid rgba(255, 77, 0, 0.2);
+            border-radius: 35px;
+            padding: 16px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9);
         }
-        .profile-group:hover .dropdown-inner {
-            transform: translateY(0);
-            opacity: 1;
-            visibility: visible;
+        /* Hover ដំណើរការតែលើ Desktop */
+        @media (hover: hover) {
+            .profile-group:hover .dropdown-content { display: block; animation: fireUp 0.4s ease-out; }
+        }
+        /* Class សម្រាប់ Toggle លើ Mobile */
+        .profile-group.active .dropdown-content { display: block; animation: fireUp 0.4s ease-out; }
+        @keyframes fireUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); filter: blur(10px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
-        /* ៥. No Scrollbar for Mobile Tools */
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        /* Promotion Badge */
-        .promo-badge {
-            background: linear-gradient(135deg, var(--primary), #4f46e5);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 8px;
-            color: #000;
-            font-weight: 900;
-        }
     </style>
 </head>
 <body>
-    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(168,85,247,0.1)_0%,transparent_50%)] -z-20"></div>
+    <div class="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,77,0,0.08)_0%,transparent_60%)] -z-20"></div>
 
-    <nav class="sticky top-0 z-50 nav-glass px-6 py-4">
+    <nav class="sticky top-0 z-50 nav-glass px-6 py-5">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <a href="/" class="group">
-                    <h1 class="text-xl md:text-3xl font-black tracking-tighter shimmer-text italic uppercase">
-                        ROYAL SUITE <span class="text-[10px] promo-badge">2026 PRO</span>
+                    <h1 class="text-xl md:text-3xl font-black tracking-tighter shimmer-fire italic uppercase">
+                        ROBOT SUITE <span class="text-[10px] bg-orange-600 px-2 py-0.5 rounded text-black">FIRE V2.6</span>
                     </h1>
-                    <p class="hidden md:block text-[8px] text-slate-500 font-mono tracking-[0.4em] uppercase mt-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                        Universal Neural Logic Interface
-                    </p>
                 </a>
             </div>
 
             <div class="hidden lg:flex items-center gap-10 text-[10px] font-black uppercase tracking-[0.2em]">
                 <% 
                 const tools = [
-                    { name: 'Reviewer', path: '/', key: 'reviewer', desc: 'បង្រៀនកូដប្អូនឱ្យខ្លាំង' },
-                    { name: 'Culture', path: '/culture', key: 'culture', desc: 'បើកក្រាំងមាសខ្មែរ' },
-                    { name: 'Visualizer', path: '/visualizer', key: 'visualizer', desc: 'ផែនទីមន្តអាគម Logic' },
-                    { name: 'Study', path: '/study-buddy', key: 'study', desc: 'មិត្តរៀនសូត្រ AI' },
+                    { name: 'Reviewer', path: '/', key: 'reviewer', desc: 'Fix កូដឱ្យដើរឆេះសន្ធោសន្ធៅ' },
+                    { name: 'Culture', path: '/culture', key: 'culture', desc: 'បើកក្រាំងមាសមន្តអាគមខ្មែរ' },
+                    { name: 'Visualizer', path: '/visualizer', key: 'visualizer', desc: 'បំប្លែង Logic ទៅជា Flowchart' },
+                    { name: 'Study', path: '/study-buddy', key: 'study', desc: 'មិត្តរៀនសូត្រ AI ចិត្តល្អ' },
                     { name: 'K-IDA', path: '/kida', key: 'kida', desc: 'ខួរក្បាលទី២ សម្រាប់ PDF' },
-                    { name: 'Tutor', path: '/tutor', key: 'tutor', desc: 'គ្រូ AI ចិត្តល្អ' }
+                    { name: 'Tutor', path: '/tutor', key: 'tutor', desc: 'គ្រូ AI បង្រៀនឱ្យភ្លឺភ្នែក' }
                 ];
                 %>
 
                 <% tools.forEach(tool => { %>
                     <div class="relative group/link">
                         <% if (locals.user) { %>
-                            <a href="<%= tool.path %>" class="<%= pageKey === tool.key ? 'active-link' : 'text-slate-500 hover:text-white' %> transition-all duration-300">
+                            <a href="<%= tool.path %>" class="<%= pageKey === tool.key ? 'active-link' : 'text-slate-500 hover:text-orange-400' %> transition-all duration-300">
                                 <%= tool.name %>
                             </a>
                         <% } else { %>
-                            <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500 hover:text-white transition-all">
+                            <a href="javascript:void(0)" onclick="checkAuthBeforeAI()" class="text-slate-500 hover:text-orange-400 transition-all">
                                 <%= tool.name %>
                             </a>
                         <% } %>
-                        <span class="absolute -bottom-12 left-1/2 -translate-x-1/2 w-32 text-center text-[8px] text-cyan-400 opacity-0 group-hover/link:opacity-100 transition-all pointer-events-none bg-black/80 p-2 rounded-lg border border-white/5">
+                        <span class="absolute -bottom-14 left-1/2 -translate-x-1/2 w-40 text-center text-[8px] text-orange-400 opacity-0 group-hover/link:opacity-100 transition-all pointer-events-none bg-black/90 p-3 rounded-xl border border-orange-500/20 shadow-2xl">
                             <%= tool.desc %>
                         </span>
                     </div>
                 <% }); %>
                 
-                <a href="/history" class="<%= pageKey === 'history' ? 'active-link' : 'text-slate-500 hover:text-white' %> transition border-l border-white/10 pl-10">Archive</a>
+                <a href="/history" class="<%= pageKey === 'history' ? 'active-link' : 'text-slate-500 hover:text-white' %> transition border-l border-orange-500/20 pl-10">Archive</a>
             </div>
 
             <div class="flex items-center gap-6">
@@ -150,38 +147,38 @@
                         <div class="flex items-center gap-4 cursor-pointer">
                             <div class="hidden md:flex flex-col items-end">
                                 <span class="text-[10px] font-black text-white uppercase tracking-widest"><%= user.displayName %></span>
-                                <span class="text-[8px] text-cyan-400 font-mono uppercase tracking-tighter">Verified Link Active</span>
+                                <span class="text-[8px] text-orange-500 font-mono uppercase tracking-tighter">Pilot Core Active</span>
                             </div>
                             <img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.displayName %>" 
-                                 class="w-10 h-10 rounded-2xl user-avatar object-cover bg-black" alt="Profile">
+                                 class="w-11 h-11 rounded-2xl user-avatar object-cover bg-black" alt="Profile">
                         </div>
 
-                        <div class="absolute right-0 pt-4 w-56">
+                        <div class="dropdown-content">
                             <div class="dropdown-inner">
                                 <div class="space-y-1">
-                                    <a href="/dashboard" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-all">
-                                        <span>📊</span> Dashboard
+                                    <a href="/dashboard" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-orange-500/10 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-orange-400 transition-all">
+                                        <span>📊</span> Dashboard Hub
                                     </a>
-                                    <a href="/user/profile" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-all">
-                                        <span>⚙️</span> Profile Control
+                                    <a href="/user/profile" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-orange-500/10 text-[10px] font-bold uppercase tracking-widest text-slate-300 hover:text-orange-400 transition-all">
+                                        <span>⚙️</span> Pilot Control
                                     </a>
                                     <div class="h-px bg-white/5 my-2 mx-4"></div>
-                                    <a href="/logout" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-400 transition-all">
-                                        <span>🛑</span> Terminate Session
+                                    <a href="/logout" class="flex items-center gap-3 p-4 rounded-2xl hover:bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-500 transition-all">
+                                        <span>💀</span> Eject Identity
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 <% } else { %>
-                    <a href="/login" class="px-8 py-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 hover:border-white/20 hover:scale-105 transition-all shadow-2xl shimmer-text">
-                        Connect Neural Link
+                    <a href="/login" class="px-8 py-3 bg-orange-600/10 border border-orange-600/20 rounded-2xl text-[10px] font-black uppercase tracking-widest text-orange-500 hover:bg-orange-600 hover:text-black transition-all shadow-2xl shimmer-fire">
+                        Ignite Core
                     </a>
                 <% } %>
             </div>
         </div>
 
-        <div class="flex lg:hidden gap-8 mt-6 overflow-x-auto pb-3 text-[9px] font-black uppercase tracking-[0.2em] no-scrollbar border-t border-white/5 pt-5">
+        <div class="flex lg:hidden gap-8 mt-6 overflow-x-auto pb-4 text-[9px] font-black uppercase tracking-[0.2em] no-scrollbar border-t border-white/5 pt-6">
             <% tools.forEach(tool => { %>
                 <a href="<%= locals.user ? tool.path : 'javascript:void(0)' %>" 
                    onclick="<%= locals.user ? '' : 'checkAuthBeforeAI()' %>"
@@ -195,22 +192,53 @@
 
     <script>
     /**
-     * 🔐 Neural Access Guard - ស្ទីល VIP
+     * Mobile Dropdown Toggle Fix
+     */
+    document.addEventListener('DOMContentLoaded', () => {
+        const profileGroup = document.querySelector('.profile-group');
+        if (profileGroup) {
+            profileGroup.addEventListener('click', function(e) {
+                if (window.innerWidth < 1024) {
+                    e.stopPropagation();
+                    this.classList.toggle('active');
+                }
+            });
+        }
+        document.addEventListener('click', () => {
+            if (profileGroup) profileGroup.classList.remove('active');
+        });
+    });
+
+    /**
+     * 🔐 FUN & COOL AUTH GUARD (ជាមួយរូប Pepe!)
      */
     function checkAuthBeforeAI() {
         Swal.fire({
-            title: '🔐 ឈប់សិនបងហា🤭',
-            text: "សួស្តីអតិថិជនជាទីស្រឡាញ់! ដើម្បីប្រើប្រាស់បច្ចេកវិទ្យាមន្តអាគម AI និងរក្សាទុកប្រវត្តិនៃការសួរ (Archive) សូមមេត្តាភ្ជាប់គណនីរបស់ប្អូនជាមុនសិនណា🙏!",
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'ភ្ជាប់ Neural Link',
-            cancelButtonText: 'ចាំបន្តិច',
+            title: 'អត់ទាន់ Login ហី? 😹',
+            text: "ចូលគណនីសិនមកមេ ដើម្បីប្រើ AI បានពេញលេញ ហើយរីករាយជាមួយមុខងារពិសេសៗ! Enjoy! 🔥",
+            imageUrl: '/images/1.png', // ត្រូវប្រាកដថាមានរូបនេះក្នុង folder /public/images/
+            imageWidth: 150,
+            imageHeight: 150,
+            imageAlt: 'Pepe Enjoying',
+            // ចលនា Animate.css ញ៉ាក់សាច់!
+            showClass: {
+                popup: 'animate__animated animate__bounceInDown'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__bounceOutUp'
+            },
+            // ស្ទីល Robot Fire Cool Cool
             background: '#020617',
-            color: '#fff',
-            confirmButtonColor: '<%= theme || "#22d3ee" %>',
-            cancelButtonColor: '#1e293b',
+            color: '#f3f4f6',
+            showCancelButton: true,
+            confirmButtonText: 'Ignite Core (Login)',
+            cancelButtonText: 'ចាំបន្តិច',
+            confirmButtonColor: '#ff4d00',
+            cancelButtonColor: '#334155',
             customClass: {
-                popup: 'rounded-[40px] border border-white/10 shadow-2xl shadow-cyan-500/10'
+                popup: 'rounded-[3rem] border-4 border-orange-500/30 shadow-[0_0_50px_rgba(255,77,0,0.4)]',
+                title: 'font-black italic text-2xl text-orange-500',
+                image: 'rounded-2xl mt-4 border-2 border-orange-500/20'
             }
         }).then((result) => {
             if (result.isConfirmed) {
@@ -219,3 +247,5 @@
         });
     }
     </script>
+</body>
+</html>
