@@ -5,7 +5,8 @@
     --primary: <%= theme || "#22d3ee" %>;
     --secondary: #6366f1;
     --bg-dark: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
+    --card-bg: rgba(30, 41, 59, 0.6);
+    --border-light: rgba(255, 255, 255, 0.1);
   }
 
   body {
@@ -14,9 +15,10 @@
     color: #f8fafc;
     margin: 0;
     line-height: 1.6;
+    overflow-x: hidden;
   }
 
-  /* ១. Background បែបស្រទន់ មិនឱ្យរំខានភ្នែក */
+  /* ១. Background បែបស្ងប់ស្ងាត់ */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -24,36 +26,99 @@
     width: 100%;
     height: 100%;
     z-index: -1;
-    opacity: 0.15;
+    opacity: 0.1;
     pointer-events: none;
   }
 
-  /* ២. Card Design ថ្មី៖ ស្អាត បែបទំនើប តែមិនញ៉ាំញ៉ាំ */
-  .magic-card {
+  /* ២. Layout ពុះជាពីរ (Split Screen) */
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .main-auth-card {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 1100px;
     background: var(--card-bg);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(20px);
+    border-radius: 32px;
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5);
+  }
+
+  @media (min-width: 1024px) {
+    .main-auth-card {
+      grid-template-columns: 1.1fr 0.9fr;
+      min-height: 650px;
+    }
+  }
+
+  /* ផ្នែករូបភាព (Visual Side) */
+  .auth-visual-side {
+    position: relative;
+    background:
+      linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)),
+      url("images/2.png"); /* រូបភាព AI ថ្លៃថ្នូរ */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 40px;
+  }
+
+  .promote-text-box {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 25px;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    transition: transform 0.3s ease;
+  }
+
+  /* ផ្នែក Form (Form Side) */
+  .auth-form-side {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ៣. Styling Inputs & Buttons */
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 8s linear infinite;
+  }
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
   }
 
   .input-group label {
     display: block;
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: #94a3b8;
-    margin-bottom: 0.5rem;
-    margin-left: 0.25rem;
+    margin-bottom: 8px;
+    margin-left: 4px;
+    text-transform: uppercase;
   }
 
   .input-magic {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
     color: white !important;
-    padding: 1rem 1.25rem !important;
-    border-radius: 16px !important;
+    padding: 1.1rem 1.4rem !important;
+    border-radius: 18px !important;
     width: 100%;
     outline: none;
     transition: all 0.3s ease;
@@ -64,136 +129,76 @@
     box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.15);
   }
 
-  /* ៣. Button៖ ធំ ងាយស្រួលចុច (Good for all ages) */
   .btn-primary-custom {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: #0f172a;
-    font-weight: 700;
-    padding: 1rem;
-    border-radius: 16px;
+    font-weight: 800;
+    padding: 1.1rem;
+    border-radius: 18px;
     width: 100%;
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
     font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 20px -5px rgba(34, 211, 238, 0.3);
   }
 
   .btn-primary-custom:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px -5px rgba(34, 211, 238, 0.4);
-    opacity: 0.9;
+    box-shadow: 0 20px 30px -10px rgba(34, 211, 238, 0.4);
   }
 
   .btn-google {
     background: white;
-    color: #374151;
-    font-weight: 600;
+    color: #1e293b;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 0.875rem;
-    border-radius: 16px;
+    gap: 12px;
+    padding: 1rem;
+    border-radius: 18px;
     width: 100%;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e2e8f0;
     transition: all 0.3s ease;
   }
 
   .btn-google:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
-  }
-
-  /* ៤. Layout Adjustment */
-  .auth-container {
-    min-height: 90vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem;
-  }
-
-  .auth-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 3rem;
-    max-width: 1100px;
-    width: 100%;
-    align-items: center;
-  }
-
-  @media (min-width: 1024px) {
-    .auth-grid {
-      grid-template-columns: 1fr 450px;
-    }
-  }
-
-  .shimmer-text {
-    background: linear-gradient(90deg, #fff, var(--primary), #fff);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 8s linear infinite;
-  }
-
-  @keyframes shine {
-    to {
-      background-position: 200% center;
-    }
+    background: #f8fafc;
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
 
 <div class="auth-container">
-  <main class="auth-grid">
-    <section class="space-y-8 animate-in fade-in duration-700">
-      <div>
-        <h2
-          class="text-4xl md:text-6xl font-extrabold leading-tight shimmer-text"
-        >
-          ស្វាគមន៍មកកាន់ <br />
-          ពិភព AI ឆ្លាតវៃ
-        </h2>
-        <p class="mt-6 text-lg md:text-xl text-slate-300 max-w-lg">
-          ចូលប្រើប្រាស់គណនីរបស់អ្នក ដើម្បីបន្តដំណើរការជាមួយ
-          <span class="text-cyan-400 font-semibold">AI ផ្ទាល់ខ្លួន</span>
-          ដែលយល់ចិត្តអ្នកបំផុត!
+  <main class="main-auth-card animate-in fade-in duration-1000">
+    <section class="auth-visual-side hidden lg:flex">
+      <div class="promote-text-box">
+        <h2 class="text-3xl font-black text-white mb-3">Royal Cyber AI</h2>
+        <p class="text-slate-200 text-lg font-light italic leading-relaxed">
+          "រៀនឱ្យឆ្លាត យល់ឱ្យច្បាស់! ចូលរួមជាមួយ
+          <span class="text-cyan-400 font-bold">Evolution</span>
+          ដើម្បីបើកពិភពមន្តអាគម AI ផ្ទាល់ខ្លួនរបស់អ្នក។"
         </p>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div
-          class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10"
-        >
-          <span class="text-2xl">🔐</span>
-          <div>
-            <h4 class="text-sm font-bold text-white">សុវត្ថិភាពខ្ពស់</h4>
-            <p class="text-xs text-slate-400">ការពារទិន្នន័យរបស់អ្នក</p>
-          </div>
-        </div>
-        <div
-          class="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10"
-        >
-          <span class="text-2xl">🧠</span>
-          <div>
-            <h4 class="text-sm font-bold text-white">ការចងចាំឆ្លាតវៃ</h4>
-            <p class="text-xs text-slate-400">AI នឹងចងចាំអ្វីដែលអ្នកចង់បាន</p>
-          </div>
-        </div>
       </div>
     </section>
 
-    <section class="animate-in slide-in-from-bottom-10 duration-700">
-      <div class="magic-card p-8 md:p-10">
-        <div class="mb-8 text-center">
-          <h3 class="text-2xl font-bold text-white">ចូលប្រើប្រាស់</h3>
-          <p class="text-slate-400 text-sm mt-2">
-            សូមជ្រើសរើសវិធីសាស្ត្រណាមួយខាងក្រោម
+    <section class="auth-form-side">
+      <div class="w-full max-w-md mx-auto">
+        <div class="text-center mb-10">
+          <h1
+            class="text-3xl md:text-4xl font-extrabold shimmer-text uppercase"
+          >
+            ចូលប្រើប្រាស់
+          </h1>
+          <p class="text-slate-400 text-sm mt-3">
+            ស្វាគមន៍ត្រលប់មកវិញមិត្តសម្លាញ់!
           </p>
         </div>
 
-        <div class="space-y-5">
+        <div class="space-y-6">
           <button
             onclick="signInWithGoogle()"
             id="googleBtn"
@@ -207,27 +212,28 @@
             <span>បន្តជាមួយ Google</span>
           </button>
 
-          <div class="flex items-center gap-3 my-6">
+          <div class="flex items-center gap-3 py-2">
             <div class="h-px flex-1 bg-white/10"></div>
-            <span class="text-xs text-slate-500 uppercase font-medium"
+            <span
+              class="text-[10px] text-slate-500 uppercase font-black tracking-widest"
               >ឬ ប្រើអ៊ីមែល</span
             >
             <div class="h-px flex-1 bg-white/10"></div>
           </div>
 
-          <div class="space-y-4">
+          <div class="space-y-5">
             <div class="input-group">
-              <label for="email">អ៊ីមែល (Email)</label>
+              <label>អាសយដ្ឋានអ៊ីមែល</label>
               <input
                 type="email"
                 id="email"
                 class="input-magic"
-                placeholder="ឈ្មោះ@ឧទាហរណ៍.com"
+                placeholder="name@example.com"
               />
             </div>
 
             <div class="input-group">
-              <label for="password">លេខសម្ងាត់ (Password)</label>
+              <label>លេខសម្ងាត់</label>
               <div class="relative">
                 <input
                   type="password"
@@ -237,7 +243,7 @@
                 />
                 <button
                   onclick="togglePassword()"
-                  class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                  class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
                 >
                   <span id="eye-icon">👁️</span>
                 </button>
@@ -250,14 +256,29 @@
             id="authBtn"
             class="btn-primary-custom mt-2"
           >
-            ចូលទៅកាន់ប្រព័ន្ធ
+            បញ្ជូនសញ្ញាចូលប្រព័ន្ធ
           </button>
 
-          <p class="text-center text-sm text-slate-400 mt-6">
+          <div class="grid grid-cols-2 gap-4 mt-8">
+            <div class="flex items-center gap-2 text-slate-400">
+              <span class="text-lg">🔐</span>
+              <span class="text-[10px] uppercase font-bold tracking-tighter"
+                >សុវត្ថិភាពខ្ពស់</span
+              >
+            </div>
+            <div class="flex items-center gap-2 text-slate-400">
+              <span class="text-lg">🧠</span>
+              <span class="text-[10px] uppercase font-bold tracking-tighter"
+                >ការចងចាំឆ្លាតវៃ</span
+              >
+            </div>
+          </div>
+
+          <p class="text-center text-sm text-slate-500 mt-8">
             មិនទាន់មានគណនីមែនទេ?
             <a
               href="/register"
-              class="text-cyan-400 font-bold hover:text-cyan-300 transition-colors ml-1"
+              class="text-cyan-400 font-bold hover:underline ml-1"
               >ចុះឈ្មោះនៅទីនេះ</a
             >
           </p>
@@ -288,12 +309,11 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // ១. Background Animation (ធ្វើឱ្យទន់ភ្លន់ជាងមុន)
+  // ១. Background Particle Animation (យឺតៗ ស្ងប់ស្ងាត់)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
-
   window.addEventListener("mousemove", (e) => {
     mouse.x = e.clientX;
     mouse.y = e.clientY;
@@ -303,13 +323,13 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 40; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 2,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        size: Math.random() * 1.5,
       });
     }
   }
@@ -323,9 +343,8 @@
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 180) {
+      if (dist < 150) {
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(mouse.x, mouse.y);
@@ -337,12 +356,11 @@
     });
     requestAnimationFrame(draw);
   }
-
   init();
   draw();
   window.addEventListener("resize", init);
 
-  // ២. Password Toggle
+  // ២. Password Logic
   window.togglePassword = () => {
     const passInput = document.getElementById("password");
     const eye = document.getElementById("eye-icon");
@@ -355,42 +373,38 @@
     }
   };
 
-  // ៣. Google Login
+  // ៣. Auth Handlers
   window.signInWithGoogle = async () => {
     const googleBtn = document.getElementById("googleBtn");
     const originalText = googleBtn.innerHTML;
     googleBtn.innerHTML = "<span>កំពុងតភ្ជាប់...</span>";
-    googleBtn.style.opacity = "0.7";
-    googleBtn.style.pointerEvents = "none";
-
     try {
       const result = await signInWithPopup(auth, provider);
       await sendTokenToBackend(result.user);
     } catch (error) {
       googleBtn.innerHTML = originalText;
-      googleBtn.style.opacity = "1";
-      googleBtn.style.pointerEvents = "all";
-      showError("ការតភ្ជាប់ជាមួយ Google បរាជ័យ!");
+      Swal.fire({
+        text: "ការតភ្ជាប់បរាជ័យ!",
+        icon: "error",
+        background: "#1e293b",
+        color: "#fff",
+      });
     }
   };
 
-  // ៤. Email Login
   window.handleAuth = async () => {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
     const btn = document.getElementById("authBtn");
-
-    if (!email || !password) {
+    if (!email || !password)
       return Swal.fire({
-        text: "បំពេញអ៊ីមែល និងលេខសម្ងាត់ផងបងប្រូ!",
+        text: "បំពេញឱ្យគ្រប់សិនបងប្រូ!",
         icon: "warning",
         confirmButtonColor: "#22d3ee",
       });
-    }
 
-    btn.innerText = "កំពុងត្រួតពិនិត្យ...";
+    btn.innerText = "កំពុងពិនិត្យ...";
     btn.classList.add("pointer-events-none", "opacity-70");
-
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -399,9 +413,14 @@
       );
       await sendTokenToBackend(userCredential.user);
     } catch (error) {
-      btn.innerText = "ចូលទៅកាន់ប្រព័ន្ធ";
+      btn.innerText = "បញ្ជូនសញ្ញាចូលប្រព័ន្ធ";
       btn.classList.remove("pointer-events-none", "opacity-70");
-      showError("អូហូ! រកគណនីមិនឃើញទេ ឬលេខសម្ងាត់ខុសបាត់ហើយ!");
+      Swal.fire({
+        text: "អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ!",
+        icon: "error",
+        background: "#1e293b",
+        color: "#fff",
+      });
     }
   };
 
@@ -412,35 +431,15 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ idToken }),
     });
-
-    if (res.ok) {
-      window.location.href = "/dashboard";
-    } else if (res.status === 404) {
+    if (res.ok) window.location.href = "/dashboard";
+    else {
+      const data = await res.json();
       Swal.fire({
-        icon: "info",
-        title: "មិនទាន់មានគណនី",
-        text: "អ៊ីមែលនេះមិនទាន់បានចុះឈ្មោះក្នុងប្រព័ន្ធយើងទេ ចុះឈ្មោះមួយសិនមក!",
+        text: data.message || "មានបញ្ហាបច្ចេកទេស!",
+        icon: "error",
         background: "#1e293b",
         color: "#fff",
-        confirmButtonText: "ទៅចុះឈ្មោះ",
-        confirmButtonColor: "#6366f1",
-      }).then(() => {
-        window.location.href = "/register";
       });
-    } else {
-      const data = await res.json();
-      showError(data.message || "មានបញ្ហាបច្ចេកទេសបន្តិចបន្តួច!");
     }
-  }
-
-  function showError(msg) {
-    Swal.fire({
-      icon: "error",
-      title: "មានបញ្ហា!",
-      text: msg,
-      background: "#1e293b",
-      color: "#fff",
-      confirmButtonColor: "#ef4444",
-    });
   }
 </script>
