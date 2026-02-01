@@ -9,18 +9,21 @@
 <style>
   :root {
     --royal-gold: <%= theme || "#d4af37" %>;
-    --deep-bronze: #8b4513;
-    --bg: #0a0a0a;
-    --magic-glow: rgba(212, 175, 55, 0.3);
-  }
-  body {
-    font-family: "Kantumruy Pro", sans-serif;
-    background-color: var(--bg);
-    color: #f3f4f6;
-    overflow-x: hidden;
+    --gold-glow: rgba(212, 175, 55, 0.2);
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-light: rgba(212, 175, 55, 0.15);
   }
 
-  /* ១. Interactive Magic Background */
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* ១. Background បែបថ្លៃថ្នូរ (Modern Khmer Heritage) */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -28,68 +31,93 @@
     width: 100%;
     height: 100%;
     z-index: -20;
-    opacity: 0.3;
+    opacity: 0.15;
+    pointer-events: none;
   }
+
   .bg-pattern {
     position: fixed;
     inset: 0;
     background-image: url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
-    opacity: 0.05;
+    opacity: 0.03;
     z-index: -15;
-  }
-  .hero-gold-glow {
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(212, 175, 55, 0.1) 0%,
-      transparent 80%
-    );
+    pointer-events: none;
   }
 
-  /* ២. Magic Card Architecture */
+  /* ២. Card Design៖ ស្អាត បែបសាមញ្ញ មិនឆើតឆាយ */
   .magic-card {
-    position: relative;
-    background: rgba(20, 20, 20, 0.7);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(212, 175, 55, 0.1);
-    transition: all 0.5s ease;
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      var(--royal-gold),
-      transparent 30%
-    );
-    animation: rotateMagic 8s linear infinite;
-    z-index: -1;
-    opacity: 0.15;
-  }
-  @keyframes rotateMagic {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    transition: all 0.3s ease;
   }
 
-  /* ៣. Shimmer & Heritage Styles */
+  .magic-card:hover {
+    border-color: var(--royal-gold);
+    background: rgba(30, 41, 59, 0.85);
+  }
+
+  /* ៣. Input & Dropdown Styles */
+  .input-custom {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 24px !important;
+    color: white !important;
+    padding: 1.5rem !important;
+    width: 100%;
+    outline: none;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .input-custom:focus {
+    border-color: var(--royal-gold) !important;
+    box-shadow: 0 0 0 4px var(--gold-glow) !important;
+  }
+
+  .select-custom {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    color: var(--royal-gold);
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  /* ៤. Button Styles */
+  .btn-khmer {
+    background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+    color: #0f172a !important;
+    font-weight: 800;
+    padding: 1.2rem 2.5rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1rem;
+  }
+
+  .btn-khmer:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px var(--gold-glow);
+    filter: brightness(1.1);
+  }
+
+  /* ៥. Promote Page Styles */
   .shimmer-gold {
-    background: linear-gradient(90deg, #ffd700, #b8860b, #ffd700);
+    background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 6s linear infinite;
   }
+
   @keyframes shine {
     to {
       background-position: 200% center;
@@ -98,84 +126,47 @@
 
   .heritage-badge {
     background: rgba(212, 175, 55, 0.1);
-    border: 1px solid rgba(212, 175, 55, 0.3);
+    border: 1px solid var(--border-light);
     color: var(--royal-gold);
-    padding: 8px 20px;
+    padding: 6px 16px;
     border-radius: 99px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
-    text-shadow: 0 0 10px var(--magic-glow);
+    text-transform: uppercase;
+    letter-spacing: 2px;
   }
 
-  .float-ui {
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .btn-khmer {
-    background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
-    color: #000 !important;
-    font-weight: 900;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 25px var(--magic-glow);
-  }
-  .btn-khmer:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 0 45px var(--royal-gold);
-  }
-
-  /* Markdown Responsive Typography */
   .prose-custom {
     line-height: 1.8;
-    color: #e5e7eb;
+    color: #cbd5e1;
+    font-size: 1.1rem;
   }
   .prose-custom strong {
     color: var(--royal-gold);
-    text-shadow: 0 0 10px var(--magic-glow);
-  }
-  .prose-custom h1,
-  .prose-custom h2 {
-    color: var(--royal-gold);
-    margin-top: 1.5rem;
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="bg-pattern"></div>
-<div class="hero-gold-glow fixed inset-0 -z-10"></div>
 
-<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-  <header
-    class="text-center mb-20 space-y-10 animate-in fade-in zoom-in duration-1000"
-  >
-    <div class="flex justify-center">
-      <span class="heritage-badge uppercase float-ui"
-        >Ancient Wisdom x Neural Intelligence</span
-      >
+<main class="max-w-7xl mx-auto px-6 py-12 relative">
+  <header class="text-center mb-16 animate-in fade-in duration-1000">
+    <div class="flex justify-center mb-6">
+      <span class="heritage-badge">Ancient Wisdom x AI Intelligence</span>
     </div>
 
     <h2
-      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-gold leading-none pb-4 uppercase italic"
+      class="text-5xl md:text-8xl font-black shimmer-gold mb-8 uppercase italic leading-none"
     >
-      មគ្គុទ្ទេសក៍វប្បធម៌ខ្មែរ
+      មគ្គុទ្ទេសក៍វប្បធម៌
     </h2>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
-        "បើកក្រាំងមាសនៃប្រវត្តិសាស្ត្រខ្មែរ តាមរយៈ
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
+        "បើកក្រាំងមាសនៃប្រវត្តិសាស្ត្រខ្មែរ តាមរយៈ <br />
         <span class="text-yellow-500 font-bold">មន្តអាគមឌីជីថល</span>!"
       </p>
-      <p
-        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
-      >
+      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
         តើប្អូនចង់ដឹងពីអាថ៌កំបាំងនៃប្រាសាទបុរាណ
         ឬទំនៀមទម្លាប់ខ្មែរដែលបាត់បង់មែនទេ?
         <strong class="text-yellow-600">AI Culture Guide</strong>
@@ -185,87 +176,80 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🏯
-        </div>
-        <h4 class="text-yellow-500 font-black uppercase mb-3">
-          Ancient Archives
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🏯</span>
+        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
+          ក្រាំងចំណេះដឹងបុរាណ
         </h4>
-        <p class="text-sm text-slate-400 italic">
-          ទាញយកចំណេះដឹងពីសម័យមហានគរ មកបង្ហាញក្នុងមួយពព្រិចភ្នែក។
+        <p class="text-slate-400 text-xs font-light">
+          ទាញយកទិន្នន័យពីសម័យមហានគរ មកបង្ហាញក្នុងមួយពព្រិចភ្នែក។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          📜
-        </div>
-        <h4 class="text-yellow-500 font-black uppercase mb-3">
-          Wise Storyteller
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">📜</span>
+        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
+          អ្នកនិទានរឿងវៃឆ្លាត
         </h4>
-        <p class="text-sm text-slate-400 italic">
+        <p class="text-slate-400 text-xs font-light">
           ការបកស្រាយបែបមន្តអាគម ងាយយល់ និងមានតុងកំប្លែងៗ។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          ✨
-        </div>
-        <h4 class="text-yellow-500 font-black uppercase mb-3">Neural Wisdom</h4>
-        <p class="text-sm text-slate-400 italic">
-          ប្រើបញ្ញាសិប្បនិម្មិតកម្រិតខ្ពស់
-          ដើម្បីផ្ទៀងផ្ទាត់រាល់ទិន្នន័យប្រវត្តិសាស្ត្រ។
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">✨</span>
+        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
+          ការផ្ទៀងផ្ទាត់ច្បាស់លាស់
+        </h4>
+        <p class="text-slate-400 text-xs font-light">
+          ប្រើ AI ដើម្បីផ្ទៀងផ្ទាត់ទិន្នន័យប្រវត្តិសាស្ត្រឱ្យបានត្រឹមត្រូវ។
         </p>
       </div>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 gap-12">
-    <div class="magic-card p-8 md:p-16 relative shadow-2xl">
+  <div class="max-w-4xl mx-auto space-y-12">
+    <section class="magic-card p-8 md:p-12 shadow-2xl">
       <textarea
         id="questionInput"
-        class="w-full h-40 md:h-56 bg-black/40 border border-white/10 rounded-[30px] p-8 focus:ring-4 focus:ring-yellow-500/20 outline-none text-xl md:text-2xl leading-relaxed text-slate-100 transition-all placeholder:text-slate-800 mb-10 shadow-inner"
+        class="input-custom h-40 md:h-52 resize-none no-scrollbar"
         placeholder="ឧទាហរណ៍៖ តើប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងគោលបំណងអ្វី?"
       ></textarea>
 
       <div
-        class="flex flex-col lg:flex-row items-center justify-between gap-10"
+        class="flex flex-col lg:flex-row items-center justify-between gap-8 mt-10"
       >
         <div class="w-full lg:w-1/2">
           <label
-            class="block text-[11px] font-black text-yellow-600 uppercase tracking-[0.3em] mb-4 ml-4"
-            >ប្រភេទនៃការបកស្រាយ (Wisdom Style)</label
+            class="block text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-3 ml-2"
+            >របៀបបកស្រាយ (Wisdom Style)</label
           >
-          <select
-            id="answerType"
-            class="w-full bg-black/60 border border-yellow-500/20 rounded-full px-8 py-5 text-lg text-yellow-200 outline-none appearance-none cursor-pointer"
-          >
+          <select id="answerType" class="input-custom py-4 !text-yellow-200">
             <option value="brief">✨ សង្ខេបខ្លី ខ្លឹម (Brief Wisdom)</option>
             <option value="detailed">📜 ពន្យល់លម្អិត (Ancient Archives)</option>
           </select>
         </div>
+
         <button
           onclick="askAI()"
           id="btnAsk"
-          class="btn-khmer px-14 py-6 rounded-full text-xl shadow-2xl active:scale-90 flex items-center gap-4 w-full lg:w-auto justify-center uppercase tracking-widest"
+          class="btn-khmer w-full lg:w-auto"
         >
-          <span id="btnText">សាកសួរអ្នកជំនាញ AI</span>
+          សាកសួរអ្នកជំនាញ AI
         </button>
       </div>
-    </div>
+    </section>
 
-    <div id="loading" class="hidden py-24 text-center">
-      <div class="relative w-24 h-24 mx-auto mb-10">
+    <div id="loading" class="hidden py-16 text-center">
+      <div class="relative w-20 h-20 mx-auto mb-8">
         <div
-          class="absolute inset-0 border-8 border-yellow-500/10 rounded-full"
+          class="absolute inset-0 border-4 border-yellow-500/10 rounded-full"
         ></div>
         <div
-          class="absolute inset-0 border-8 border-t-yellow-500 rounded-full animate-spin"
+          class="absolute inset-0 border-4 border-t-yellow-500 rounded-full animate-spin"
         ></div>
       </div>
       <p
-        class="mt-8 text-yellow-500 text-sm font-black animate-pulse uppercase tracking-[0.4em]"
+        class="text-yellow-500 text-xs font-bold animate-pulse uppercase tracking-[0.4em]"
       >
         កំពុងស្រាវជ្រាវក្រាំងមាស...
       </p>
@@ -273,20 +257,15 @@
 
     <div
       id="responseSection"
-      class="hidden space-y-8 animate-in zoom-in-95 duration-1000"
+      class="hidden animate-in slide-in-from-bottom-6 duration-700"
     >
-      <div
-        class="magic-card p-10 md:p-16 border-l-[15px] border-yellow-600 relative"
-      >
+      <div class="magic-card p-10 md:p-14 border-l-[12px] border-yellow-600">
         <div
-          class="text-[10px] font-black tracking-[0.5em] text-yellow-600/40 uppercase mb-10"
+          class="text-[10px] font-bold text-yellow-600/50 uppercase tracking-[0.3em] mb-8"
         >
           Chronicle Extraction Result
         </div>
-        <div
-          id="responseText"
-          class="prose-custom text-lg md:text-2xl font-light italic"
-        ></div>
+        <div id="responseText" class="prose-custom italic"></div>
       </div>
     </div>
   </div>
@@ -298,26 +277,27 @@
   const socket = io();
   let isWaiting = false;
 
-  // ១. Interactive Magic Background (Mouse Follow)
+  // ១. Background Animation (រង្វើល និងយឺត)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 60; i++) {
+    const count = window.innerWidth < 768 ? 30 : 60;
+    for (let i = 0; i < count; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
         size: Math.random() * 2,
       });
     }
@@ -325,14 +305,13 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "<%= theme || '#ffd700' %>";
-    ctx.strokeStyle = "rgba(212, 175, 55, 0.1)";
+    ctx.fillStyle = "<%= theme || '#d4af37' %>";
+    ctx.strokeStyle = "rgba(212, 175, 55, 0.05)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
       if (dist < 150) {
         ctx.beginPath();
@@ -340,7 +319,6 @@
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
       }
-
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -349,6 +327,7 @@
   }
   init();
   draw();
+  window.addEventListener("resize", init);
 
   // ២. AI Interaction Logic
   function askAI() {
@@ -359,17 +338,15 @@
 
     if (!firebaseUid)
       return Swal.fire({
+        text: "សូមចូលគណនីសិនប្អូន!",
         icon: "warning",
-        title: "សូមចូលគណនីសិន!",
-        background: "#0a0a0a",
-        color: "#ffd700",
+        confirmButtonColor: "#d4af37",
       });
     if (!question)
       return Swal.fire({
+        text: "តើប្អូនចង់ដឹងអ្វីដែរ?",
         icon: "question",
-        title: "តើប្អូនចង់ដឹងអ្វីដែរ?",
-        background: "#0a0a0a",
-        color: "#ffd700",
+        confirmButtonColor: "#d4af37",
       });
 
     toggleState(true);
@@ -393,7 +370,7 @@
       icon: "error",
       title: "Oops!",
       text: msg,
-      background: "#0a0a0a",
+      background: "#0f172a",
       color: "#fff",
     });
   });
@@ -410,6 +387,4 @@
       loader.classList.add("hidden");
     }
   }
-
-  window.addEventListener("resize", init);
 </script>

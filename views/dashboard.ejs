@@ -6,204 +6,255 @@
   :root {
     --primary: <%= theme || "#8b5cf6" %>;
     --secondary: #06b6d4;
-    --bg-dark: #020617;
-    --magic-glow: rgba(139, 92, 246, 0.3);
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.5);
+    --border-light: rgba(255, 255, 255, 0.08);
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', "Kantumruy Pro", sans-serif;
+    font-family: "Kantumruy Pro", 'Plus Jakarta Sans', sans-serif;
     background-color: var(--bg-dark);
-    color: #f1f5f9;
-    overflow-x: hidden;
+    color: #e2e8f0;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* ២. Interactive Magic Background */
-  #neural-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -20; opacity: 0.25; }
-  .hero-glow { background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 70%); }
-
-  /* ៣. Magic Card Architecture */
-  .magic-card {
-    position: relative;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: conic-gradient(from 0deg, transparent, var(--primary), transparent 30%);
-    animation: rotateMagic 10s linear infinite;
-    z-index: -1;
+  /* ១. Background បែបថ្លៃថ្នូរ និងស្ងប់ស្ងាត់ */
+  #neural-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -20;
     opacity: 0.15;
+    pointer-events: none;
   }
-  @keyframes rotateMagic { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-  /* ៤. Shimmer & UI Animations */
+  .hero-glow {
+    background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* ២. Card Design ថ្មី៖ សាមញ្ញ ងាយស្រួលមើល */
+  .magic-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 24px;
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+  }
+
+  .magic-card:hover {
+    border-color: rgba(139, 92, 246, 0.3);
+    background: rgba(30, 41, 59, 0.7);
+    transform: translateY(-4px);
+  }
+
+  /* ៣. Profile Section */
+  .avatar-ring {
+    padding: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border-radius: 2rem;
+    box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4);
+  }
+
   .shimmer-text {
-    background: linear-gradient(90deg, #fff, var(--primary), var(--secondary), #fff);
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 8s linear infinite;
   }
+
   @keyframes shine { to { background-position: 200% center; } }
 
-  .float-ui { animation: float 4s ease-in-out infinite; }
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-  .avatar-ring {
-    position: relative;
-    padding: 6px;
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    border-radius: 2.5rem;
-    box-shadow: 0 0 30px var(--magic-glow);
+  .status-online {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
-  /* Status Badges */
-  .neural-badge {
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    color: var(--primary);
-    padding: 6px 16px;
-    border-radius: 99px;
-    font-size: 10px;
+  /* ៤. Stats Typography */
+  .stat-value {
+    font-size: 2.5rem;
     font-weight: 800;
-    letter-spacing: 0.1em;
+    color: white;
+    letter-spacing: -1px;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+  }
+
+  /* ៥. Activity Item */
+  .activity-item {
+    border-left: 4px solid var(--primary);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 16px;
+    transition: background 0.2s;
+  }
+
+  .activity-item:hover {
+    background: rgba(255, 255, 255, 0.05);
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="hero-glow fixed inset-0 -z-10"></div>
 
-<main class="max-w-7xl mx-auto px-6 py-12 relative">
-  <section class="magic-card rounded-[3rem] p-10 md:p-16 mb-12 animate-in fade-in slide-in-from-top-10 duration-1000">
-    <div class="flex flex-col lg:flex-row items-center gap-12">
-      <div class="avatar-ring float-ui">
+<main class="max-w-7xl mx-auto px-6 py-8 md:py-12 relative">
+  <section class="magic-card p-8 md:p-12 mb-10 animate-in fade-in slide-in-from-top-4 duration-700">
+    <div class="flex flex-col md:flex-row items-center gap-8">
+      <div class="avatar-ring shrink-0">
         <img src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/adventurer/svg?seed=' + user.displayName %>" 
-             class="w-32 h-32 md:w-44 md:h-44 rounded-[2rem] object-cover bg-slate-800" alt="Profile">
+             class="w-28 h-28 md:w-36 md:h-36 rounded-[1.7rem] object-cover bg-slate-800" alt="Profile">
       </div>
       
-      <div class="text-center lg:text-left space-y-6">
-        <div class="flex flex-wrap justify-center lg:justify-start gap-4">
-            <span class="neural-badge uppercase">Neural Rank: Elite Architect</span>
-            <span class="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">System Online</span>
+      <div class="text-center md:text-left">
+        <div class="flex flex-wrap justify-center md:justify-start gap-3 mb-4">
+          <span class="status-online">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            ប្រព័ន្ធដំណើរការធម្មតា
+          </span>
+          <span class="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-3 py-1 rounded-full text-[11px] font-bold uppercase">Elite Architect</span>
         </div>
-        <h2 class="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none">
+        <h2 class="text-4xl md:text-6xl font-extrabold text-white mb-4">
           សួស្តី, <span class="shimmer-text italic"><%= user.displayName %></span>!
         </h2>
-        <div class="max-w-2xl">
-            <p class="text-xl md:text-2xl text-slate-300 font-light italic leading-relaxed">
-              "សូមស្វាគមន៍មកកាន់ <strong class="text-purple-400">Neural Control Center</strong>! រាល់ការជជែក គ្រប់ដានជើងមេរៀន និងកូដដែលប្អូនបានបំប្លែង សុទ្ធតែត្រូវបានរក្សាទុកក្នុងក្រាំងមាសឌីជីថលជារៀងរហូត។"
-            </p>
-        </div>
+        <p class="text-slate-400 text-lg md:text-xl font-light italic max-w-2xl leading-relaxed">
+          "ត្រលប់មកវិញហើយមែនទេ? រាល់ចំណេះដឹងដែលប្អូនបានសួរនាំ ត្រូវបានរក្សាទុកយ៉ាងត្រឹមត្រូវក្នុង <span class="text-purple-400 font-semibold">ក្រាំងមាសឌីជីថល</span> របស់ប្អូន។"
+        </p>
       </div>
     </div>
   </section>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-    <div class="magic-card p-10 group hover:scale-105 transition-all">
-      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">📚</div>
-      <h3 class="text-5xl font-black text-white mb-2"><%= totalWisdom %></h3>
-      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Knowledge Base Sync</p>
-      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-          <div class="h-full bg-purple-500 w-3/4 animate-pulse"></div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    <div class="magic-card p-8">
+      <div class="flex justify-between items-start mb-4">
+        <span class="text-3xl">📚</span>
+        <span class="text-purple-500 font-bold text-xs uppercase">Wisdom</span>
+      </div>
+      <h3 class="stat-value"><%= totalWisdom %></h3>
+      <p class="stat-label">ចំណេះដឹងសរុប</p>
+      <div class="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+        <div class="h-full bg-purple-500 w-3/4"></div>
       </div>
     </div>
 
-    <div class="magic-card p-10 group hover:scale-105 transition-all">
-      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">🤖</div>
-      <h3 class="text-5xl font-black text-white mb-2"><%= tutorCount %></h3>
-      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Neural Interactions</p>
-      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-          <div class="h-full bg-cyan-400 w-1/2 animate-pulse"></div>
+    <div class="magic-card p-8">
+      <div class="flex justify-between items-start mb-4">
+        <span class="text-3xl">🤖</span>
+        <span class="text-cyan-400 font-bold text-xs uppercase">Neural</span>
+      </div>
+      <h3 class="stat-value"><%= tutorCount %></h3>
+      <p class="stat-label">ការជជែកជាមួយ AI</p>
+      <div class="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+        <div class="h-full bg-cyan-400 w-1/2"></div>
       </div>
     </div>
 
-    <div class="magic-card p-10 group hover:scale-105 transition-all sm:col-span-2 lg:col-span-1">
-      <div class="text-5xl mb-6 group-hover:scale-125 transition-transform duration-500">⚡</div>
-      <h3 class="text-5xl font-black text-emerald-400 mb-2 italic">Active</h3>
-      <p class="text-slate-500 text-xs font-black uppercase tracking-[0.3em]">Neural Link Protocol</p>
-      <div class="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-          <div class="h-full bg-emerald-500 w-full"></div>
+    <div class="magic-card p-8 sm:col-span-2 lg:col-span-1">
+      <div class="flex justify-between items-start mb-4">
+        <span class="text-3xl">⚡</span>
+        <span class="text-emerald-400 font-bold text-xs uppercase">Status</span>
+      </div>
+      <h3 class="stat-value text-emerald-400 italic">Active</h3>
+      <p class="stat-label">ស្ថានភាពតភ្ជាប់</p>
+      <div class="mt-4 h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+        <div class="h-full bg-emerald-500 w-full"></div>
       </div>
     </div>
   </div>
 
-  <section class="mb-16">
-    <div class="flex items-center gap-6 mb-10">
-        <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em] whitespace-nowrap">System Capabilities</h4>
-        <div class="h-px w-full bg-gradient-to-r from-slate-800 to-transparent"></div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+    <div class="p-6 rounded-2xl bg-gradient-to-br from-purple-500/5 to-transparent border border-purple-500/10">
+      <h5 class="text-purple-400 font-bold mb-2 flex items-center gap-2 text-sm">
+        🚀 វិភាគរហ័សទាន់ចិត្ត
+      </h5>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        រាល់សំណួររបស់ប្អូន ត្រូវបានវិភាគដោយ Gemini 1.5 Flash ផ្ដល់ចម្លើយភ្លាមៗ មិនបាច់ចាំយូរនាំឱ្យហត់។
+      </p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="magic-card p-8 bg-purple-500/5">
-            <h5 class="text-purple-400 font-bold mb-3 uppercase text-xs">🚀 Ultra-Fast Analysis</h5>
-            <p class="text-sm text-slate-400 italic font-light">រាល់សំណួររបស់ប្អូន ត្រូវបានវិភាគដោយ Gemini 1.5 Flash ដែលផ្ដល់ចម្លើយលឿនបំផុត មិនឱ្យប្អូនចាំយូរឡើយ!</p>
-        </div>
-        <div class="magic-card p-8 bg-cyan-500/5">
-            <h5 class="text-cyan-400 font-bold mb-3 uppercase text-xs">🧠 Memory Persistence</h5>
-            <p class="text-sm text-slate-400 italic font-light">ប្រព័ន្ធ Dashboard នេះនឹងរៀបរាប់ពីគ្រប់សកម្មភាពប្អូន ជួយឱ្យប្អូនងាយស្រួលស្វែងរកមេរៀនដែលបានរៀនរួច។</p>
-        </div>
+    <div class="p-6 rounded-2xl bg-gradient-to-br from-cyan-500/5 to-transparent border border-cyan-500/10">
+      <h5 class="text-cyan-400 font-bold mb-2 flex items-center gap-2 text-sm">
+        🧠 ការចងចាំអមតៈ
+      </h5>
+      <p class="text-sm text-slate-400 leading-relaxed">
+        មិនថាប្អូនសួរតាំងពីឆ្នាំណាទេ ប្រព័ន្ធនឹងរក្សាទុកដានជើងមេរៀនទាំងអស់ ឱ្យប្អូនងាយស្រួលរកមើលឡើងវិញ។
+      </p>
     </div>
-  </section>
+  </div>
 
-  <div class="space-y-8">
-    <div class="flex justify-between items-center mb-10">
-        <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em]">Neural Footprints (Recent)</h4>
-        <a href="/history" class="text-[10px] font-black text-purple-400 uppercase tracking-widest hover:text-white transition-all">View Full Archive →</a>
+  <section>
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <h4 class="stat-label">សកម្មភាពចុងក្រោយ</h4>
+        <div class="h-1 w-12 bg-purple-500 mt-2 rounded-full"></div>
+      </div>
+      <a href="/history" class="text-xs font-bold text-purple-400 hover:text-white transition-colors uppercase tracking-widest">មើលទាំងអស់ →</a>
     </div>
 
-    <div class="grid gap-6">
+    <div class="space-y-4">
       <% recentActivity.forEach(act => { %>
-        <div class="magic-card p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-l-[10px] border-purple-500/30 hover:border-purple-500 transition-all">
-          <div class="flex-1 space-y-3">
-            <p class="text-white font-light text-2xl italic leading-relaxed">"<%= act.userInput %>"</p>
-            <div class="flex items-center gap-4">
-              <span class="text-[9px] bg-white/5 px-3 py-1 rounded-full text-slate-400 border border-white/10 font-mono uppercase tracking-widest"><%= act.toolName %></span>
-              <span class="text-[9px] text-slate-500 uppercase font-bold tracking-tighter">Sync Date: <%= new Date(act.createdAt).toLocaleDateString() %></span>
+        <div class="activity-item p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="flex-1">
+            <p class="text-white text-lg font-medium leading-relaxed mb-2">"<%= act.userInput %>"</p>
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="text-[10px] bg-slate-800 px-3 py-1 rounded-lg text-slate-300 border border-white/5 font-mono"><%= act.toolName %></span>
+              <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tight">Sync: <%= new Date(act.createdAt).toLocaleDateString() %></span>
             </div>
           </div>
-          <a href="/history" class="w-full md:w-auto text-center px-10 py-4 rounded-2xl bg-white/5 hover:bg-purple-600 hover:text-white border border-white/10 text-purple-400 text-xs font-black transition-all active:scale-90 uppercase tracking-widest shadow-xl">
-            Analyze Log
+          <a href="/history" class="shrink-0 px-6 py-2.5 rounded-xl bg-purple-500/10 hover:bg-purple-500 text-purple-400 hover:text-white text-[11px] font-bold transition-all uppercase tracking-wider border border-purple-500/20">
+            វិភាគទិន្នន័យ
           </a>
         </div>
       <% }) %>
       
       <% if (recentActivity.length === 0) { %>
-        <div class="text-center py-20 opacity-30">
-            <p class="text-xl font-black italic uppercase tracking-[0.3em]">No Activity Detected in Neural Node</p>
-            <p class="text-sm mt-2">តោះចាប់ផ្ដើមបេសកកម្មរៀនសូត្រជាមួយ AI ទាំងអស់គ្នា!</p>
+        <div class="text-center py-16 magic-card border-dashed">
+          <p class="text-slate-500 font-bold italic">មិនទាន់មានសកម្មភាពនៅឡើយទេ...</p>
+          <p class="text-xs text-slate-600 mt-1 uppercase">តោះ! ចាប់ផ្ដើមសួរសំណួរដំបូងរបស់អ្នក</p>
         </div>
       <% } %>
     </div>
-  </div>
+  </section>
 </main>
 
 <%- include('partials/footer') %>
 
 <script>
-  // ១. Interactive Particle Background (Mouse Follow)
+  // ១. Background Animation (Calm & Slow)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
-  window.addEventListener("mousemove", (e) => { mouse.x = e.x; mouse.y = e.y; });
+  window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
 
   function init() {
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 80; i++) {
+    for (let i = 0; i < 60; i++) { // បន្ថយចំនួនគ្រាប់ចុចកុំឱ្យរញ៉េរញ៉ៃ
       dots.push({ 
           x: Math.random() * canvas.width, 
           y: Math.random() * canvas.height, 
-          vx: (Math.random() - 0.5) * 0.5, 
-          vy: (Math.random() - 0.5) * 0.5, 
-          size: Math.random() * 2 
+          vx: (Math.random() - 0.5) * 0.3, // បន្ថយល្បឿនឱ្យដើរយឺតៗ
+          vy: (Math.random() - 0.5) * 0.3, 
+          size: Math.random() * 1.5 + 0.5
       });
     }
   }
@@ -211,14 +262,16 @@
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "<%= theme || '#8b5cf6' %>";
-    ctx.strokeStyle = "rgba(139, 92, 246, 0.05)";
+    ctx.strokeStyle = "rgba(139, 92, 246, 0.04)";
     dots.forEach(d => {
       d.x += d.vx; d.y += d.vy;
-      if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
       
-      // Connect to mouse
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 150) { ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke(); }
+      if (dist < 150) {
+        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+      }
       
       ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
     });

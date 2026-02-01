@@ -5,18 +5,21 @@
 <style>
   :root {
     --primary: <%= theme || "#6366f1" %>;
-    --secondary: #a855f7;
-    --bg: #030712;
-    --magic-glow: rgba(99, 102, 241, 0.3);
-  }
-  body {
-    font-family: "Kantumruy Pro", sans-serif;
-    background-color: var(--bg);
-    color: #e2e8f0;
-    overflow-x: hidden;
+    --secondary: #818cf8;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-light: rgba(255, 255, 255, 0.1);
   }
 
-  /* ១. Interactive Magic Background */
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ១. Background បែបស្ងប់ស្ងាត់ ជួយឱ្យផ្ដោតអារម្មណ៍រៀន */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -24,66 +27,75 @@
     width: 100%;
     height: 100%;
     z-index: -20;
-    opacity: 0.25;
-  }
-  .study-gradient {
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(99, 102, 241, 0.1) 0%,
-      transparent 80%
-    );
+    opacity: 0.1;
+    pointer-events: none;
   }
 
-  /* ២. Magic Border Animation (កូដមកពីអនាគត) */
+  /* ២. Card Design៖ សាមញ្ញ ថ្លៃថ្នូរ និងមានសណ្ដាប់ធ្នាប់ */
   .magic-card {
-    position: relative;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s ease;
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      var(--primary),
-      transparent 30%
-    );
-    animation: rotateMagic 6s linear infinite;
-    z-index: -1;
-    opacity: 0.2;
-  }
-  @keyframes rotateMagic {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 28px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
   }
 
-  /* ៣. Shimmer & Glow Effects */
+  /* ៣. Input Styles */
+  .big-input {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 20px !important;
+    color: white !important;
+    padding: 1.5rem !important;
+    width: 100%;
+    outline: none;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    transition: all 0.3s ease;
+  }
+
+  .big-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  /* ៤. Button Styles */
+  .btn-study {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 700;
+    padding: 1.2rem;
+    border-radius: 20px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-study:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+  }
+
+  /* ៥. Result Text Style */
+  .summary-box {
+    border-left: 8px solid var(--primary);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2.5rem;
+    border-radius: 24px;
+  }
+
   .shimmer-text {
-    background: linear-gradient(
-      90deg,
-      #fff,
-      var(--primary),
-      var(--secondary),
-      #fff
-    );
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 8s linear infinite;
   }
   @keyframes shine {
     to {
@@ -91,88 +103,40 @@
     }
   }
 
-  /* ៤. Hover & Floating Animation */
-  .float-ui {
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-15px);
-    }
-  }
-
-  .status-badge {
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.2);
-    color: var(--primary);
-    padding: 6px 16px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 800;
-    text-shadow: 0 0 10px var(--magic-glow);
-  }
-
-  .btn-magic {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    font-weight: 900;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px var(--magic-glow);
-  }
-  .btn-magic:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 40px var(--primary);
-  }
-
-  /* Responsive Input Fix */
-  .big-input {
-    background: rgba(0, 0, 0, 0.4) !important;
-    border: 1px solid rgba(255, 255, 255, 0.05) !important;
-    transition: all 0.4s ease;
-    font-size: 1.1rem;
-    line-height: 1.8;
-  }
-  .big-input:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 30px rgba(99, 102, 241, 0.1);
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
-<div class="study-gradient fixed inset-0 -z-10"></div>
 
-<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-  <header
-    class="text-center mb-20 space-y-10 animate-in fade-in slide-in-from-top-10 duration-1000"
-  >
+<main class="max-w-7xl mx-auto px-6 py-12 relative">
+  <header class="text-center mb-16 animate-in fade-in duration-700">
     <div
-      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 float-ui"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-8"
     >
-      <span class="w-2 h-2 rounded-full bg-indigo-400 animate-ping"></span>
-      <span class="text-indigo-400 text-xs font-black tracking-widest uppercase"
-        >🧠 Neural Study Assist V4.0</span
+      <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+      <span
+        class="text-indigo-400 text-[10px] font-bold uppercase tracking-widest"
+        >AI Learning Assistant</span
       >
     </div>
 
-    <h2
-      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+    <h1
+      class="text-5xl md:text-8xl font-black shimmer-text mb-8 uppercase italic leading-none"
     >
       STUDY BUDDY
-    </h2>
+    </h1>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
         "រៀនឱ្យឆ្លាត មិនមែនរៀនឱ្យហត់! ឱ្យបង AI ក្លាយជា
         <span class="text-indigo-400 font-bold">មន្តអាគម</span>
         នៃចំណេះដឹងប្អូន!"
       </p>
-      <p
-        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
-      >
+      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
         ប្អូនធុញនឹងការអានមេរៀនក្រាស់ៗមែនទេ?
         <strong class="text-indigo-400">Study Buddy</strong>
         នឹងជួយប្អូនសង្ខេបចំណុចសំខាន់ៗ និងបង្កើត Quiz
@@ -181,140 +145,110 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          📜
-        </div>
-        <h4 class="text-indigo-400 font-black uppercase mb-3">
-          Instant Summary
-        </h4>
-        <p class="text-sm text-slate-400 italic">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <div class="magic-card p-8">
+        <span class="feature-icon">📜</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">សង្ខេបរហ័ស</h4>
+        <p class="text-slate-400 text-xs font-light">
           បំប្លែងមេរៀនរាប់សិបទំព័រ ឱ្យមកនៅត្រឹមចំណុចខ្លឹមៗបំផុត។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🧩
-        </div>
-        <h4 class="text-indigo-400 font-black uppercase mb-3">
-          Interactive Quiz
+      <div class="magic-card p-8">
+        <span class="feature-icon">🧩</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          តេស្តសមត្ថភាព
         </h4>
-        <p class="text-sm text-slate-400 italic">
-          តេស្តសមត្ថភាពប្អូនភ្លាមៗ ជាមួយសំណួរដែលបង្កើតដោយ AI។
+        <p class="text-slate-400 text-xs font-light">
+          បង្កើតសំណួរ Quiz ភ្លាមៗ ដើម្បីជួយឱ្យប្អូនចងចាំមេរៀនបានយូរ។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🔥
-        </div>
-        <h4 class="text-indigo-400 font-black uppercase mb-3">
-          Daily Motivation
+      <div class="magic-card p-8">
+        <span class="feature-icon">🔥</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          កម្លាំងចិត្ត
         </h4>
-        <p class="text-sm text-slate-400 italic">
-          ពាក្យលើកទឹកចិត្តកំប្លែងៗ ដើម្បីឱ្យប្អូនមានកម្លាំងរៀនបន្ត។
+        <p class="text-slate-400 text-xs font-light">
+          ទទួលបានពាក្យលើកទឹកចិត្តកំប្លែងៗ ដើម្បីឱ្យប្អូនមានកម្លាំងរៀនបន្ត។
         </p>
       </div>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-16 items-start">
-    <div class="xl:col-span-5 space-y-10">
-      <div class="magic-card p-10 md:p-14 shadow-2xl">
-        <div class="flex items-center gap-4 mb-10">
-          <div class="p-3 bg-indigo-500/10 rounded-2xl">
-            <span class="text-3xl">📥</span>
-          </div>
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-12 items-start">
+    <section class="xl:col-span-5">
+      <div class="magic-card p-8 md:p-10">
+        <div class="flex items-center gap-4 mb-8">
+          <span class="text-2xl">📥</span>
           <div>
-            <h3
-              class="text-lg font-black text-white uppercase tracking-tighter"
-            >
-              Knowledge Input
+            <h3 class="text-lg font-bold text-white uppercase tracking-tight">
+              បញ្ចូលមេរៀន
             </h3>
-            <p class="text-xs text-slate-500">បញ្ចូលខ្លឹមសារមេរៀនខាងក្រោម</p>
+            <p class="text-xs text-slate-500 uppercase">
+              Input Knowledge Block
+            </p>
           </div>
         </div>
 
         <textarea
           id="studyContent"
-          class="w-full big-input rounded-[30px] p-8 h-80 md:h-[500px] outline-none text-slate-200 resize-none placeholder:text-slate-800 shadow-inner"
-          placeholder="បិទភ្ជាប់អត្ថបទមេរៀនដែលប្អូនចង់ឱ្យបងសង្ខេបឱ្យ... (ឧទាហរណ៍៖ ច្បាប់ញូតុន)"
+          class="big-input h-80 md:h-[450px] resize-none"
+          placeholder="បិទភ្ជាប់អត្ថបទមេរៀនដែលប្អូនចង់ឱ្យបងជួយ... (ឧទាហរណ៍៖ ច្បាប់រូបវិទ្យា ឬ ប្រវត្តិសាស្ត្រ)"
         ></textarea>
 
-        <button
-          onclick="processStudy()"
-          id="btnAction"
-          class="btn-magic w-full mt-10 py-7 rounded-[35px] text-xl uppercase tracking-[0.3em] flex justify-center items-center gap-5 active:scale-90"
-        >
-          <span>Activate Mission</span>
+        <button onclick="processStudy()" id="btnAction" class="btn-study mt-8">
+          ចាប់ផ្ដើមបំប្លែងមេរៀន
         </button>
       </div>
-    </div>
+    </section>
 
-    <div class="xl:col-span-7">
+    <section class="xl:col-span-7">
       <div
         id="loading"
-        class="hidden magic-card p-32 flex flex-col items-center justify-center"
+        class="hidden magic-card p-20 flex flex-col items-center justify-center"
       >
-        <div class="relative w-24 h-24 mb-10">
-          <div
-            class="absolute inset-0 border-8 border-white/5 rounded-full"
-          ></div>
-          <div
-            class="absolute inset-0 border-8 border-t-indigo-500 rounded-full animate-spin"
-          ></div>
-        </div>
+        <div
+          class="w-12 h-12 border-4 border-white/5 border-t-indigo-500 rounded-full animate-spin mb-6"
+        ></div>
         <p
-          class="text-indigo-400 font-mono text-sm tracking-[0.6em] animate-pulse uppercase"
+          class="text-indigo-400 text-xs font-bold uppercase tracking-[0.3em] animate-pulse"
         >
-          Synthesizing_Knowledge...
+          កំពុងវិភាគ និងសង្ខេបមេរៀន...
         </p>
       </div>
 
-      <div
-        id="resultArea"
-        class="hidden space-y-10 animate-in zoom-in-95 duration-700"
-      >
-        <div
-          class="magic-card p-10 md:p-16 border-l-[15px] border-indigo-500 bg-indigo-500/5"
-        >
+      <div id="resultArea" class="hidden space-y-8">
+        <div class="summary-box">
           <h4
-            class="text-indigo-400 font-black uppercase tracking-[0.4em] text-[10px] mb-8 flex items-center gap-3"
+            class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-6 flex items-center gap-3"
           >
-            <span class="h-1 w-10 bg-indigo-500 rounded-full"></span>
-            សេចក្ដីសង្ខេបមេរៀន (Summary)
+            <span class="h-px w-10 bg-indigo-500/30"></span> សេចក្ដីសង្ខេបមេរៀន
           </h4>
           <div
             id="summaryText"
-            class="text-2xl md:text-3xl font-light text-slate-100 leading-relaxed italic"
+            class="text-xl md:text-2xl font-light text-slate-200 leading-relaxed italic"
           ></div>
         </div>
 
-        <div class="magic-card p-10 md:p-16 border-t border-white/5">
+        <div class="magic-card p-8 md:p-12">
           <h4
-            class="text-yellow-500 font-black uppercase tracking-[0.4em] text-[10px] mb-10 flex items-center gap-3"
+            class="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mb-10 flex items-center gap-3"
           >
-            <span class="h-1 w-10 bg-yellow-500 rounded-full"></span> Brain Test
-            (Active Recall)
+            <span class="h-px w-10 bg-yellow-500/30"></span> Brain Test (Quiz)
           </h4>
-          <div id="quizContainer" class="space-y-8"></div>
+          <div id="quizContainer" class="space-y-6"></div>
         </div>
 
         <div
-          class="magic-card p-10 bg-indigo-500/5 text-center relative overflow-hidden"
+          class="magic-card p-8 bg-indigo-500/5 border-indigo-500/20 text-center"
         >
-          <div
-            class="absolute -top-10 -left-10 text-8xl opacity-10 uppercase font-black"
-          >
-            Boost
-          </div>
+          <span class="text-4xl mb-4 block">🙌</span>
           <p
             id="motivationText"
-            class="text-xl md:text-3xl text-indigo-300 font-medium italic relative z-10"
+            class="text-lg md:text-xl text-indigo-300 font-medium italic"
           ></p>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </main>
 
@@ -323,26 +257,27 @@
 <script>
   const socket = io();
 
-  // ១. Interactive Magic Background (Mouse Follow)
+  // ១. Background Animation (រង្វើល និងយឺត)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 70; i++) {
+    const count = window.innerWidth < 768 ? 30 : 60;
+    for (let i = 0; i < count; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.25,
+        vy: (Math.random() - 0.5) * 0.25,
         size: Math.random() * 1.5,
       });
     }
@@ -351,13 +286,12 @@
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "<%= theme || '#6366f1' %>";
-    ctx.strokeStyle = "rgba(99, 102, 241, 0.05)";
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.04)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
       if (dist < 150) {
         ctx.beginPath();
@@ -365,7 +299,6 @@
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
       }
-
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -374,34 +307,31 @@
   }
   init();
   draw();
+  window.addEventListener("resize", init);
 
-  // ២. AI Study Logic
+  // ២. Study Logic
   function processStudy() {
     const content = document.getElementById("studyContent").value.trim();
     const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
 
     if (!content)
       return Swal.fire({
-        icon: "info",
-        title: "Empty Brain",
         text: "ដាក់មេរៀនឱ្យបងមើលសិនប្អូន កុំចង់រៀនកាត់! 😂",
-        background: "#030712",
-        color: "#818cf8",
+        icon: "info",
+        confirmButtonColor: "#6366f1",
       });
     if (!firebaseUid)
       return Swal.fire({
+        text: "សូមចូលគណនីសិនប្អូន!",
         icon: "warning",
-        title: "Identity Unknown",
-        text: "សូម Login សិន ដើម្បីឱ្យបងរក្សាទុកដានជើងមេរៀនប្អូន!",
-        background: "#030712",
-        color: "#818cf8",
+        confirmButtonColor: "#6366f1",
       });
 
     document.getElementById("loading").classList.remove("hidden");
     document.getElementById("resultArea").classList.add("hidden");
     document.getElementById("btnAction").disabled = true;
 
-    socket.emit("study_assist", { content: content, firebaseUid: firebaseUid });
+    socket.emit("study_assist", { content, firebaseUid });
   }
 
   socket.on("study_result", (res) => {
@@ -415,18 +345,17 @@
 
     const container = document.getElementById("quizContainer");
     container.innerHTML = "";
-    // បង្ហាញ Quiz បែប Interactive
     res.quiz.forEach((q, idx) => {
       const card = document.createElement("div");
       card.className =
-        "magic-card p-10 bg-white/5 border border-white/5 mb-8 hover:border-indigo-500/40 transition-all";
+        "p-6 rounded-2xl bg-white/5 border border-white/5 space-y-4";
       card.innerHTML = `
-        <p class="font-black text-white mb-8 text-2xl italic"><span class="text-indigo-500 mr-3">Q${idx + 1}:</span> ${q.question}</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <p class="font-bold text-white text-lg italic"><span class="text-indigo-400">#${idx + 1}:</span> ${q.question}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           ${q.options
             .map(
               (opt) => `
-            <button onclick="checkAnswer(this, '${opt}', '${q.answer}')" class="text-left p-6 rounded-2xl bg-black/40 border border-white/5 hover:bg-indigo-600 hover:text-white transition-all text-lg font-medium shadow-lg">
+            <button onclick="checkAnswer(this, '${opt}', '${q.answer}')" class="text-left p-4 rounded-xl bg-black/30 border border-white/5 hover:bg-indigo-600/20 transition-all text-sm">
               ${opt}
             </button>
           `,
@@ -442,24 +371,14 @@
   });
 
   function checkAnswer(btn, selected, correct) {
-    if (selected === correct) {
-      btn.classList.add(
-        "bg-emerald-500",
-        "text-black",
-        "border-emerald-400",
-        "shadow-[0_0_20px_rgba(16,185,129,0.4)]",
-      );
-      btn.innerHTML += " ✨ (Correct!)";
-    } else {
-      btn.classList.add(
-        "bg-red-500",
-        "text-white",
-        "border-red-400",
-        "shadow-[0_0_20px_rgba(239,68,68,0.4)]",
-      );
-      btn.innerHTML += " 💀 (Oops!)";
-    }
     const parent = btn.parentElement;
+    if (selected === correct) {
+      btn.classList.add("bg-emerald-500", "text-black", "border-emerald-400");
+      btn.innerHTML += " ✨ (ត្រឹមត្រូវ!)";
+    } else {
+      btn.classList.add("bg-red-500", "text-white", "border-red-400");
+      btn.innerHTML += " 💀 (ខុសហើយ!)";
+    }
     parent.querySelectorAll("button").forEach((b) => (b.disabled = true));
   }
 
@@ -476,6 +395,4 @@
     }
     type();
   }
-
-  window.addEventListener("resize", init);
 </script>

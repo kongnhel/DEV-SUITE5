@@ -4,19 +4,22 @@
 
 <style>
   :root {
-    --primary: <%= theme || "#00f2ff" %>;
-    --secondary: #7000ff;
-    --bg: #030712;
-    --magic-glow: rgba(0, 242, 255, 0.3);
-  }
-  body {
-    background-color: var(--bg);
-    color: #e2e8f0;
-    font-family: "Kantumruy Pro", sans-serif;
-    overflow-x: hidden;
+    --primary: <%= theme || "#22d3ee" %>;
+    --secondary: #6366f1;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-light: rgba(255, 255, 255, 0.1);
   }
 
-  /* ១. Interactive Magic Background */
+  body {
+    background-color: var(--bg-dark);
+    color: #e2e8f0;
+    font-family: "Kantumruy Pro", sans-serif;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ១. Background បែបស្ងប់ស្ងាត់ មិនឱ្យរំខានភ្នែក */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -24,65 +27,100 @@
     width: 100%;
     height: 100%;
     z-index: -20;
-    opacity: 0.25;
+    opacity: 0.1;
+    pointer-events: none;
   }
+
   .hero-glow {
     background: radial-gradient(
       circle at 50% 50%,
-      rgba(112, 0, 255, 0.1) 0%,
-      transparent 80%
+      rgba(34, 211, 238, 0.1) 0%,
+      transparent 70%
     );
+    pointer-events: none;
   }
 
-  /* ២. Magic Border Animation (កូដមកពីអនាគត) */
+  /* ២. Card Design៖ បែបសាមញ្ញ ថ្លៃថ្នូរ មិនឆើតឆាយ */
   .magic-card {
-    position: relative;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      var(--primary),
-      transparent 30%
-    );
-    animation: rotateMagic 6s linear infinite;
-    z-index: -1;
-    opacity: 0.2;
-  }
-  @keyframes rotateMagic {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
   }
 
-  /* ៣. Shimmer & Glow Effects */
+  .magic-card:hover {
+    border-color: var(--primary);
+  }
+
+  /* ៣. Inputs & Code Editor */
+  .input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+    margin-bottom: 8px;
+    margin-left: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .input-custom {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 16px !important;
+    color: white !important;
+    padding: 1rem 1.25rem !important;
+    width: 100%;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .code-area {
+    font-family: "Fira Code", "Courier New", monospace;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--primary) !important;
+    resize: none;
+  }
+
+  .input-custom:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1) !important;
+  }
+
+  /* ៤. Button Style */
+  .btn-evolution {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #0f172a;
+    font-weight: 800;
+    padding: 1.1rem;
+    border-radius: 18px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 15px -3px rgba(34, 211, 238, 0.3);
+  }
+
+  .btn-evolution:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(34, 211, 238, 0.4);
+    filter: brightness(1.1);
+  }
+
+  /* ៥. Output & Result Area */
   .shimmer-text {
-    background: linear-gradient(
-      90deg,
-      #fff,
-      var(--primary),
-      var(--secondary),
-      #fff
-    );
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 8s linear infinite;
   }
   @keyframes shine {
     to {
@@ -90,221 +128,177 @@
     }
   }
 
-  /* ៤. Hover & Floating Animation */
-  .float-ui {
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .btn-magic {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #000;
-    font-weight: 900;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px var(--magic-glow);
-  }
-  .btn-magic:hover {
-    transform: scale(1.05) rotate(-1deg);
-    box-shadow: 0 0 40px var(--primary);
-  }
-
-  /* Responsive Typography */
   .prose-reviewer {
     line-height: 1.8;
-    font-size: 1.1rem;
     color: #cbd5e1;
+    font-size: 1.05rem;
   }
   .prose-reviewer strong {
     color: var(--primary);
-    text-shadow: 0 0 10px var(--magic-glow);
+  }
+
+  .code-output-container {
+    background: #010409;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="hero-glow fixed inset-0 -z-10"></div>
 
-<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-  <header
-    class="text-center mb-20 space-y-10 animate-in fade-in slide-in-from-top-10 duration-1000"
-  >
+<main class="max-w-7xl mx-auto px-6 py-12 relative">
+  <header class="text-center mb-16 animate-in fade-in duration-700">
     <div
-      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 float-ui"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6"
     >
-      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-      <span class="text-cyan-400 text-xs font-black tracking-widest uppercase"
-        >System Evolution 2026.v1</span
+      <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+      <span
+        class="text-cyan-400 text-[10px] font-bold uppercase tracking-widest"
+        >Evolution System V2.6</span
       >
     </div>
 
     <h2
-      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+      class="text-5xl md:text-8xl font-black shimmer-text mb-8 uppercase italic leading-none"
     >
       EVOLUTION
     </h2>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
-        "កុំឱ្យកូដបែកថ្នាំ បំផ្លាញក្តីស្រមៃប្អូន! ឱ្យបង AI ជួយបំប្លែងកូដឱ្យទៅជា
-        <span class="text-cyan-400 font-bold">មន្តអាគម</span> វិញ!"
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
+        "កុំឱ្យកូដបែកថ្នាំ បំផ្លាញក្តីស្រមៃប្អូន! ឱ្យបង AI ជួយ
+        <span class="text-cyan-400 font-bold">កែលម្អកូដ</span>
+        ឱ្យកាន់តែអស្ចារ្យ!"
       </p>
-      <p
-        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
-      >
+      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
         ប្អូនធុញនឹង Error មែនទេ?
-        <strong class="text-cyan-400">Evolution</strong> នឹងប្រើប្រាស់
-        <span class="underline decoration-cyan-500/30">Neural Engine</span>
-        ដើម្បីវិភាគកូដប្អូនយ៉ាងស៊ីជម្រៅ។ បងមិនត្រឹមតែ Fix ឱ្យដើរប៉ុណ្ណោះទេ
-        តែបងនឹងជួយ Review ឱ្យកូដប្អូនខ្លាំងដូច Senior Developer លំដាប់ពិភពលោក!
+        <strong class="text-cyan-400">Evolution</strong> នឹងប្រើប្រាស់ Neural
+        Engine ដើម្បីវិភាគកូដប្អូនយ៉ាងស៊ីជម្រៅ។ បងមិនត្រឹមតែ Fix
+        ឱ្យដើរប៉ុណ្ណោះទេ តែបងនឹងជួយ Review ឱ្យកូដប្អូនខ្លាំងដូច Senior Developer
+        លំដាប់ពិភពលោក! 🚀
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          ⚡
-        </div>
-        <h4 class="text-cyan-400 font-black uppercase mb-3">Ultra Refactor</h4>
-        <p class="text-sm text-slate-400">
-          បំប្លែងកូដញ៉េរញ៉ៃ ឱ្យទៅជាកូដដែលស្អាតបំផុតក្នុងមួយពព្រិចភ្នែក។
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">⚡</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">កែលម្អរហ័ស</h4>
+        <p class="text-slate-400 text-xs font-light">
+          បំប្លែងកូដដែលញ៉េរញ៉ៃ ឱ្យទៅជាកូដដែលស្អាតបំផុតក្នុងមួយពព្រិចភ្នែក។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🎭
-        </div>
-        <h4 class="text-cyan-400 font-black uppercase mb-3">Empathy Hub</h4>
-        <p class="text-sm text-slate-400">
-          AI ដែលយល់ពីទុក្ខលំបាកប្អូន។ ជួយលើកទឹកចិត្តប្អូនរាល់ពេលកូដ Error។
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🎭</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">AI យល់ចិត្ត</h4>
+        <p class="text-slate-400 text-xs font-light">
+          ជួយលើកទឹកចិត្តប្អូនរាល់ពេលកូដ Error ជាមួយពាក្យពេចន៍កំប្លែងៗ។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🛡️
-        </div>
-        <h4 class="text-cyan-400 font-black uppercase mb-3">Logic Shield</h4>
-        <p class="text-sm text-slate-400">
-          ការពារកូដប្អូនពី Bug ផ្សេងៗនាពេលអនាគត តាមរយៈការវិភាគ Logic
-          យ៉ាងម៉ត់ចត់។
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🛡️</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          ការពារ Logic
+        </h4>
+        <p class="text-slate-400 text-xs font-light">
+          ការពារកូដប្អូនពី Bug ផ្សេងៗនាពេលអនាគត តាមរយៈការវិភាគយ៉ាងម៉ត់ចត់។
         </p>
       </div>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-16 items-start">
-    <div class="xl:col-span-6 space-y-10">
-      <div class="magic-card p-8 md:p-14 shadow-2xl">
-        <div class="space-y-10">
-          <div class="relative group">
-            <label
-              class="block text-[11px] font-black text-cyan-500 uppercase tracking-[0.4em] mb-4 ml-2"
-              >Human Emotion Signal</label
-            >
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <section class="xl:col-span-6 space-y-6">
+      <div class="magic-card p-8 md:p-10 shadow-xl">
+        <div class="space-y-8">
+          <div class="input-group">
+            <label>អារម្មណ៍ចំពោះកូដនេះ (Optional)</label>
             <textarea
               id="userComment"
-              class="w-full h-32 bg-black/40 border border-white/5 rounded-[30px] p-6 outline-none text-xl text-slate-200 transition-all focus:border-cyan-500 placeholder:text-slate-800"
-              placeholder="តើប្អូនមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ?"
+              class="input-custom h-24 resize-none"
+              placeholder="តើប្អូនមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ? (ឧ. ជិតឆ្កួតហើយបង!)"
             ></textarea>
           </div>
 
-          <div class="relative group">
-            <label
-              class="block text-[11px] font-black text-cyan-500 uppercase tracking-[0.4em] mb-4 ml-2"
-              >Broken Logic Stream (Paste Code)</label
-            >
+          <div class="input-group">
+            <label>បញ្ចូលកូដដែលចង់ឱ្យបង Review</label>
             <textarea
               id="code"
-              class="w-full h-[450px] md:h-[600px] bg-black/60 border border-white/5 rounded-[30px] p-8 outline-none font-mono text-lg text-cyan-400 transition-all focus:border-cyan-500 no-scrollbar shadow-inner"
-              placeholder="// Paste your messy code here..."
+              class="input-custom code-area h-96 md:h-[500px] no-scrollbar shadow-inner"
+              placeholder="// បិទភ្ជាប់កូដដែលញ៉េរញ៉ៃរបស់ប្អូននៅទីនេះ..."
             ></textarea>
           </div>
 
-          <button
-            onclick="sendCode()"
-            id="btnSend"
-            class="btn-magic w-full py-7 rounded-[35px] text-xl uppercase tracking-[0.3em] flex justify-center items-center gap-5 active:scale-90"
-          >
-            <span>Execute Magic Review</span>
+          <button onclick="sendCode()" id="btnSend" class="btn-evolution">
+            ចាប់ផ្ដើមពិនិត្យកូដ
           </button>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="xl:col-span-6">
+    <section class="xl:col-span-6">
       <div
         id="loading"
         class="hidden magic-card p-32 flex flex-col items-center justify-center"
       >
-        <div class="relative w-24 h-24 mb-10">
-          <div
-            class="absolute inset-0 border-8 border-white/5 rounded-full"
-          ></div>
-          <div
-            class="absolute inset-0 border-8 border-t-cyan-500 rounded-full animate-spin"
-          ></div>
-        </div>
+        <div
+          class="w-12 h-12 border-4 border-white/5 border-t-cyan-500 rounded-full animate-spin mb-6"
+        ></div>
         <p
-          class="text-cyan-500 font-mono text-sm tracking-[0.6em] animate-pulse uppercase"
+          class="text-cyan-500 text-xs font-bold uppercase tracking-[0.3em] animate-pulse"
         >
-          Neural_Processing...
+          កំពុងវិភាគ Logic នៃកូដ...
         </p>
       </div>
 
       <div
         id="aiSection"
-        class="hidden space-y-10 animate-in zoom-in-95 duration-700"
+        class="hidden space-y-6 animate-in slide-in-from-bottom-6 duration-700"
       >
         <div
-          class="magic-card p-10 md:p-16 border-l-[15px] border-cyan-500 bg-cyan-500/5"
+          class="magic-card p-8 md:p-10 border-l-[10px] border-cyan-500 bg-cyan-500/5"
         >
           <div
             id="aiMood"
-            class="text-[10px] font-black tracking-widest uppercase mb-6 text-cyan-400 opacity-60"
+            class="text-[10px] font-bold text-cyan-400/60 uppercase tracking-widest mb-4"
           ></div>
           <div
             id="aiJoke"
-            class="text-2xl md:text-4xl font-light text-white italic leading-snug pr-10"
+            class="text-lg md:text-2xl font-light text-white italic leading-relaxed"
           ></div>
         </div>
 
-        <div class="magic-card p-10 md:p-16">
+        <div class="magic-card p-8 md:p-10">
           <h4
-            class="text-slate-500 font-black uppercase tracking-widest text-[10px] mb-8 flex items-center gap-4"
+            class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3"
           >
-            <span class="h-1 w-10 bg-slate-700 rounded-full"></span> Neural
-            Diagnostic
+            <span class="w-8 h-px bg-slate-700"></span> លទ្ធផលនៃការវិភាគ
           </h4>
           <div id="aiReview" class="prose-reviewer"></div>
         </div>
 
-        <div class="magic-card overflow-hidden">
+        <div class="code-output-container">
           <div
-            class="px-10 py-6 bg-white/5 border-b border-white/5 flex justify-between items-center"
+            class="px-6 py-4 bg-white/5 border-b border-white/5 flex justify-between items-center"
           >
             <span
-              class="text-[10px] font-black tracking-widest text-slate-500 uppercase italic"
-              >Magic_Fixed_Code.js</span
+              class="text-[10px] font-bold text-slate-500 uppercase italic tracking-wider"
+              >Evolution_Fixed_Source.js</span
             >
             <button
               onclick="copyCode()"
-              class="text-xs font-black text-cyan-400 uppercase hover:text-white transition-all tracking-widest border border-cyan-500/20 px-6 py-2 rounded-full"
+              class="text-[10px] font-bold text-cyan-400 hover:text-white transition-all uppercase tracking-widest border border-cyan-500/20 px-4 py-1.5 rounded-lg"
             >
-              Copy_All
+              ចម្លងកូដ
             </button>
           </div>
           <pre
-            class="p-8 md:p-12 overflow-x-auto bg-black/40"
-          ><code id="fixedCode" class="language-javascript text-sm md:text-xl"></code></pre>
+            class="p-6 md:p-8 overflow-x-auto"
+          ><code id="fixedCode" class="language-javascript text-sm md:text-base"></code></pre>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </main>
 
@@ -322,26 +316,27 @@
   const loading = document.getElementById("loading");
   const aiSection = document.getElementById("aiSection");
 
-  // ១. Interactive Particle Background (Mouse Follow)
+  // ១. Background Animation (រង្វើល និងយឺត មិនឱ្យវិលមុខ)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 70; i++) {
+    const count = window.innerWidth < 768 ? 30 : 60;
+    for (let i = 0; i < count; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
         size: Math.random() * 1.5,
       });
     }
@@ -350,14 +345,12 @@
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "<%= theme || '#00f2ff' %>";
-    ctx.strokeStyle = "rgba(0, 242, 255, 0.05)";
+    ctx.strokeStyle = "rgba(34, 211, 238, 0.03)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
-      // Connect to mouse
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
       if (dist < 150) {
         ctx.beginPath();
@@ -365,7 +358,6 @@
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
       }
-
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -374,8 +366,9 @@
   }
   init();
   draw();
+  window.addEventListener("resize", init);
 
-  // ២. AI Interaction Logic
+  // ២. AI Review Interaction
   function sendCode() {
     const code = document.getElementById("code").value.trim();
     const userComment = document.getElementById("userComment").value;
@@ -383,19 +376,15 @@
 
     if (!code)
       return Swal.fire({
-        icon: "info",
-        title: "Empty Spell",
         text: "បោះកូដចូលមកអាអូន! 😂",
-        background: "#030712",
-        color: "#00f2ff",
+        icon: "info",
+        confirmButtonColor: "#22d3ee",
       });
     if (!firebaseUid)
       return Swal.fire({
+        text: "សូមចូលគណនីសិនប្អូន!",
         icon: "warning",
-        title: "Identity Unknown",
-        text: "សូម Login ដើម្បីឱ្យបងស្គាល់មុខ!",
-        background: "#030712",
-        color: "#00f2ff",
+        confirmButtonColor: "#22d3ee",
       });
 
     loading.classList.remove("hidden");
@@ -418,7 +407,8 @@
     );
 
     const codeContainer = document.getElementById("fixedCode");
-    codeContainer.textContent = res.fixed_code || "// Perfection detected.";
+    codeContainer.textContent =
+      res.fixed_code || "// លទ្ធផលកូដនឹងបង្ហាញនៅទីនេះ។";
     Prism.highlightElement(codeContainer);
     aiSection.scrollIntoView({ behavior: "smooth" });
   });
@@ -438,17 +428,15 @@
   }
 
   function copyCode() {
-    navigator.clipboard.writeText(
-      document.getElementById("fixedCode").textContent,
-    );
+    const code = document.getElementById("fixedCode").textContent;
+    navigator.clipboard.writeText(code);
     Swal.fire({
+      text: "ចម្លងកូដបានជោគជ័យ!",
       icon: "success",
-      title: "Magic Copied!",
       toast: true,
       position: "top-end",
+      showConfirmButton: false,
       timer: 2000,
-      background: "#030712",
-      color: "#00f2ff",
     });
   }
 </script>

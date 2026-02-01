@@ -5,19 +5,22 @@
 
 <style>
   :root {
-    --primary: <%= theme || "#ef4444" %>;
-    --secondary: #ff8c00;
-    --bg: #030712;
-    --magic-glow: rgba(239, 68, 68, 0.3);
-  }
-  body {
-    font-family: "Kantumruy Pro", sans-serif;
-    background-color: var(--bg);
-    color: #e2e8f0;
-    overflow-x: hidden;
+    --primary: <%= theme || "#6366f1" %>;
+    --secondary: #f43f5e;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-light: rgba(255, 255, 255, 0.08);
   }
 
-  /* ១. Interactive Magic Background */
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ១. Background បែបស្ងប់ស្ងាត់ ជួយឱ្យផ្ដោតអារម្មណ៍ */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -25,65 +28,80 @@
     width: 100%;
     height: 100%;
     z-index: -20;
-    opacity: 0.25;
-  }
-  .hero-gradient {
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(239, 68, 68, 0.1) 0%,
-      transparent 80%
-    );
+    opacity: 0.12;
+    pointer-events: none;
   }
 
-  /* ២. Magic Border Animation (កូដមកពីអនាគត) */
+  /* ២. Card Design៖ បែបសាមញ្ញ ថ្លៃថ្នូរ មិនឆើតឆាយ */
   .magic-card {
-    position: relative;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      var(--primary),
-      transparent 30%
-    );
-    animation: rotateMagic 6s linear infinite;
-    z-index: -1;
-    opacity: 0.2;
-  }
-  @keyframes rotateMagic {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
   }
 
-  /* ៣. Shimmer & Glow Effects */
+  /* ៣. Dropzone៖ បង្រួមឱ្យស្អាត និងងាយយល់ */
+  .drop-zone {
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(15, 23, 42, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .drop-zone:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+  }
+
+  /* ៤. Input & Button */
+  .input-custom {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 16px !important;
+    color: white !important;
+    padding: 1rem 1.5rem !important;
+    width: 100%;
+    outline: none;
+    font-size: 1rem;
+  }
+
+  .input-custom:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  }
+
+  .btn-execute {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: 700;
+    padding: 0.8rem 2rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
+  }
+
+  .btn-execute:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.4);
+  }
+
+  /* ៥. Promote Text Styles */
   .shimmer-text {
-    background: linear-gradient(
-      90deg,
-      #fff,
-      var(--primary),
-      var(--secondary),
-      #fff
-    );
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 8s linear infinite;
   }
   @keyframes shine {
     to {
@@ -91,250 +109,173 @@
     }
   }
 
-  /* ៤. Hover & Floating Animation */
-  .float-ui {
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .status-badge {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: var(--primary);
-    padding: 6px 16px;
-    border-radius: 99px;
-    font-size: 11px;
-    font-weight: 800;
-    text-shadow: 0 0 10px var(--magic-glow);
-  }
-
   .prose-kida {
     line-height: 1.8;
-    font-size: 1.15rem;
     color: #cbd5e1;
   }
   .prose-kida strong {
     color: var(--primary);
-    text-shadow: 0 0 10px var(--magic-glow);
-  }
-
-  .btn-magic {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: #fff;
-    font-weight: 900;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px var(--magic-glow);
-  }
-  .btn-magic:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 40px var(--primary);
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
-<div class="hero-gradient fixed inset-0 -z-10"></div>
 
-<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-  <header
-    class="text-center mb-20 space-y-10 animate-in fade-in slide-in-from-top-10 duration-1000"
-  >
+<main class="max-w-7xl mx-auto px-6 py-8 md:py-12 relative">
+  <header class="text-center mb-16 animate-in fade-in duration-1000">
     <div
-      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-red-500/10 border border-red-500/20 float-ui"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6"
     >
-      <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+      <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
       <span
-        class="text-red-500 text-xs font-black tracking-widest uppercase text-shadow"
-        >K-IDA Neural Ingest V2.6</span
+        class="text-indigo-400 text-[10px] font-bold uppercase tracking-widest"
+        >K-IDA Neural Extraction</span
       >
     </div>
 
     <h2
-      class="text-7xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+      class="text-5xl md:text-7xl font-black shimmer-text mb-6 uppercase italic"
     >
       K-IDA
     </h2>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
-        "ឈប់ស៊ូទ្រាំនឹង PDF រាប់រយទំព័រ! ឱ្យ K-IDA ក្លាយជា
-        <span class="text-red-500 font-bold">មន្តអាគម</span> នៃចំណេះដឹងប្អូន!"
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
+        "ឈប់ហត់នឹងការអានឯកសាររាប់រយទំព័រ! ឱ្យ K-IDA ក្លាយជា
+        <span class="text-indigo-400 font-bold">មន្តអាគម</span>
+        នៃចំណេះដឹងប្អូន!"
       </p>
-      <p
-        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
-      >
-        ប្អូនធុញនឹងការអង្គុយអានឯកសារមែនទេ?
-        <strong class="text-red-500">K-IDA</strong> នឹងប្រើប្រាស់
-        <span class="underline decoration-red-500/30"
-          >Intelligence Extraction</span
-        >
-        ដើម្បីអាន និងយល់គ្រប់ចំណុចក្នុង PDF ប្អូន។ បោះឯកសារចូលមក
-        រួចសួរចង់ដឹងអីក៏បាន
+      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
+        តើប្អូនធុញនឹងការអង្គុយអានឯកសារមែនទេ?
+        <strong class="text-indigo-400">K-IDA</strong>
+        នឹងប្រើប្រាស់ប្រព័ន្ធវៃឆ្លាត ដើម្បីអាន និងយល់គ្រប់ចំណុចក្នុង PDF ប្អូន។
+        បោះឯកសារចូលមក រួចសួរចង់ដឹងអីក៏បាន
         វានឹងឆ្លើយយ៉ាងលម្អិតដូចមានអ្នកជំនាញនៅក្បែរខ្លួនអ៊ីចឹង! 😂
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🔍
-        </div>
-        <h4 class="text-red-500 font-black uppercase mb-3">Instant Scan</h4>
-        <p class="text-sm text-slate-400 italic">
-          ទាញយកទិន្នន័យយ៉ាងហ្មត់ចត់ពី PDF គ្រប់ប្រភេទក្នុងវិនាទី។
-        </p>
+    <div class="flex flex-wrap justify-center gap-4 mt-10">
+      <div
+        class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5"
+      >
+        <span class="text-lg">🔍</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+          >Instant Scan</span
+        >
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🧠
-        </div>
-        <h4 class="text-red-500 font-black uppercase mb-3">Deep Context</h4>
-        <p class="text-sm text-slate-400 italic">
-          យល់ពីខ្លឹមសារមេរៀនទាំងមូល និងរកឃើញប្រភពយ៉ាងច្បាស់។
-        </p>
+      <div
+        class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5"
+      >
+        <span class="text-lg">🧠</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+          >Deep Context</span
+        >
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🇰🇭
-        </div>
-        <h4 class="text-red-500 font-black uppercase mb-3">Khmer Native AI</h4>
-        <p class="text-sm text-slate-400 italic">
-          បកស្រាយជាភាសាខ្មែរយ៉ាងរលូន ងាយយល់ និងកំប្លែងៗ។
-        </p>
+      <div
+        class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-xl border border-white/5"
+      >
+        <span class="text-lg">🇰🇭</span>
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+          >Khmer Native</span
+        >
       </div>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-16 items-start">
-    <section class="xl:col-span-5 space-y-10">
-      <div class="magic-card p-10 md:p-14">
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+    <section class="xl:col-span-4 space-y-6">
+      <div class="magic-card p-8">
         <h3
-          class="text-[11px] font-black text-red-400 uppercase tracking-widest mb-10 flex items-center gap-4"
+          class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
         >
-          <span class="h-1 w-6 bg-red-500 rounded-full"></span> 01. Sync Memory
-          Block
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> ០១.
+          បញ្ចូលឯកសារ
         </h3>
-        <div
-          id="dropZone"
-          class="border-2 border-dashed border-white/5 rounded-[40px] p-12 text-center cursor-pointer hover:border-red-500/50 hover:bg-red-500/5 transition-all group"
-        >
-          <div
-            class="text-7xl mb-8 group-hover:scale-110 group-hover:rotate-6 transition-transform"
-          >
+
+        <div id="dropZone" class="drop-zone group">
+          <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">
             📄
           </div>
-          <p
-            class="text-lg md:text-xl text-slate-300 font-bold uppercase tracking-tighter"
-          >
-            Drop PDF or Click to Scan
+          <p class="text-white font-bold text-sm uppercase">
+            បោះ PDF ចូល ឬ ចុចដើម្បីជ្រើសរើស
           </p>
           <input type="file" id="fileInput" class="hidden" accept=".pdf" />
         </div>
 
         <div
           id="textPreview"
-          class="hidden magic-card p-8 mt-10 bg-emerald-500/5 border-emerald-500/10"
+          class="hidden mt-6 p-5 bg-white/5 rounded-2xl border border-white/5"
         >
-          <div class="flex justify-between items-center mb-6">
-            <span
-              class="text-[11px] font-black text-emerald-400 uppercase tracking-widest"
-              >Neural Data Extracted</span
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-[10px] font-bold text-emerald-400 uppercase"
+              >Neural Scan Success</span
             >
             <span
               id="pageCount"
-              class="text-xs font-mono bg-emerald-500/20 px-3 py-1.5 rounded-full text-white"
-              >0 Units Sync</span
+              class="text-[10px] bg-emerald-500/10 px-2 py-1 rounded text-emerald-400 font-mono"
+              >0 Pages</span
             >
           </div>
           <div
             id="previewContent"
-            class="text-base text-slate-400 h-40 overflow-y-auto no-scrollbar italic leading-relaxed border-t border-white/5 pt-6"
+            class="text-xs text-slate-500 h-32 overflow-y-auto italic no-scrollbar leading-relaxed"
           ></div>
         </div>
       </div>
     </section>
 
-    <section class="xl:col-span-7 space-y-10">
-      <div class="magic-card p-10 md:p-14">
+    <section class="xl:col-span-8 space-y-6">
+      <div class="magic-card p-8">
         <h3
-          class="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-4"
+          class="text-[11px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2"
         >
-          <span class="h-1 w-6 bg-slate-500 rounded-full"></span> 02. Neural
-          Query Hub
+          <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span> ០២.
+          សួរសំណួរទៅកាន់ AI
         </h3>
-        <div class="flex flex-col md:flex-row gap-5">
+        <div class="flex flex-col md:flex-row gap-4">
           <input
             type="text"
             id="userQuery"
-            class="flex-1 bg-black/40 border border-white/5 rounded-3xl px-10 py-7 outline-none focus:border-red-500 transition-all text-xl text-white shadow-inner"
-            placeholder="សួរមកប្អូន! ចង់ដឹងអីក្នុង PDF ហ្នឹង?"
+            class="input-custom"
+            placeholder="សួរអំពីអ្វីដែលមានក្នុងឯកសារ... (ឧ. សង្ខេបចំណុចសំខាន់ឱ្យបងបន្តិច)"
           />
           <button
             onclick="askKIDA()"
             id="btnAsk"
-            class="btn-magic px-14 py-7 rounded-3xl font-black text-sm uppercase tracking-widest active:scale-90"
+            class="btn-execute whitespace-nowrap"
           >
-            EXECUTE
+            វិភាគទិន្នន័យ
           </button>
         </div>
       </div>
 
-      <div
-        id="responseContainer"
-        class="hidden animate-in zoom-in-95 duration-700"
-      >
-        <div
-          class="magic-card p-10 md:p-16 border-l-[15px] border-red-500 bg-red-600/5 relative"
-        >
+      <div id="responseContainer" class="hidden">
+        <div class="magic-card p-10 md:p-12 border-l-[8px] border-indigo-500">
           <div
             id="pageBadge"
-            class="absolute top-8 right-12 bg-red-500/10 border border-red-500/30 px-6 py-4 rounded-3xl flex items-center gap-4 opacity-0 transition-all duration-1000"
+            class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-lg mb-6 opacity-0 transition-opacity"
           >
-            <div class="flex flex-col text-right">
-              <span
-                class="text-[9px] font-black text-red-500 uppercase tracking-widest"
-                >Source_Location</span
-              >
-              <span id="pageSource" class="text-xl font-black text-white"
-                >N/A</span
-              >
-            </div>
+            <span class="text-[10px] font-bold text-indigo-400 uppercase"
+              >រកឃើញនៅ:</span
+            >
+            <span id="pageSource" class="text-xs font-black text-white"
+              >N/A</span
+            >
           </div>
-          <div
-            class="text-[10px] font-black tracking-[0.5em] text-red-400 opacity-40 uppercase mb-10"
-          >
-            Extraction_Result_Ready
-          </div>
-          <div
-            id="aiAnswer"
-            class="prose-kida text-2xl md:text-3xl font-light text-slate-100 italic"
-          ></div>
+          <div id="aiAnswer" class="prose-kida italic"></div>
         </div>
       </div>
 
       <div
         id="loading"
-        class="hidden magic-card p-32 flex flex-col items-center justify-center"
+        class="hidden magic-card p-20 flex flex-col items-center justify-center"
       >
-        <div class="relative w-24 h-24 mb-10">
-          <div
-            class="absolute inset-0 border-8 border-white/5 rounded-full"
-          ></div>
-          <div
-            class="absolute inset-0 border-8 border-t-red-500 rounded-full animate-spin"
-          ></div>
-        </div>
+        <div
+          class="w-10 h-10 border-3 border-white/5 border-t-indigo-500 rounded-full animate-spin mb-4"
+        ></div>
         <p
-          class="text-red-500 font-mono text-sm tracking-[0.6em] uppercase animate-pulse"
+          class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse"
         >
-          Scanning_Memory_Blocks...
+          កំពុងវិភាគទិន្នន័យពីអង្គចងចាំ...
         </p>
       </div>
     </section>
@@ -351,26 +292,27 @@
   pdfjsLib.GlobalWorkerOptions.workerSrc =
     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js";
 
-  // ១. Interactive Magic Background (Mouse Follow)
+  // ១. Background Animation (រង្វើល និងយឺត មិនឱ្យវិលមុខ)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
+
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 70; i++) {
+    for (let i = 0; i < 45; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
         size: Math.random() * 1.5,
       });
     }
@@ -378,22 +320,20 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "<%= theme || '#ef4444' %>";
-    ctx.strokeStyle = "rgba(239, 68, 68, 0.05)";
+    ctx.fillStyle = "<%= theme || '#6366f1' %>";
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.04)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 150) {
+      if (dist < 160) {
         ctx.beginPath();
         ctx.moveTo(d.x, d.y);
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
       }
-
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -402,21 +342,36 @@
   }
   init();
   draw();
+  window.addEventListener("resize", init);
 
-  // ២. Application Logic
+  // ២. File Handlers
   document.getElementById("dropZone").onclick = () => fileInput.click();
   fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+  const dropZone = document.getElementById("dropZone");
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("bg-indigo-500/5");
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("bg-indigo-500/5");
+  });
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("bg-indigo-500/5");
+    handleFile(e.dataTransfer.files[0]);
+  });
 
   async function handleFile(file) {
     if (!file || file.type !== "application/pdf") {
       return Swal.fire({
-        icon: "error",
-        title: "Format Error",
         text: "បងសុំតែ PDF ទេប្អូន! 😂",
-        background: "#030712",
-        color: "#ef4444",
+        icon: "error",
+        background: "#1e293b",
+        color: "#fff",
       });
     }
+
     pdfPagesData = [];
     const reader = new FileReader();
     reader.onload = async function () {
@@ -431,16 +386,18 @@
         });
       }
       document.getElementById("previewContent").innerText =
-        pdfPagesData[0].text.substring(0, 300) + "...";
+        pdfPagesData[0].text.substring(0, 150) + "...";
       document.getElementById("pageCount").innerText =
-        `${pdf.numPages} Units Sync`;
+        `${pdf.numPages} Pages Sync`;
       document.getElementById("textPreview").classList.remove("hidden");
+
       Swal.fire({
+        text: "បងអានចប់ហើយ! តោះ សួរមកប្អូន!",
         icon: "success",
-        title: "Memory Sync",
-        text: "បងអានចប់ហើយ សួរមកប្អូន!",
-        background: "#030712",
-        color: "#22c55e",
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
       });
     };
     reader.readAsArrayBuffer(file);
@@ -450,22 +407,13 @@
     const query = document.getElementById("userQuery").value.trim();
     const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
 
-    if (!query || pdfPagesData.length === 0)
+    if (!query || pdfPagesData.length === 0) {
       return Swal.fire({
-        icon: "warning",
-        title: "Empty Memory",
         text: "បោះឯកសារឱ្យបងអានសិន! 😂",
-        background: "#030712",
-        color: "#ef4444",
-      });
-    if (!firebaseUid)
-      return Swal.fire({
         icon: "warning",
-        title: "Identity Unknown",
-        text: "សូម Login ដើម្បីរក្សាទុកប្រវត្តិ!",
-        background: "#030712",
-        color: "#ef4444",
+        confirmButtonColor: "#6366f1",
       });
+    }
 
     document.getElementById("loading").classList.remove("hidden");
     document.getElementById("responseContainer").classList.add("hidden");
@@ -485,8 +433,10 @@
     const badge = document.getElementById("pageBadge");
     if (data.page_found) {
       document.getElementById("pageSource").innerText =
-        "Page " + data.page_found;
-      badge.classList.replace("opacity-0", "opacity-100");
+        "ទំព័រទី " + data.page_found;
+      badge.style.opacity = "1";
+    } else {
+      badge.style.opacity = "0";
     }
     document
       .getElementById("responseContainer")

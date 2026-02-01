@@ -4,19 +4,22 @@
 
 <style>
   :root {
-    --primary: <%= theme || "#00ff41" %>;
+    --primary: <%= theme || "#10b981" %>; /* Emerald Green */
     --secondary: #059669;
-    --bg: #020617;
-    --magic-glow: rgba(0, 255, 65, 0.2);
-  }
-  body {
-    font-family: "Kantumruy Pro", sans-serif;
-    background-color: var(--bg);
-    color: #f8fafc;
-    overflow-x: hidden;
+    --bg-dark: #0f172a;
+    --card-bg: rgba(30, 41, 59, 0.7);
+    --border-light: rgba(255, 255, 255, 0.1);
   }
 
-  /* ១. Interactive Magic Background */
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ១. Background បែបស្ងប់ស្ងាត់ មិនរំខានភ្នែក */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -24,247 +27,232 @@
     width: 100%;
     height: 100%;
     z-index: -20;
-    opacity: 0.2;
+    opacity: 0.12;
+    pointer-events: none;
   }
+
   .bg-grid {
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(to right, rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(to right, rgba(16, 185, 129, 0.02) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(16, 185, 129, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
     mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
     z-index: -10;
   }
 
-  /* ២. Magic Card Architecture */
+  /* ២. Card Design៖ បែប Modern Glassmorphism ស្រទន់ */
   .magic-card {
-    position: relative;
-    background: rgba(15, 23, 42, 0.7);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(0, 255, 65, 0.1);
-  }
-  .magic-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: conic-gradient(
-      from 0deg,
-      transparent,
-      var(--primary),
-      transparent 30%
-    );
-    animation: rotateMagic 8s linear infinite;
-    z-index: -1;
-    opacity: 0.15;
-  }
-  @keyframes rotateMagic {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+    background: var(--card-bg);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 28px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
   }
 
-  /* ៣. Shimmer & UI Effects */
+  .magic-card:hover {
+    border-color: var(--primary);
+  }
+
+  /* ៣. Inputs & Buttons */
+  .code-input {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 20px !important;
+    color: #10b981 !important;
+    padding: 1.5rem !important;
+    width: 100%;
+    outline: none;
+    font-family: "Fira Code", "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: none;
+  }
+
+  .code-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+  }
+
+  .btn-visualize {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #0f172a;
+    font-weight: 700;
+    padding: 1.1rem;
+    border-radius: 18px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-visualize:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px -5px rgba(16, 185, 129, 0.4);
+  }
+
+  /* ៤. Diagram Styles */
+  #diagramContainer {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    min-height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+  }
+
   .shimmer-text {
     background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 8s linear infinite;
   }
   @keyframes shine {
     to {
       background-position: 200% center;
     }
   }
-
-  .float-ui {
-    animation: float 4s ease-in-out infinite;
-  }
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  .btn-magic {
-    background: linear-gradient(135deg, var(--secondary), var(--primary));
-    color: #000;
-    font-weight: 900;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 0 20px var(--magic-glow);
-  }
-  .btn-magic:hover {
-    transform: scale(1.05) translateY(-3px);
-    box-shadow: 0 0 40px var(--primary);
-  }
-
-  /* Diagram Custom Styles */
-  #diagramContainer {
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 30px;
-    border: 1px dashed rgba(0, 255, 65, 0.2);
-  }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="bg-grid"></div>
 
-<main class="max-w-7xl mx-auto p-4 md:p-12 relative">
-  <header
-    class="text-center mb-20 space-y-10 animate-in fade-in zoom-in duration-1000"
-  >
+<main class="max-w-7xl mx-auto px-6 py-12 relative">
+  <header class="text-center mb-16 animate-in fade-in duration-700">
     <div
-      class="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 float-ui"
+      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
     >
-      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
       <span
-        class="text-emerald-400 text-xs font-black tracking-widest uppercase"
-        >System Logic Engine V2.6</span
+        class="text-emerald-400 text-[10px] font-bold uppercase tracking-widest"
+        >Logic Visualizer Intelligence</span
       >
     </div>
 
     <h2
-      class="text-6xl md:text-9xl font-black tracking-tighter shimmer-text italic uppercase leading-none"
+      class="text-5xl md:text-8xl font-black shimmer-text mb-8 uppercase italic leading-none"
     >
       LOGIC VISUALIZER
     </h2>
 
-    <div class="max-w-4xl mx-auto space-y-8">
-      <p class="text-3xl md:text-5xl font-light text-white leading-tight">
-        "ឈប់វង្វេងក្នុងកូដរាប់ពាន់បន្ទាត់! ឱ្យបង AI បំប្លែងវាទៅជា
-        <span class="text-emerald-400 font-bold">ផែនទីមន្តអាគម</span> វិញ!"
+    <div class="max-w-3xl mx-auto space-y-6">
+      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
+        "ឈប់វង្វេងក្នុងកូដ! ឱ្យបង AI បំប្លែងវាទៅជា
+        <span class="text-emerald-400 font-bold">ផែនទីមន្តអាគម</span>
+        សម្រាប់ប្អូន!"
       </p>
-      <p
-        class="text-lg md:text-xl text-slate-400 font-light italic leading-relaxed px-4"
-      >
+      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
         តើប្អូនធ្លាប់វិលមុខនឹងការអាន Logic ស្មុគស្មាញមែនទេ?
-        <strong class="text-emerald-400">Logic Visualizer</strong> នឹងប្រើប្រាស់
-        <span class="underline decoration-emerald-500/30">Neural Mapping</span>
-        ដើម្បីបំប្លែងកូដប្អូនឱ្យក្លាយជា Flowchart ដ៏ស្រស់ស្អាតភ្លាមៗ។
-        ជួយឱ្យយល់ពីដំណើរការកូដ និងរកឃើញ Bug បានលឿនជាងមុន ១០ដង! 🚀
+        <strong class="text-emerald-400">Logic Visualizer</strong>
+        នឹងជួយបំប្លែងកូដប្អូនឱ្យក្លាយជា Flowchart ដ៏ស្រស់ស្អាតភ្លាមៗ។
+        ជួយឱ្យយល់ពីដំណើរការកូដ និងរកឃើញ Bug បានលឿនជាងមុន! 🚀
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pt-10">
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🗺️
-        </div>
-        <h4 class="text-emerald-400 font-black uppercase mb-3">
-          Instant Mapping
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🗺️</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          គូរផែនទីរហ័ស
         </h4>
-        <p class="text-sm text-slate-400 italic">
-          គ្រាន់តែបោះកូដចូលមក ផែនទី Logic នឹងលេចឡើងក្នុងមួយពព្រិចភ្នែក។
+        <p class="text-slate-400 text-xs font-light">
+          បោះកូដចូលមក ផែនទី Logic នឹងលេចឡើងក្នុងមួយពព្រិចភ្នែក។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🕵️
-        </div>
-        <h4 class="text-emerald-400 font-black uppercase mb-3">Logic Debug</h4>
-        <p class="text-sm text-slate-400 italic">
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🕵️</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          ស្វែងយល់លក្ខខណ្ឌ
+        </h4>
+        <p class="text-slate-400 text-xs font-light">
           មើលឃើញរាល់លក្ខខណ្ឌ (If/Else, Loops) យ៉ាងច្បាស់លាស់បំផុត។
         </p>
       </div>
-      <div class="magic-card p-10 text-center group">
-        <div class="text-5xl mb-6 group-hover:scale-125 transition-transform">
-          🖼️
-        </div>
-        <h4 class="text-emerald-400 font-black uppercase mb-3">Pro Export</h4>
-        <p class="text-sm text-slate-400 italic">
-          Export ជា SVG គុណភាពខ្ពស់សម្រាប់ដាក់ក្នុង Report ឬ Presentation។
+      <div class="magic-card p-8">
+        <span class="text-4xl mb-4 block">🖼️</span>
+        <h4 class="text-white font-bold mb-2 uppercase text-xs">
+          Export គុណភាពខ្ពស់
+        </h4>
+        <p class="text-slate-400 text-xs font-light">
+          រក្សាទុកជា SVG សម្រាប់ដាក់ក្នុង Report ឬ Presentation ផ្សេងៗ។
         </p>
       </div>
     </div>
   </header>
 
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-16 items-start">
-    <div class="lg:col-span-5 space-y-10">
-      <div class="magic-card p-8 md:p-12 shadow-2xl">
-        <div class="flex items-center gap-4 mb-10">
-          <div class="p-3 bg-emerald-500/10 rounded-2xl">
-            <span class="text-3xl">💻</span>
-          </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-start">
+    <section class="lg:col-span-5">
+      <div class="magic-card p-8 md:p-10">
+        <div class="flex items-center gap-4 mb-8">
+          <span class="text-2xl">💻</span>
           <div>
-            <h3
-              class="text-lg font-black text-white uppercase tracking-tighter"
-            >
-              Source Ingest
+            <h3 class="text-lg font-bold text-white uppercase tracking-tight">
+              បញ្ចូលកូដប្អូន
             </h3>
-            <p class="text-xs text-slate-500">បញ្ចូលកូដប្អូនខាងក្រោម</p>
+            <p class="text-xs text-slate-500 uppercase">Source Ingest Block</p>
           </div>
         </div>
 
         <textarea
           id="codeInput"
-          class="w-full h-64 md:h-[500px] bg-black/40 border border-white/5 rounded-[30px] p-8 focus:ring-4 focus:ring-emerald-500/20 outline-none transition-all font-mono text-base leading-relaxed text-emerald-400 no-scrollbar shadow-inner"
-          placeholder="ឧទាហរណ៍៖&#10;if (userIsRich) {&#10;  buyTesla();&#10;} else {&#10;  buyBicycle();&#10;}"
+          class="code-input h-80 md:h-[500px] no-scrollbar"
+          placeholder="ឧទាហរណ៍៖&#10;if (isRich) {&#10;  buyTesla();&#10;} else {&#10;  buyBicycle();&#10;}"
         ></textarea>
 
-        <button
-          onclick="visualize()"
-          id="btnAction"
-          class="btn-magic w-full mt-10 py-7 rounded-[35px] text-xl uppercase tracking-[0.3em] flex justify-center items-center gap-5 active:scale-90"
-        >
-          <span>Generate Flow</span>
+        <button onclick="visualize()" id="btnAction" class="btn-visualize mt-8">
+          បំប្លែងទៅជាផែនទី
         </button>
       </div>
-    </div>
+    </section>
 
-    <div class="lg:col-span-7">
-      <div
-        class="magic-card p-6 md:p-12 flex flex-col min-h-[600px] md:min-h-[800px]"
-      >
+    <section class="lg:col-span-7">
+      <div class="magic-card p-8 md:p-10 min-h-[600px] flex flex-col">
         <div
-          class="p-6 border-b border-white/5 flex justify-between items-center mb-8"
+          class="flex justify-between items-center mb-8 pb-6 border-b border-white/5"
         >
-          <div class="flex items-center gap-3">
-            <div class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></div>
+          <div class="flex items-center gap-2">
             <span
-              class="text-[11px] font-black text-slate-400 uppercase tracking-widest"
+              class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
+            ></span>
+            <span
+              class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
               >Neural Diagram Output</span
             >
           </div>
-          <div id="controlPanel" class="hidden flex gap-4">
+          <div id="controlPanel" class="hidden">
             <button
               onclick="downloadSVG()"
-              class="text-xs bg-white/5 hover:bg-emerald-500 hover:text-black px-6 py-2.5 rounded-full border border-white/10 transition-all font-black uppercase tracking-widest shadow-lg"
+              class="text-[10px] bg-white/5 hover:bg-emerald-500 hover:text-black px-4 py-2 rounded-lg border border-white/10 font-bold uppercase transition-all"
             >
-              Export_SVG
+              Export SVG
             </button>
           </div>
         </div>
 
-        <div
-          class="flex-grow flex items-center justify-center relative overflow-hidden"
-        >
+        <div class="flex-grow flex items-center justify-center relative">
           <div id="loading" class="hidden text-center">
-            <div class="relative w-24 h-24 mx-auto mb-10">
-              <div
-                class="absolute inset-0 border-8 border-white/5 rounded-full"
-              ></div>
-              <div
-                class="absolute inset-0 border-8 border-t-emerald-500 rounded-full animate-spin"
-              ></div>
-            </div>
+            <div
+              class="w-12 h-12 border-4 border-white/5 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4"
+            ></div>
             <p
-              class="text-emerald-500 font-mono text-xs animate-pulse tracking-[0.5em] uppercase"
+              class="text-emerald-400 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse"
             >
-              Mapping_Logic...
+              កំពុងគូរផែនទី...
+            </p>
+          </div>
+
+          <div id="placeholder" class="text-center opacity-30">
+            <p class="text-xs font-mono uppercase tracking-[0.5em]">
+              កំពុងរង់ចាំសញ្ញា Logic...
             </p>
           </div>
 
@@ -272,33 +260,20 @@
             id="resultContainer"
             class="hidden w-full h-full flex flex-col items-center"
           >
-            <div
-              id="diagramContainer"
-              class="p-10 no-scrollbar w-full flex justify-center overflow-x-auto"
-            >
-              <div
-                id="mermaidGraph"
-                class="mermaid scale-110 md:scale-125"
-              ></div>
+            <div id="diagramContainer" class="w-full">
+              <div id="mermaidGraph" class="mermaid"></div>
             </div>
             <div
-              class="mt-10 p-8 bg-emerald-500/5 rounded-3xl border border-emerald-500/10 text-center w-full"
+              class="mt-8 p-6 bg-emerald-500/5 rounded-2xl border border-emerald-500/10 text-center w-full"
             >
-              <p class="text-base text-slate-400 italic">
-                💡 គន្លឹះ៖ Logic នេះត្រូវបានវិភាគដោយ AI
-                ដើម្បីឱ្យប្អូនងាយស្រួលយល់បំផុត!
+              <p class="text-sm text-slate-400 italic">
+                💡 ផែនទីនេះនឹងជួយឱ្យប្អូនយល់ពីដំណើរការកូដកាន់តែស៊ីជម្រៅ!
               </p>
             </div>
           </div>
-
-          <div id="placeholder" class="text-center space-y-6 opacity-30">
-            <p class="text-xs font-mono uppercase tracking-[0.5em]">
-              Waiting for logic signals...
-            </p>
-          </div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </main>
 
@@ -307,26 +282,27 @@
 <script>
   const socket = io();
 
-  // ១. Interactive Magic Background (Mouse Follow)
+  // ១. Background Animation (រង្វើល និងយឺត)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
   let mouse = { x: null, y: null };
   window.addEventListener("mousemove", (e) => {
-    mouse.x = e.x;
-    mouse.y = e.y;
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
   });
 
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     dots = [];
-    for (let i = 0; i < 70; i++) {
+    const count = window.innerWidth < 768 ? 30 : 60;
+    for (let i = 0; i < count; i++) {
       dots.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
         size: Math.random() * 1.5,
       });
     }
@@ -334,14 +310,13 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "<%= theme || '#00ff41' %>";
-    ctx.strokeStyle = "rgba(0, 255, 65, 0.05)";
+    ctx.fillStyle = "<%= theme || '#10b981' %>";
+    ctx.strokeStyle = "rgba(16, 185, 129, 0.04)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-
       let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
       if (dist < 150) {
         ctx.beginPath();
@@ -349,7 +324,6 @@
         ctx.lineTo(mouse.x, mouse.y);
         ctx.stroke();
       }
-
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -358,15 +332,16 @@
   }
   init();
   draw();
+  window.addEventListener("resize", init);
 
-  // ២. Mermaid Interaction Logic
+  // ២. Mermaid Logic
   mermaid.initialize({
     startOnLoad: false,
     theme: "dark",
     flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
     themeVariables: {
       fontFamily: "Kantumruy Pro",
-      primaryColor: "#00ff41",
+      primaryColor: "#10b981",
       nodeTextColor: "#ffffff",
     },
   });
@@ -377,19 +352,15 @@
 
     if (!code)
       return Swal.fire({
-        icon: "warning",
-        title: "Empty Logic",
         text: "ដាក់កូដមកប្អូន!",
-        background: "#020617",
-        color: "#00ff41",
+        icon: "warning",
+        confirmButtonColor: "#10b981",
       });
     if (!firebaseUid)
       return Swal.fire({
+        text: "សូមចូលគណនីសិនប្អូន!",
         icon: "warning",
-        title: "Identity Unknown",
-        text: "សូម Login សិន ដើម្បីរក្សាទុក History!",
-        background: "#020617",
-        color: "#00ff41",
+        confirmButtonColor: "#10b981",
       });
 
     document.getElementById("placeholder").classList.add("hidden");
@@ -417,7 +388,7 @@
         .scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       container.innerHTML =
-        "<div class='text-red-400 p-10 bg-red-500/10 rounded-[30px] text-center'>💀 បងគូរអត់ចេញទេ កូដនេះស្មុគស្មាញពេក!</div>";
+        "<div class='text-red-400 p-8 text-center'>💀 បងគូរអត់ចេញទេ កូដនេះស្មុគស្មាញពេក!</div>";
     }
   });
 
@@ -432,6 +403,4 @@
     link.download = `logic_flow_${Date.now()}.svg`;
     link.click();
   }
-
-  window.addEventListener("resize", init);
 </script>
