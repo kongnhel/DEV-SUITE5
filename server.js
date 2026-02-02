@@ -74,6 +74,16 @@ app.use(async (req, res, next) => {
   }
 });
 
+app.use(session({
+  secret: 'keyboard cat', // ដាក់ Key ងាប់ៗរបស់បងទៅ
+  resave: false,
+  saveUninitialized: true,
+  cookie: { 
+    // កំណត់ទៅ ២៤ ម៉ោង
+    maxAge: 24 * 60 * 60 * 1000 
+  }
+}));
+
 // --- ៤. បម្រើឯកសារ Static & View Engine ---
 app.use(express.static("public"));
 app.set("view engine", "ejs");
