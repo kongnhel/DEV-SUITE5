@@ -212,11 +212,21 @@ module.exports = (socket) => {
             if (!user) return socket.emit("error_occured", "សូម Login សិនម៉ូយ!");
 
             const style = mode === "kid" ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ (ភាសាសាមញ្ញបំផុត)" : "ពន្យល់បែបអាជីព និងងាយយល់";
-            const prompt = `You are an expert Khmer Teacher. 
-                STRICT RULES:
-                1. Answer EVERYTHING in Khmer.
-                2. Topic: "${topic}" | Style: ${style}
-                3. Return ONLY valid JSON with title, explanation, key_points, examples, and fun_fact.`;
+           const prompt = `You are an expert Khmer Teacher. 
+        STRICT RULES:
+        1. Answer EVERYTHING in Khmer.
+        2. Topic: "${topic}" | Style: ${style}
+        3. Return ONLY valid JSON with this structure:
+        {
+          "title": "ចំណងជើងមេរៀន",
+          "explanation": "ការបកស្រាយសង្ខេប",
+          "key_points": [
+            {"label": "ចំណុចសំខាន់ទី១", "desc": "ការពិពណ៌នាទី១"},
+            {"label": "ចំណុចសំខាន់ទី២", "desc": "ការពិពណ៌នាទី២"}
+          ],
+          "examples": ["ឧទាហរណ៍១", "ឧទាហរណ៍២"],
+          "fun_fact": "រឿងគួរឱ្យចាប់អារម្មណ៍"
+        }`;
 
             const result = await aiModel.generateContent(prompt);
             const aiData = parseAIJson(result.response.text());

@@ -395,11 +395,11 @@
     document.getElementById("pointsContainer").innerHTML = data.key_points
       .map(
         (p) => `
-      <div class="point-card">
-        <div class="text-cyan-400 font-black text-xl mb-4 underline decoration-cyan-500/20">${p.label}</div>
-        <p class="text-lg text-slate-400 font-light leading-relaxed">${p.desc}</p>
-      </div>
-    `,
+  <div class="point-card">
+    <div class="text-cyan-400 font-black text-xl mb-4 underline decoration-cyan-500/20">${p.label}</div>
+    <p class="text-lg text-slate-400 font-light leading-relaxed">${p.desc}</p>
+  </div>
+`,
       )
       .join("");
 
