@@ -10,6 +10,10 @@ const admin = require("firebase-admin"); // បន្ថែមគ្រឿងផ
 const viewRoutes = require("./routes/viewRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const historyRoutes = require('./routes/history');
+
+// ២. ចុះឈ្មោះផ្លូវមេ (Prefix)
+// បើប្អូនដាក់ '/history' នៅទីនេះ...
 const aiHandler = require("./controllers/aiController");
 const User = require("./models/User");
 
@@ -93,6 +97,9 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", authRoutes);
 app.use("/user", userRoutes);
 app.use("/", viewRoutes);
+app.use('/history', historyRoutes);
+
+
 
 // --- ៦. Socket Connection សម្រាប់ AI Tutor ---
 io.on("connection", (socket) => {

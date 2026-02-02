@@ -1,0 +1,149 @@
+<%- include('partials/header') %>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<style>
+  :root {
+    --primary: #ff4d00; /* Robot Fire Orange */
+    --secondary: #ff9100;
+    --bg-dark: #020617;
+    --robot-glow: rgba(255, 77, 0, 0.4);
+  }
+
+  body { font-family: "Kantumruy Pro", sans-serif; background-color: var(--bg-dark); color: #f3f4f6; overflow-x: hidden; }
+
+  /* ១. Background បែប Robot Core */
+  .core-bg {
+    position: fixed; inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 77, 0, 0.05) 0%, transparent 80%);
+    z-index: -20; pointer-events: none;
+  }
+
+  /* ២. Robotic Magic Card */
+  .robot-card {
+    position: relative; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(30px);
+    border-radius: 45px; border: 2px solid rgba(255, 77, 0, 0.15);
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.8); overflow: hidden;
+  }
+  .robot-card::before {
+    content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, var(--primary), var(--secondary), transparent 40%);
+    animation: rotateFire 6s linear infinite; z-index: -1; opacity: 0.2;
+  }
+  @keyframes rotateFire { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+  /* ៣. Shimmer & UI Effects */
+  .shimmer-fire {
+    background: linear-gradient(90deg, #fff, var(--primary), var(--secondary), #fff);
+    background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    animation: fireShine 4s linear infinite;
+  }
+  @keyframes fireShine { to { background-position: 200% center; } }
+
+  .status-badge {
+    background: rgba(255, 77, 0, 0.1); border: 1px solid rgba(255, 77, 0, 0.2);
+    color: var(--primary); padding: 6px 16px; border-radius: 99px; font-size: 10px; font-weight: 800;
+  }
+
+  .prose-robot { line-height: 1.8; color: #cbd5e1; font-size: 1.2rem; }
+  .prose-robot strong { color: var(--primary); text-shadow: 0 0 10px var(--robot-glow); }
+  
+  pre { background: rgba(0,0,0,0.5) !important; border-radius: 20px; padding: 2rem; border-left: 5px solid var(--primary); }
+</style>
+
+<div class="core-bg"></div>
+<canvas id="neural-bg" class="fixed inset-0 -z-10 opacity-30"></canvas>
+
+<main class="max-w-6xl mx-auto px-6 py-12 relative">
+  <header class="mb-16 animate-in fade-in slide-in-from-top-10 duration-1000">
+    <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="text-center md:text-left space-y-4">
+            <div class="flex items-center justify-center md:justify-start gap-4">
+                <span class="status-badge uppercase">Decryption Stage: Final</span>
+                <span class="text-slate-500 font-mono text-[9px] uppercase tracking-widest">Memory_ID: <%= record._id %></span>
+            </div>
+            <h1 class="text-4xl md:text-7xl font-black text-white italic uppercase tracking-tighter">
+                Memory <span class="shimmer-fire">Decrypted</span>
+            </h1>
+        </div>
+        <a href="/history" class="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-black transition-all">
+            ← Back to Archive
+        </a>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-5 gap-12">
+    <section class="lg:col-span-2 space-y-8 animate-in slide-in-from-left-10 duration-1000">
+        <div class="robot-card p-10 border-l-[15px] border-white/20">
+            <h4 class="text-[10px] font-black text-slate-500 uppercase tracking-[0.5em] mb-8">Human Input Signal</h4>
+            <p class="text-3xl text-white font-light italic leading-tight">"<%= record.userInput %>"</p>
+            <div class="mt-10 pt-8 border-t border-white/5 flex items-center gap-4">
+                <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500">🤖</div>
+                <div>
+                    <p class="text-[9px] font-black text-slate-400 uppercase">Sector Analyzed</p>
+                    <p class="text-xs text-orange-400 font-bold"><%= record.toolName %></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="lg:col-span-3 space-y-8 animate-in slide-in-from-right-10 duration-1000">
+        <div class="robot-card p-10 md:p-14 border-l-[15px] border-orange-500 bg-orange-500/5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-orange-500/20 shadow-[0_0_15px_var(--primary)] animate-[scan_4s_linear_infinite]"></div>
+            
+            <h4 class="text-[10px] font-black text-orange-500 uppercase tracking-[0.5em] mb-10 flex items-center gap-4">
+                <span class="h-px w-12 bg-orange-500"></span> Neural Output Data
+            </h4>
+
+            <div id="aiContent" class="prose-robot italic">
+                </div>
+        </div>
+    </section>
+  </div>
+</main>
+
+<style>
+    @keyframes scan { 0% { top: 0% } 100% { top: 100% } }
+</style>
+
+<script>
+  // ១. Markdown Rendering Logic
+  (function() {
+      const rawRes = <%- JSON.stringify(record.aiResponse) %>;
+      let textToRender = "Extraction Complete.";
+
+      if (typeof rawRes === 'string') {
+          textToRender = rawRes;
+      } else if (rawRes && typeof rawRes === 'object') {
+          // ឆែក Key ច្រើនជម្រើស ដើម្បីការពារ Bug "undefined"
+          textToRender = rawRes.explanation || rawRes.response || rawRes.answer || rawRes.humorous_response || "Data Integrity Verified.";
+      }
+      
+      document.getElementById("aiContent").innerHTML = marked.parse(textToRender);
+  })();
+
+  // ២. Interactive Particles
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  function init() {
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 60; i++) {
+      dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, size: Math.random() * 2 });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = "#ff4d00";
+    dots.forEach(d => {
+      d.x += d.vx; d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init(); draw();
+  window.addEventListener("resize", init);
+</script>
+
+<%- include('partials/footer') %>
