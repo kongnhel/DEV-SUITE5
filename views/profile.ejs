@@ -1,210 +1,375 @@
 <%- include('partials/header') %>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link
+  href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@300;400;700&display=swap"
+  rel="stylesheet"
+/>
 
 <style>
   :root {
-    --primary: #f97316; /* ពណ៌ទឹកក្រូចបែបទំនើប */
-    --primary-glow: rgba(249, 115, 22, 0.2);
+    --primary: #f97316;
+    --primary-dark: #c2410c;
+    --primary-glow: rgba(249, 115, 22, 0.4);
     --bg-dark: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
-    --border-light: rgba(255, 255, 255, 0.08);
+    --card-glass: rgba(30, 41, 59, 0.6);
+    --border-glass: rgba(255, 255, 255, 0.1);
+    --text-glow: 0 0 10px rgba(249, 115, 22, 0.5);
   }
 
   body {
     font-family: "Kantumruy Pro", sans-serif;
     background-color: var(--bg-dark);
-    color: #f1f5f9;
+    color: #f8fafc;
     margin: 0;
+    overflow-x: hidden;
   }
 
-  /* ១. Background បែបអ័ព្ទក្នុងលំហ (ស្ងប់ស្ងាត់) */
+  /* ១. Background Animation Canvas */
   #neural-bg {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -20;
-    opacity: 0.15;
-    pointer-events: none;
+    z-index: -1;
+    opacity: 0.3;
   }
 
-  /* ២. Profile Card - បែបកញ្ចក់ថ្លា */
-  .profile-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 28px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  /* ២. Main Container Animation */
+  .fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  /* ៣. Avatar Section */
-  .avatar-container {
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ៣. Glass Profile Card */
+  .glass-card {
+    background: var(--card-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glass);
+    border-radius: 24px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
     position: relative;
-    width: 150px;
-    height: 150px;
-    margin: 0 auto;
-    padding: 6px;
-    background: linear-gradient(135deg, var(--primary), #6366f1);
-    border-radius: 40px;
-    box-shadow: 0 10px 25px -5px var(--primary-glow);
-  }
-
-  .avatar-inner {
-    width: 100%;
-    height: 100%;
-    background: #1e293b;
-    border-radius: 35px;
     overflow: hidden;
   }
 
-  #avatarPreview {
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--primary),
+      transparent
+    );
+    opacity: 0.5;
+  }
+
+  /* ៤. Modern Avatar Upload (Clickable) */
+  .avatar-wrapper {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    border-radius: 50%;
+    padding: 5px;
+    background: linear-gradient(135deg, var(--primary), #8b5cf6);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .avatar-wrapper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px var(--primary-glow);
+  }
+
+  .avatar-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid var(--bg-dark);
+    background: #1e293b;
   }
 
-  /* ៤. Form Inputs */
-  .input-group label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    margin-left: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  .avatar-overlay {
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border: 4px solid transparent;
   }
 
-  .input-custom {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border: 1px solid var(--border-light) !important;
-    border-radius: 16px !important;
-    color: white !important;
-    padding: 1rem 1.25rem !important;
+  .avatar-wrapper:hover .avatar-overlay {
+    opacity: 1;
+  }
+
+  /* ៥. Modern Inputs */
+  .floating-input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .modern-input {
     width: 100%;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-
-  .input-custom:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 4px var(--primary-glow) !important;
-  }
-
-  /* ៥. Buttons */
-  .btn-submit {
-    background: linear-gradient(135deg, var(--primary), #ea580c);
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border-glass);
+    padding: 1rem 1rem;
+    border-radius: 12px;
     color: white;
-    font-weight: 700;
-    padding: 1.1rem;
-    border-radius: 18px;
-    width: 100%;
-    border: none;
-    cursor: pointer;
     font-size: 1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
+    outline: none;
+    box-sizing: border-box; /* Important fix */
   }
 
-  .btn-submit:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.4);
+  .modern-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+    background: rgba(15, 23, 42, 0.9);
   }
 
-  .btn-delete {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    padding: 0.8rem;
-    border-radius: 14px;
-    width: 100%;
-    font-size: 0.8rem;
+  .input-label {
+    position: absolute;
+    left: 1rem;
+    top: -0.6rem;
+    background: var(--bg-dark);
+    padding: 0 0.5rem;
+    font-size: 0.75rem;
+    color: var(--primary);
     font-weight: 700;
-    text-transform: uppercase;
-    transition: all 0.2s;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
   }
 
-  .btn-delete:hover {
-    background: #ef4444;
+  /* ៦. Buttons */
+  .btn-primary-glow {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
+    border: none;
+    padding: 1rem;
+    width: 100%;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
 
-  .shimmer-text {
+  .btn-primary-glow:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px var(--primary-glow);
+  }
+
+  .btn-primary-glow:active {
+    transform: scale(0.98);
+  }
+
+  .btn-danger-ghost {
+    background: transparent;
+    border: 1px dashed rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+    padding: 0.8rem;
+    width: 100%;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .btn-danger-ghost:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #ef4444;
+  }
+
+  /* Text Effects */
+  .shimmer {
     background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 8s linear infinite;
+    animation: shine 5s linear infinite;
   }
-  @keyframes shine { to { background-position: 200% center; } }
+
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
 </style>
 
 <canvas id="neural-bg"></canvas>
 
-<main class="max-w-4xl mx-auto px-6 py-12 relative">
-  <header class="text-center mb-12 animate-in fade-in duration-700">
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 mb-6">
-      <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-      <span class="text-orange-500 text-[10px] font-bold uppercase tracking-widest">Profile Configuration</span>
-    </div>
-    <h2 class="text-4xl md:text-6xl font-black shimmer-text uppercase mb-4">ការកំណត់ Profile</h2>
-    <p class="text-slate-400 text-lg font-light italic max-w-2xl mx-auto">
-      "អាប់ដេតព័ត៌មានផ្ទាល់ខ្លួន ដើម្បីឱ្យ AI កាន់តែយល់ចិត្តប្អូន"
-    </p>
-  </header>
-
-  <div class="max-w-xl mx-auto">
-    <div class="profile-card p-8 md:p-10">
-      
-      <div class="text-center mb-10">
-        <div class="avatar-container mb-4">
-          <div class="avatar-inner">
-            <img id="avatarPreview" 
-                 src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.displayName %>" 
-                 alt="Profile">
-          </div>
-        </div>
-        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-[0.2em]">Neural Identity Processor</p>
+<main class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-lg fade-in-up">
+    <div class="text-center mb-8">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-900/30 border border-orange-500/30 mb-4 backdrop-blur-sm"
+      >
+        <span class="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
+        <span
+          class="text-orange-400 text-[10px] font-bold uppercase tracking-widest"
+          >System Configuration</span
+        >
       </div>
+      <h1 class="text-3xl md:text-4xl font-black uppercase shimmer mb-2">
+        កែប្រែព័ត៌មាន
+      </h1>
+      <p class="text-slate-400 text-sm font-light">
+        "ធ្វើឱ្យ Profile បងកាន់តែឡូយជាងមុន"
+      </p>
+    </div>
 
-      <form id="profileForm" class="space-y-8">
-        <div class="input-group">
-          <label>ឈ្មោះហៅក្រៅរបស់ប្អូន (Display Name)</label>
-          <input type="text" id="displayName" value="<%= user.displayName %>" 
-                 class="input-custom" placeholder="បញ្ចូលឈ្មោះរបស់អ្នក..." required />
+    <div class="glass-card p-8">
+      <form id="profileForm" enctype="multipart/form-data">
+        <div class="text-center mb-10">
+          <div
+            class="avatar-wrapper"
+            onclick="document.getElementById('photoFile').click()"
+          >
+            <img
+              id="avatarPreview"
+              class="avatar-img"
+              src="<%= user.photoURL && user.photoURL !== '' ? user.photoURL : 'https://api.dicebear.com/7.x/bottts/svg?seed=' + user.displayName %>"
+              alt="Profile"
+            />
+
+            <input
+              type="file"
+              id="photoFile"
+              name="photo"
+              accept="image/*"
+              class="hidden"
+              onchange="previewLocalFile(this)"
+            />
+
+            <div class="avatar-overlay">
+              <div class="text-white text-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  class="w-8 h-8 mx-auto mb-1"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
+                  />
+                </svg>
+                <span class="text-[10px] font-bold uppercase tracking-wider"
+                  >ប្តូររូប</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- <p class="text-xs text-slate-500 mt-4 font-mono">
+            ID:
+            <span class="text-orange-400"><%= user._id || 'UNKNOWN' %></span>
+          </p> -->
         </div>
 
-        <div class="input-group">
-          <label>តំណភ្ជាប់រូបភាព (Photo URL)</label>
-          <input type="text" id="photoURL" value="<%= user.photoURL %>" 
-                 oninput="updatePreview(this.value)" class="input-custom" 
-                 placeholder="បិទភ្ជាប់ Link រូបភាពពី Facebook ឬ Google..." />
-        </div>
+        <div class="space-y-6">
+          <div class="floating-input-group">
+            <span class="input-label">DISPLAY NAME</span>
+            <input
+              type="text"
+              id="displayName"
+              name="displayName"
+              value="<%= user.displayName %>"
+              class="modern-input"
+              placeholder="ឈ្មោះហៅក្រៅ..."
+              required
+            />
+          </div>
 
-        <button type="submit" id="submitBtn" class="btn-submit">
-          រក្សាទុកការផ្លាស់ប្តូរ
-        </button>
+          <button type="submit" id="submitBtn" class="btn-primary-glow group">
+            <span class="relative z-10 flex items-center justify-center gap-2">
+              <span>រក្សាទុកការផ្លាស់ប្តូរ</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="2"
+                stroke="currentColor"
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+                />
+              </svg>
+            </span>
+          </button>
+        </div>
       </form>
 
-      <div class="mt-12 pt-8 border-t border-white/5">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-xl">⚠️</span>
-          <div>
-            <h4 class="text-xs font-bold text-red-500 uppercase">តំបន់គ្រោះថ្នាក់ (Danger Zone)</h4>
-            <p class="text-[10px] text-slate-500">លុបគណនី និងរាល់ទិន្នន័យរបស់អ្នកចោលទាំងស្រុង</p>
-          </div>
+      <div class="mt-10 pt-6 border-t border-white/5">
+        <div class="flex items-center justify-between mb-4">
+          <span
+            class="text-[10px] font-bold text-slate-500 uppercase tracking-widest"
+            >Danger Zone</span
+          >
         </div>
-        <button onclick="confirmDelete()" class="btn-delete">
-          លុបគណនីនេះចោល
+        <button
+          onclick="confirmDelete()"
+          class="btn-danger-ghost flex items-center justify-center gap-2"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-4 h-4"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
+            />
+          </svg>
+          លុបគណនីចោល
         </button>
       </div>
 
-      <div class="text-center mt-8">
-        <a href="/dashboard" class="text-xs text-slate-500 hover:text-orange-400 transition-colors italic">
-          ← ត្រលប់ទៅកាន់ Dashboard វិញ
+      <div class="text-center mt-6">
+        <a
+          href="/dashboard"
+          class="text-xs text-slate-500 hover:text-orange-400 transition-colors"
+        >
+          &larr; ត្រលប់ទៅ Dashboard
         </a>
       </div>
     </div>
@@ -214,129 +379,145 @@
 <%- include('partials/footer') %>
 
 <script>
-  // ១. Background Animation (រង្វើល និងយឺត បែបផ្សែងអ័ព្ទ)
+  // ១. Background Animation (Space Neural Network)
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
-  let dots = [];
-  let mouse = { x: null, y: null };
-  window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
-  function init() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  let width,
+    height,
     dots = [];
-    for (let i = 0; i < 40; i++) {
-      dots.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: (Math.random() - 0.5) * 0.2,
-        size: Math.random() * 2 + 1,
-      });
-    }
+  const mouse = { x: null, y: null };
+
+  window.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  function initDots() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+    dots = Array.from({ length: 50 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.5,
+      vy: (Math.random() - 0.5) * 0.5,
+      size: Math.random() * 2,
+    }));
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = "#f97316";
-    ctx.strokeStyle = "rgba(249, 115, 22, 0.03)";
-    dots.forEach((d) => {
-      d.x += d.vx; d.y += d.vy;
-      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
-      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+    ctx.strokeStyle = "rgba(249, 115, 22, 0.1)";
 
-      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 200) {
-        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+    dots.forEach((dot) => {
+      dot.x += dot.vx;
+      dot.y += dot.vy;
+      if (dot.x < 0 || dot.x > width) dot.vx *= -1;
+      if (dot.y < 0 || dot.y > height) dot.vy *= -1;
+
+      // Draw connections
+      const dist = Math.hypot(mouse.x - dot.x, mouse.y - dot.y);
+      if (dist < 150) {
+        ctx.beginPath();
+        ctx.moveTo(dot.x, dot.y);
+        ctx.lineTo(mouse.x, mouse.y);
+        ctx.stroke();
       }
-      ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  init(); draw();
-  window.addEventListener("resize", init);
 
-  // ២. Logic Update Preview
-  function updatePreview(url) {
-    const preview = document.getElementById("avatarPreview");
-    if (url && url.trim() !== "") {
-      preview.src = url;
-      preview.onerror = () => {
-        preview.src = "https://api.dicebear.com/7.x/bottts/svg?seed=fallback";
+      ctx.beginPath();
+      ctx.arc(dot.x, dot.y, dot.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  }
+
+  initDots();
+  animate();
+  window.addEventListener("resize", initDots);
+
+  // ២. Preview Image Logic
+  function previewLocalFile(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.getElementById("avatarPreview").src = e.target.result;
       };
+      reader.readAsDataURL(input.files[0]);
     }
   }
 
-  // ៣. Logic Delete Account
+  // ៣. Consolidated Submit Logic (Fixing Duplicate Handlers)
+  document
+    .getElementById("profileForm")
+    .addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("submitBtn");
+      const originalText = btn.innerHTML;
+
+      // Loading State
+      btn.disabled = true;
+      btn.innerHTML = `<span class="animate-spin mr-2">⏳</span> កំពុងដំណើរការ...`;
+
+      // Create FormData (Handling both text and file)
+      const formData = new FormData(e.target);
+
+      try {
+        const res = await fetch("/user/update-profile", {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+          Swal.fire({
+            icon: "success",
+            title: "ជោគជ័យ!",
+            text: "ទិន្នន័យត្រូវបានអាប់ដេតរួចរាល់!",
+            background: "#1e293b",
+            color: "#fff",
+            confirmButtonColor: "#f97316",
+          });
+        } else {
+          throw new Error(result.message || "Unknown error");
+        }
+      } catch (error) {
+        console.error(error);
+        Swal.fire({
+          icon: "error",
+          title: "បរាជ័យ!",
+          text: "មានបញ្ហាក្នុងការភ្ជាប់ទៅកាន់ Server!",
+          background: "#1e293b",
+          color: "#fff",
+        });
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    });
+
+  // ៤. Delete Account Logic
   function confirmDelete() {
     Swal.fire({
-      title: "ប្រយ័ត្នបងប្រូ!",
-      text: "តើប្អូនប្រាកដទេថាចង់លុបគណនីចោល? រាល់ទិន្នន័យនឹងបាត់ជារៀងរហូត!",
+      title: "គិតច្បាស់នៅ?",
+      text: "ទិន្នន័យទាំងអស់នឹងត្រូវលុបចោល! មិនអាចយកវិញបានទេណា!",
       icon: "warning",
       background: "#1e293b",
       color: "#fff",
       showCancelButton: true,
       confirmButtonColor: "#ef4444",
-      cancelButtonText: "ទុកសិនបង!",
-      confirmButtonText: "លុបវាចោលទៅ!",
+      cancelButtonColor: "#334155",
+      confirmButtonText: "លុបចោល!",
+      cancelButtonText: "ប្តូរចិត្ត",
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
           const res = await fetch("/user/delete-account", { method: "POST" });
-          if (res.ok) {
-            window.location.href = "/login";
-          }
+          if (res.ok) window.location.href = "/login";
         } catch (err) {
-          showError("មានបញ្ហាក្នុងការលុបគណនី!");
+          Swal.fire("Error", "មិនអាចលុបបានទេ!", "error");
         }
       }
-    });
-  }
-
-  // ៤. Logic Submit Form
-  document.getElementById("profileForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
-    btn.innerText = "កំពុងរក្សាទុក...";
-
-    const data = {
-      displayName: document.getElementById("displayName").value,
-      photoURL: document.getElementById("photoURL").value,
-    };
-
-    try {
-      const res = await fetch("/user/update-profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      const result = await res.json();
-      if (result.status === "success") {
-        Swal.fire({
-          icon: "success",
-          title: "រួចរាល់!",
-          text: "ព័ត៌មានរបស់ប្អូនត្រូវបានអាប់ដេត!",
-          background: "#1e293b",
-          color: "#fff",
-          confirmButtonColor: "#f97316",
-        });
-      }
-    } catch (error) {
-      showError("ការអាប់ដេតបរាជ័យ!");
-    } finally {
-      btn.disabled = false;
-      btn.innerText = "រក្សាទុកការផ្លាស់ប្តូរ";
-    }
-  });
-
-  function showError(msg) {
-    Swal.fire({
-      icon: "error",
-      title: "អូហូ!",
-      text: msg,
-      background: "#1e293b",
-      color: "#fff",
     });
   }
 </script>
