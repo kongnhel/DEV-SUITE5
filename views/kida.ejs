@@ -145,9 +145,9 @@
         នៃចំណេះដឹងប្អូន!"
       </p>
       <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        តើប្អូនធុញនឹងការអង្គុយអានឯកសារមែនទេ?
+        តើបងធុញនឹងការអង្គុយអានឯកសារមែនទេ?
         <strong class="text-indigo-400">K-IDA</strong>
-        នឹងប្រើប្រាស់ប្រព័ន្ធវៃឆ្លាត ដើម្បីអាន និងយល់គ្រប់ចំណុចក្នុង PDF ប្អូន។
+        នឹងប្រើប្រាស់ប្រព័ន្ធវៃឆ្លាត ដើម្បីអាន និងយល់គ្រប់ចំណុចក្នុង PDF បង។
         បោះឯកសារចូលមក រួចសួរចង់ដឹងអីក៏បាន
         វានឹងឆ្លើយយ៉ាងលម្អិតដូចមានអ្នកជំនាញនៅក្បែរខ្លួនអ៊ីចឹង! 😂
       </p>
@@ -365,7 +365,7 @@
   async function handleFile(file) {
     if (!file || file.type !== "application/pdf") {
       return Swal.fire({
-        text: "បងសុំតែ PDF ទេប្អូន! 😂",
+        text: "អូនសុំតែ PDF ទេបង! 😂",
         icon: "error",
         background: "#1e293b",
         color: "#fff",
@@ -392,7 +392,7 @@
       document.getElementById("textPreview").classList.remove("hidden");
 
       Swal.fire({
-        text: "បងអានចប់ហើយ! តោះ សួរមកប្អូន!",
+        text: "អូនអានចប់ហើយ! តោះ សួរមកបង!",
         icon: "success",
         toast: true,
         position: "top-end",
@@ -409,7 +409,7 @@
 
     if (!query || pdfPagesData.length === 0) {
       return Swal.fire({
-        text: "បោះឯកសារឱ្យបងអានសិន! 😂",
+        text: "បោះឯកសារឱ្យអូនអានសិន! 😂",
         icon: "warning",
         confirmButtonColor: "#6366f1",
       });

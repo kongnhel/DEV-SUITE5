@@ -173,10 +173,10 @@
         ឱ្យកាន់តែអស្ចារ្យ!"
       </p>
       <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        ប្អូនធុញនឹង Error មែនទេ?
+        បងធុញនឹង Error មែនទេ?
         <strong class="text-cyan-400">Evolution</strong> នឹងប្រើប្រាស់ Neural
-        Engine ដើម្បីវិភាគកូដប្អូនយ៉ាងស៊ីជម្រៅ។ បងមិនត្រឹមតែ Fix
-        ឱ្យដើរប៉ុណ្ណោះទេ តែបងនឹងជួយ Review ឱ្យកូដប្អូនខ្លាំងដូច Senior Developer
+        Engine ដើម្បីវិភាគកូដបងយ៉ាងស៊ីជម្រៅ។ អូនមិនត្រឹមតែ Fix
+        ឱ្យដើរប៉ុណ្ណោះទេ តែបងនឹងជួយ Review ឱ្យកូដបងខ្លាំងដូច Senior Developer
         លំដាប់ពិភពលោក! 🚀
       </p>
     </div>
@@ -193,7 +193,7 @@
         <span class="text-4xl mb-4 block">🎭</span>
         <h4 class="text-white font-bold mb-2 uppercase text-xs">AI យល់ចិត្ត</h4>
         <p class="text-slate-400 text-xs font-light">
-          ជួយលើកទឹកចិត្តប្អូនរាល់ពេលកូដ Error ជាមួយពាក្យពេចន៍កំប្លែងៗ។
+          ជួយលើកទឹកចិត្តបងរាល់ពេលកូដ Error ជាមួយពាក្យពេចន៍កំប្លែងៗ។
         </p>
       </div>
       <div class="magic-card p-8">
@@ -202,7 +202,7 @@
           ការពារ Logic
         </h4>
         <p class="text-slate-400 text-xs font-light">
-          ការពារកូដប្អូនពី Bug ផ្សេងៗនាពេលអនាគត តាមរយៈការវិភាគយ៉ាងម៉ត់ចត់។
+          ការពារកូដបងពី Bug ផ្សេងៗនាពេលអនាគត តាមរយៈការវិភាគយ៉ាងម៉ត់ចត់។
         </p>
       </div>
     </div>
@@ -217,16 +217,16 @@
             <textarea
               id="userComment"
               class="input-custom h-24 resize-none"
-              placeholder="តើប្អូនមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ? (ឧ. ជិតឆ្កួតហើយបង!)"
+              placeholder="តើបងមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ? (ឧ. ជិតឆ្កួតហើយអូន!)"
             ></textarea>
           </div>
 
           <div class="input-group">
-            <label>បញ្ចូលកូដដែលចង់ឱ្យបង Review</label>
+            <label>បញ្ចូលកូដដែលចង់ឱ្យអូន Review</label>
             <textarea
               id="code"
               class="input-custom code-area h-96 md:h-[500px] no-scrollbar shadow-inner"
-              placeholder="// បិទភ្ជាប់កូដដែលញ៉េរញ៉ៃរបស់ប្អូននៅទីនេះ..."
+              placeholder="// បិទភ្ជាប់កូដដែលញ៉េរញ៉ៃរបស់បងនៅទីនេះ..."
             ></textarea>
           </div>
 
@@ -376,13 +376,13 @@
 
     if (!code)
       return Swal.fire({
-        text: "បោះកូដចូលមកអាអូន! 😂",
+        text: "បោះកូដចូលមកអាបង! 😂",
         icon: "info",
         confirmButtonColor: "#22d3ee",
       });
     if (!firebaseUid)
       return Swal.fire({
-        text: "សូមចូលគណនីសិនប្អូន!",
+        text: "សូមចូលគណនីសិនបង!",
         icon: "warning",
         confirmButtonColor: "#22d3ee",
       });
@@ -431,7 +431,7 @@
     const code = document.getElementById("fixedCode").textContent;
     navigator.clipboard.writeText(code);
     Swal.fire({
-      text: "ចម្លងកូដបានជោគជ័យ!",
+      text: "ចម្លងកូដបានជោគជ័យ!(ចេះតែ Ctrl+C និង Ctrl + V ហា) 😂",
       icon: "success",
       toast: true,
       position: "top-end",

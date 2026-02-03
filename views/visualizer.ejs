@@ -146,14 +146,14 @@
 
     <div class="max-w-3xl mx-auto space-y-6">
       <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
-        "ឈប់វង្វេងក្នុងកូដ! ឱ្យបង AI បំប្លែងវាទៅជា
+        "ឈប់វង្វេងក្នុងកូដ! ឱ្យអូន AI បំប្លែងវាទៅជា
         <span class="text-emerald-400 font-bold">ផែនទីមន្តអាគម</span>
-        សម្រាប់ប្អូន!"
+        សម្រាប់បង!"
       </p>
       <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        តើប្អូនធ្លាប់វិលមុខនឹងការអាន Logic ស្មុគស្មាញមែនទេ?
+        តើបងធ្លាប់វិលមុខនឹងការអាន Logic ស្មុគស្មាញមែនទេ?
         <strong class="text-emerald-400">Logic Visualizer</strong>
-        នឹងជួយបំប្លែងកូដប្អូនឱ្យក្លាយជា Flowchart ដ៏ស្រស់ស្អាតភ្លាមៗ។
+        នឹងជួយបំប្លែងកូដបងឱ្យក្លាយជា Flowchart ដ៏ស្រស់ស្អាតភ្លាមៗ។
         ជួយឱ្យយល់ពីដំណើរការកូដ និងរកឃើញ Bug បានលឿនជាងមុន! 🚀
       </p>
     </div>
@@ -165,7 +165,7 @@
           គូរផែនទីរហ័ស
         </h4>
         <p class="text-slate-400 text-xs font-light">
-          បោះកូដចូលមក ផែនទី Logic នឹងលេចឡើងក្នុងមួយពព្រិចភ្នែក។
+          បោះកូដចូលមក ផែនទី(Flow Chart) Logic នឹងលេចឡើងក្នុងមួយពព្រិចភ្នែក។
         </p>
       </div>
       <div class="magic-card p-8">
@@ -196,7 +196,7 @@
           <span class="text-2xl">💻</span>
           <div>
             <h3 class="text-lg font-bold text-white uppercase tracking-tight">
-              បញ្ចូលកូដប្អូន
+              បញ្ចូលកូដបង
             </h3>
             <p class="text-xs text-slate-500 uppercase">Source Ingest Block</p>
           </div>
@@ -209,7 +209,7 @@
         ></textarea>
 
         <button onclick="visualize()" id="btnAction" class="btn-visualize mt-8">
-          បំប្លែងទៅជាផែនទី
+          បំប្លែងទៅជាផែនទី(Flow Chart)
         </button>
       </div>
     </section>
@@ -246,7 +246,7 @@
             <p
               class="text-emerald-400 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse"
             >
-              កំពុងគូរផែនទី...
+              កំពុងគូរផែនទី(Flow Chart)...
             </p>
           </div>
 
@@ -267,7 +267,7 @@
               class="mt-8 p-6 bg-emerald-500/5 rounded-2xl border border-emerald-500/10 text-center w-full"
             >
               <p class="text-sm text-slate-400 italic">
-                💡 ផែនទីនេះនឹងជួយឱ្យប្អូនយល់ពីដំណើរការកូដកាន់តែស៊ីជម្រៅ!
+                💡 ផែនទី(Flow Chart)នេះនឹងជួយឱ្យប្អូនយល់ពីដំណើរការកូដកាន់តែស៊ីជម្រៅ!
               </p>
             </div>
           </div>
@@ -352,13 +352,13 @@
 
     if (!code)
       return Swal.fire({
-        text: "ដាក់កូដមកប្អូន!",
+        text: "ដាក់កូដមកបង!",
         icon: "warning",
         confirmButtonColor: "#10b981",
       });
     if (!firebaseUid)
       return Swal.fire({
-        text: "សូមចូលគណនីសិនប្អូន!",
+        text: "សូមចូលគណនីសិនបង!",
         icon: "warning",
         confirmButtonColor: "#10b981",
       });
@@ -388,7 +388,7 @@
         .scrollIntoView({ behavior: "smooth" });
     } catch (err) {
       container.innerHTML =
-        "<div class='text-red-400 p-8 text-center'>💀 បងគូរអត់ចេញទេ កូដនេះស្មុគស្មាញពេក!</div>";
+        "<div class='text-red-400 p-8 text-center'>💀ហើយដាក់មកច្រើនចឺង គិតថាអញអទិទេពមែន?🙏 ច្រលំមាត់បង</div>";
     }
   });
 
