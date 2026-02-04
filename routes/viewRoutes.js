@@ -15,6 +15,7 @@ router.get("/kida", authMiddleware, viewController.getKida);
 router.get("/tutor", authMiddleware, viewController.getTutor);
 router.get("/history", authMiddleware, viewController.getHistory);
 router.get('/dashboard', authMiddleware, userController.getDashboard);
+router.get("/love-guru", authMiddleware, viewController.getLoveGuru);
 
 router.get('/profile', authMiddleware, (req, res) => {
     res.render('profile', { title: 'Neural Profile', user: res.locals.user });
