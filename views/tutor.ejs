@@ -1,5 +1,7 @@
 <%- include('partials/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
   :root {
     --primary: <%= theme || "#22d3ee" %>;
@@ -15,9 +17,10 @@
     color: #f1f5f9;
     margin: 0;
     line-height: 1.6;
+    overflow-x: hidden;
   }
 
-  /* ១. Background បែបស្ងប់ស្ងាត់ (Calm Learning Environment) */
+  /* ១. Background Animation (Calm Learning Environment) */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -29,7 +32,15 @@
     pointer-events: none;
   }
 
-  /* ២. Card Design ថ្មី៖ ស្រឡះភ្នែក និងមានសណ្ដាប់ធ្នាប់ */
+  /* --- Full Screen PC Optimization --- */
+  .tutor-container {
+    max-width: 1200px; /* ពង្រីកឱ្យពេញ PC */
+    width: 95%;
+    margin: 40px auto;
+    position: relative;
+    z-index: 10;
+  }
+
   .magic-card {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
@@ -37,34 +48,45 @@
     border-radius: 30px;
     border: 1px solid var(--border-light);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transition: 0.3s ease;
   }
 
-  /* ៣. Mode Buttons៖ ធំ ស្រួលចុច និងច្បាស់ៗ */
+  /* --- Vision Support: Image Preview --- */
+  #imgPreview {
+    max-width: 250px;
+    border-radius: 15px;
+    border: 2px solid var(--primary);
+    display: none;
+    margin: 15px auto;
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+  }
+
   .mode-btn {
     background: rgba(255, 255, 255, 0.05);
     color: #94a3b8;
     border: 1px solid var(--border-light);
-    padding: 1rem 2rem;
-    border-radius: 20px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 15px;
     font-weight: 700;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    cursor: pointer;
   }
 
   .mode-btn.active {
     background: var(--primary);
     color: #0f172a;
     border-color: var(--primary);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+    box-shadow: 0 0 15px var(--primary);
   }
 
   .btn-generate {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: #0f172a;
     font-weight: 800;
-    padding: 1.2rem 2.5rem;
+    padding: 1rem 2rem;
     border-radius: 20px;
     transition: all 0.3s ease;
     border: none;
@@ -78,29 +100,37 @@
     box-shadow: 0 10px 25px -5px rgba(34, 211, 238, 0.4);
   }
 
-  /* ៤. Input Field៖ ធំច្បាស់ ងាយស្រួលវាយ */
   .input-custom {
     background: rgba(15, 23, 42, 0.8) !important;
     border: 2px solid var(--border-light) !important;
     border-radius: 24px !important;
     color: white !important;
-    padding: 1.5rem 2rem !important;
-    font-size: 1.2rem;
+    padding: 1.2rem 1.5rem !important;
+    font-size: 1.1rem;
     outline: none;
     transition: all 0.3s ease;
   }
 
-  .input-custom:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1);
-  }
-
-  /* ៥. Result Area Stylings */
   .result-title {
     font-size: 2.5rem;
     font-weight: 900;
     color: var(--primary);
     margin-bottom: 1.5rem;
+  }
+
+  /* Markdown Content Styling */
+  .markdown-body {
+    color: #e2e8f0;
+    line-height: 1.8;
+  }
+  .markdown-body h1,
+  .markdown-body h2 {
+    color: var(--primary);
+    margin-top: 1rem;
+  }
+  .markdown-body strong {
+    color: #fff;
+    border-bottom: 1px dashed var(--primary);
   }
 
   .point-card {
@@ -112,8 +142,8 @@
   }
 
   .point-card:hover {
-    background: rgba(255, 255, 255, 0.05);
     border-color: var(--primary);
+    transform: translateY(-5px);
   }
 
   .shimmer-text {
@@ -133,7 +163,7 @@
 
 <canvas id="neural-bg"></canvas>
 
-<main class="max-w-7xl mx-auto px-6 py-12 relative">
+<main class="tutor-container">
   <header
     class="text-center mb-16 animate-in fade-in slide-in-from-top-10 duration-700"
   >
@@ -156,37 +186,9 @@
       <p
         class="text-xl md:text-2xl font-light text-slate-300 leading-relaxed mb-10"
       >
-        "រៀនឱ្យឆ្លាត យល់ឱ្យច្បាស់! ឱ្យអូណ AI បកស្រាយរឿងស្មុគស្មាញ
-        <br />ឱ្យក្លាយជារឿង
+        "រៀនឱ្យឆ្លាត យល់ឱ្យច្បាស់! បកស្រាយរឿងស្មុគស្មាញឱ្យក្លាយជារឿង
         <span class="text-cyan-400 font-bold">សាមញ្ញបំផុត</span> សម្រាប់បង!"
       </p>
-    </div>
-
-    <div class="flex flex-wrap justify-center gap-6">
-      <div
-        class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10"
-      >
-        <span class="text-xl">⚡</span>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
-          >រហ័សទាន់ចិត្ត</span
-        >
-      </div>
-      <div
-        class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10"
-      >
-        <span class="text-xl">🧸</span>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
-          >ងាយស្រួលយល់</span
-        >
-      </div>
-      <div
-        class="flex items-center gap-3 bg-white/5 px-6 py-3 rounded-2xl border border-white/10"
-      >
-        <span class="text-xl">🎯</span>
-        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"
-          >ចំចំណុចសំខាន់</span
-        >
-      </div>
     </div>
   </header>
 
@@ -197,30 +199,37 @@
       class="flex flex-col lg:flex-row justify-between items-center gap-10 mb-12"
     >
       <div class="text-left">
-        <h2 class="text-2xl font-bold text-white mb-2">
-          តើបងចង់រៀនអំពីអ្វី?
-        </h2>
+        <h2 class="text-2xl font-bold text-white mb-2">តើបងចង់រៀនអំពីអ្វី?</h2>
         <p class="text-slate-500 text-sm">
-          សូមជ្រើសរើសកម្រិតនៃការបកស្រាយខាងក្រោម
+          ជ្រើសរើសកម្រិតនៃការបកស្រាយ និងបោះរូបភាពចូលបើមាន
         </p>
       </div>
-      <div class="flex gap-4 w-full md:w-auto">
-        <button
-          onclick="setMode('kid', this)"
-          class="mode-btn flex-1 md:flex-none active"
-        >
-          👶 បែបក្មេងៗ (ងាយបំផុត)
+      <div class="flex flex-wrap gap-4 w-full md:w-auto justify-center">
+        <button onclick="setMode('kid', this)" class="mode-btn active">
+          👶 បែបក្មេងៗ
+        </button>
+        <button onclick="setMode('simple', this)" class="mode-btn">
+          💡 បែបសាមញ្ញ
         </button>
         <button
-          onclick="setMode('simple', this)"
-          class="mode-btn flex-1 md:flex-none"
+          onclick="document.getElementById('fileInput').click()"
+          class="mode-btn !bg-slate-700 !text-white"
         >
-          💡 បែបសាមញ្ញ (ខ្លីខ្លឹម)
+          📸 បោះរូបភាពលំហាត់
         </button>
+        <input
+          type="file"
+          id="fileInput"
+          hidden
+          accept="image/*"
+          onchange="previewImg(this)"
+        />
       </div>
     </div>
 
-    <div class="relative group">
+    <center><img id="imgPreview" src="" alt="Exercise Preview" /></center>
+
+    <div class="relative group mt-6">
       <input
         type="text"
         id="topicInput"
@@ -229,9 +238,10 @@
       />
       <button
         onclick="askTutor()"
+        id="btnAction"
         class="lg:absolute right-3 top-3 bottom-3 mt-6 lg:mt-0 w-full lg:w-auto btn-generate"
       >
-        បង្កើតចំណេះដឹង
+        បង្កើតចំណេះដឹង 🔥
       </button>
     </div>
   </section>
@@ -255,10 +265,18 @@
     class="hidden space-y-12 animate-in slide-in-from-bottom-10 duration-700"
   >
     <div class="magic-card p-10 md:p-16 border-l-[12px] border-cyan-400">
-      <h3 id="resTitle" class="result-title uppercase italic"></h3>
+      <div class="flex justify-between items-start mb-6">
+        <h3 id="resTitle" class="result-title uppercase italic"></h3>
+        <button
+          onclick="copyLesson()"
+          class="text-[10px] text-slate-400 hover:text-white uppercase tracking-widest"
+        >
+          Copy Lesson 📋
+        </button>
+      </div>
       <div
         id="resDesc"
-        class="text-xl md:text-3xl font-light text-slate-200 leading-relaxed italic"
+        class="markdown-body text-xl md:text-2xl font-light text-slate-200 leading-relaxed italic"
       ></div>
     </div>
 
@@ -279,7 +297,7 @@
         <ul id="resExamples" class="space-y-6"></ul>
       </div>
       <div
-        class="magic-card p-10 bg-cyan-400/5 text-center flex items-center justify-center"
+        class="magic-card p-10 bg-cyan-400/5 text-center flex items-center justify-center border-dashed border-cyan-500/20"
       >
         <div>
           <span class="text-6xl mb-6 block">💡</span>
@@ -295,11 +313,13 @@
 
 <%- include('partials/footer') %>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
   let currentMode = "kid";
+  let base64Img = null;
 
-  // ១. Background Animation (រង្វើល និងយឺត មិនឱ្យវិលមុខ)
+  // ១. Background Animation
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
@@ -351,7 +371,36 @@
   draw();
   window.addEventListener("resize", init);
 
-  // ២. Tutor Logic
+  // ២. Vision Support: Image Handling
+  function previewImg(input) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById("imgPreview").src = e.target.result;
+      document.getElementById("imgPreview").style.display = "block";
+      base64Img = e.target.result.split(",")[1];
+    };
+    if (file) reader.readAsDataURL(file);
+  }
+
+  // ៣. Typewriter Effect with Markdown Rendering
+  function typeWriter(id, text) {
+    let i = 0;
+    const el = document.getElementById(id);
+    el.innerHTML = "";
+    function type() {
+      if (i < text.length) {
+        // Render Markdown based on substring for real-time effect
+        el.innerHTML = marked.parse(text.substring(0, i + 1));
+        i++;
+        setTimeout(type, 12);
+        const area = document.getElementById("answerArea");
+        // Optional: Auto-scroll while typing
+      }
+    }
+    type();
+  }
+
   function setMode(mode, btn) {
     currentMode = mode;
     document
@@ -364,42 +413,42 @@
     const topic = document.getElementById("topicInput").value.trim();
     const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
 
-    if (!topic)
-      return Swal.fire({
-        text: "ប្រាប់អូនមកថាចង់រៀនអី? 😂",
-        icon: "info",
-        confirmButtonColor: "#22d3ee",
-      });
+    if (!topic && !base64Img)
+      return Swal.fire({ text: "ប្រាប់គ្រូថាចង់រៀនអីដែរចៅ? 😂", icon: "info" });
     if (!firebaseUid)
-      return Swal.fire({
-        text: "សូមចូលគណនីសិនបង!",
-        icon: "warning",
-        confirmButtonColor: "#22d3ee",
-      });
+      return Swal.fire({ text: "សូមចូលគណនីសិនបង!", icon: "warning" });
 
     document.getElementById("loading").classList.remove("hidden");
     document.getElementById("answerArea").classList.add("hidden");
+    document.getElementById("btnAction").disabled = true;
 
-    socket.emit("ask_tutor", { topic, mode: currentMode, firebaseUid });
+    // Send both topic and image to backend
+    socket.emit("ask_tutor", {
+      topic,
+      image: base64Img,
+      mode: currentMode,
+      firebaseUid,
+    });
   }
 
   socket.on("tutor_result", (data) => {
     document.getElementById("loading").classList.add("hidden");
     document.getElementById("answerArea").classList.remove("hidden");
+    document.getElementById("btnAction").disabled = false;
     document.getElementById("resTitle").innerText = data.title;
 
-    // Typewriter effect for explanation
+    // Start Typing Effect for the Explanation
     typeWriter("resDesc", data.explanation);
 
     // Render Key Points
     document.getElementById("pointsContainer").innerHTML = data.key_points
       .map(
         (p) => `
-  <div class="point-card">
-    <div class="text-cyan-400 font-black text-xl mb-4 underline decoration-cyan-500/20">${p.label}</div>
-    <p class="text-lg text-slate-400 font-light leading-relaxed">${p.desc}</p>
-  </div>
-`,
+      <div class="point-card">
+        <div class="text-cyan-400 font-black text-xl mb-4 underline decoration-cyan-500/20">${p.label}</div>
+        <p class="text-lg text-slate-400 font-light leading-relaxed">${p.desc}</p>
+      </div>
+    `,
       )
       .join("");
 
@@ -420,19 +469,21 @@
     document
       .getElementById("answerArea")
       .scrollIntoView({ behavior: "smooth" });
+
+    // Reset Image after processing
+    base64Img = null;
+    document.getElementById("imgPreview").style.display = "none";
   });
 
-  function typeWriter(id, text) {
-    let i = 0;
-    const el = document.getElementById(id);
-    el.innerHTML = "";
-    function type() {
-      if (i < text.length) {
-        el.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, 15);
-      }
-    }
-    type();
+  function copyLesson() {
+    const title = document.getElementById("resTitle").innerText;
+    const desc = document.getElementById("resDesc").innerText;
+    navigator.clipboard.writeText(`${title}\n\n${desc}`);
+    Swal.fire({
+      text: "មេរៀនត្រូវបានចម្លងទុក! 📋",
+      icon: "success",
+      timer: 1500,
+      showConfirmButton: false,
+    });
   }
 </script>

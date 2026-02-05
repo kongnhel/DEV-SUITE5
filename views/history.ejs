@@ -1,6 +1,7 @@
 <%- include('partials/header') %>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
     :root { 
@@ -9,140 +10,61 @@
         --bg-dark: #0f172a; 
         --card-bg: rgba(30, 41, 59, 0.6);
         --border-light: rgba(255, 255, 255, 0.1);
+        --danger: #ef4444;
     }
     
-    body {
-        font-family: "Kantumruy Pro", sans-serif;
-        background-color: var(--bg-dark);
-        color: #e2e8f0;
-        margin: 0;
-    }
+    body { font-family: "Kantumruy Pro", sans-serif; background-color: var(--bg-dark); color: #e2e8f0; margin: 0; }
+    #neural-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -20; opacity: 0.15; pointer-events: none; }
+    .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%); z-index: -10; }
 
-    /* ១. Background បែបស្រទន់ មិនរំខានការអាន */
-    #neural-bg { 
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -20; 
-        opacity: 0.15; pointer-events: none; 
-    }
+    .magic-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 24px; border: 1px solid var(--border-light); transition: 0.3s; }
+    .magic-card:hover { border-color: var(--primary); }
 
-    .bg-grid {
-        position: fixed; inset: 0;
-        background-image: 
-            linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
-        background-size: 40px 40px;
-        mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%);
-        z-index: -10;
-    }
+    .search-container { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--border-light); border-radius: 20px; padding: 1.5rem; }
+    .input-custom { background: rgba(0, 0, 0, 0.3) !important; border: 1px solid var(--border-light) !important; border-radius: 12px !important; color: white !important; padding: 0.75rem 1rem !important; }
 
-    /* ២. Magic Card Design ថ្មី៖ សាមញ្ញ ងាយស្រួលមើល */
-    .magic-card {
-        background: var(--card-bg);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border-radius: 24px;
-        border: 1px solid var(--border-light);
-        transition: all 0.3s ease;
-    }
+    /* Tool Color Badges */
+    .badge-love { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+    .badge-culture { background: rgba(212, 175, 55, 0.1); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.2); }
+    .badge-code { background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); }
 
-    .magic-card:hover {
-        border-color: var(--primary);
-        box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-    }
-
-    /* ៣. Search Section */
-    .search-container {
-        background: rgba(15, 23, 42, 0.8);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--border-light);
-        border-radius: 20px;
-        padding: 1.5rem;
-    }
-
-    .input-custom {
-        background: rgba(0, 0, 0, 0.3) !important;
-        border: 1px solid var(--border-light) !important;
-        border-radius: 12px !important;
-        color: white !important;
-        padding: 0.75rem 1rem !important;
-    }
-
-    .input-custom:focus {
-        border-color: var(--primary) !important;
-        box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2) !important;
-    }
-
-    /* ៤. Typography & Markdown */
-    .shimmer-text {
-        background: linear-gradient(90deg, #fff, var(--primary), #fff);
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: shine 8s linear infinite;
-    }
+    .shimmer-text { background: linear-gradient(90deg, #fff, var(--primary), #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 8s linear infinite; }
     @keyframes shine { to { background-position: 200% center; } }
 
-    .prose-archive { 
-        line-height: 1.7; 
-        color: #cbd5e1; 
-        font-size: 1.05rem;
-    }
-    .prose-archive strong { color: var(--primary); }
-    .prose-archive p { margin-bottom: 1rem; }
-
-    /* ៥. Labels & Badges */
-    .label-tag {
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: #94a3b8;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-    }
-
-    .label-tag .dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--primary);
-    }
+    .history-img { max-width: 150px; border-radius: 12px; border: 1px solid var(--border-light); margin-top: 10px; cursor: zoom-in; }
+    
+    .btn-delete { color: #64748b; transition: 0.3s; cursor: pointer; }
+    .btn-delete:hover { color: var(--danger); transform: scale(1.1); }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="bg-grid"></div>
 
 <main class="max-w-6xl mx-auto px-6 py-12 relative">
-    <header class="text-center mb-12 animate-in fade-in duration-700">
-        <h2 class="text-4xl md:text-6xl font-black shimmer-text mb-4 uppercase">Neural Archive</h2>
-        <p class="text-slate-400 text-lg font-light italic">
-            "រក្សាទុករាល់ដានជើងមេរៀន និងចំណេះដឹងដែលបងបានសាងឡើង"
-        </p>
+    <header class="text-center mb-12">
+        <h2 class="text-4xl md:text-6xl font-black shimmer-text mb-4 uppercase italic">Memory Vault</h2>
+        <p class="text-slate-400 text-lg font-light italic">"រុករករាល់ដានជើងនៃការសន្ទនាដែលបងធ្លាប់បានឆ្លងកាត់"</p>
     </header>
 
     <div class="search-container mb-12 shadow-xl sticky top-4 z-50">
         <form action="/history" method="GET" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            <div class="lg:col-span-6 relative">
-                <input type="text" name="search" value="<%= currentSearch %>"
-                    class="input-custom w-full placeholder:text-slate-600"
-                    placeholder="ស្វែងរកមេរៀនដែលបានរៀន (ឧ. Python, Laravel)...">
+            <div class="lg:col-span-5">
+                <input type="text" name="search" value="<%= currentSearch %>" class="input-custom w-full" placeholder="ស្វែងរកតាមពាក្យគន្លឹះ...">
             </div>
             
-            <div class="lg:col-span-3">
-                <select name="tool" class="input-custom w-full cursor-pointer text-sm font-bold uppercase tracking-wider">
-                    <option value="ALL" <%= currentTool === 'ALL' ? 'selected' : '' %>>គ្រប់ផ្នែកទាំងអស់</option>
-                    <option value="AI_TUTOR" <%= currentTool === 'AI_TUTOR' ? 'selected' : '' %>>AI Tutor</option>
-                    <option value="CODE_REVIEWER" <%= currentTool === 'CODE_REVIEWER' ? 'selected' : '' %>>Reviewer</option>
-                    <option value="K_IDA" <%= currentTool === 'K_IDA' ? 'selected' : '' %>>K-IDA Chat</option>
-                    <option value="STUDY_ASSISTANT" <%= currentTool === 'STUDY_ASSISTANT' ? 'selected' : '' %>>Study Buddy</option>
+            <div class="lg:col-span-4">
+                <select name="tool" class="input-custom w-full cursor-pointer text-xs font-bold uppercase tracking-widest">
+                    <option value="ALL" <%= currentTool === 'ALL' ? 'selected' : '' %>>គ្រប់ផ្នែកទាំងអស់ (All Tools)</option>
+                    <option value="LOVE_HEALER_RAGE" <%= currentTool === 'LOVE_HEALER_RAGE' ? 'selected' : '' %>>🔥 Love Healer</option>
+                    <option value="CODE_REVIEWER" <%= currentTool === 'CODE_REVIEWER' ? 'selected' : '' %>>💻 Code Reviewer</option>
+                    <option value="STUDY_ASSISTANT" <%= currentTool === 'STUDY_ASSISTANT' ? 'selected' : '' %>>📖 Study Buddy</option>
+                    <option value="KHMER_CULTURE" <%= currentTool === 'KHMER_CULTURE' ? 'selected' : '' %>>🏯 Culture Sage</option>
+                    <option value="K_IDA" <%= currentTool === 'K_IDA' ? 'selected' : '' %>>📄 K-IDA Docs</option>
                 </select>
             </div>
 
             <div class="lg:col-span-3">
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-all active:scale-95 shadow-lg uppercase tracking-widest">
-                    ស្វែងរកទិន្នន័យ
-                </button>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold text-xs hover:opacity-90 transition-all uppercase tracking-widest">ស្វែងរកទិន្នន័យ</button>
             </div>
         </form>
     </div>
@@ -150,66 +72,56 @@
     <div class="space-y-8">
         <% if (history.length > 0) { %>
             <% history.forEach(item => { %>
-                <div class="magic-card p-8 md:p-10">
-                    <div class="flex flex-wrap justify-between items-center gap-4 mb-8 border-b border-white/5 pb-6">
-                        <div class="flex items-center gap-4">
-                            <span class="px-4 py-1.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-black uppercase tracking-widest">
-                                <%= item.toolName %>
-                            </span>
-                            <span class="text-slate-500 text-[10px] font-mono">
-                                ថ្ងៃទី: <%= new Date(item.createdAt).toLocaleDateString('km-KH') %> | ម៉ោង: <%= new Date(item.createdAt).toLocaleTimeString('km-KH') %>
-                            </span>
-                        </div>
-                        <!-- <button onclick="copyEntry('<%= item._id %>')" class="text-[10px] font-bold text-slate-400 hover:text-white transition-colors flex items-center gap-2">
-                            <span>🔗</span> ចម្លង ID
-                        </button> -->
+                <div class="magic-card p-6 md:p-10 relative group" id="card-<%= item._id %>">
+                    <div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span onclick="confirmDelete('<%= item._id %>')" class="btn-delete text-xl" title="លុបចោល">🗑️</span>
                     </div>
 
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="flex flex-wrap items-center gap-4 mb-8 border-b border-white/5 pb-4">
+                        <% 
+                           let badgeClass = "bg-purple-500/10 text-purple-400";
+                           if(item.toolName.includes('LOVE')) badgeClass = "badge-love";
+                           if(item.toolName.includes('CULTURE')) badgeClass = "badge-culture";
+                           if(item.toolName.includes('CODE')) badgeClass = "badge-code";
+                        %>
+                        <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest <%= badgeClass %>">
+                            <%= item.toolName %>
+                        </span>
+                        <span class="text-slate-500 text-[10px] font-mono italic">
+                            <%= new Date(item.createdAt).toLocaleString('km-KH') %>
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                         <div class="lg:col-span-4">
-                            <div class="label-tag"><span class="dot"></span> សំណួររបស់បង</div>
-                            <p class="text-xl text-white font-medium italic leading-relaxed">"<%= item.userInput %>"</p>
+                            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">ចម្ងល់របស់បង</div>
+                            <p class="text-lg text-white font-medium italic">"<%= item.userInput %>"</p>
+                            
+                            <% if (item.userImage) { %>
+                                <img src="data:image/jpeg;base64,<%= item.userImage %>" class="history-img" alt="Uploaded Image">
+                            <% } %>
                         </div>
 
                         <div class="lg:col-span-8">
-                            <div class="label-tag"><span class="dot" style="background: var(--secondary)"></span> ការបកស្រាយពី AI</div>
+                            <div class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-3">ការបកស្រាយពី AI</div>
+                            <div id="content-<%= item._id %>" class="prose prose-invert max-w-none text-slate-300 leading-relaxed"></div>
                             
-                            <div id="content-<%= item._id %>" class="prose-archive">
-                                </div>
-
                             <script>
                                 (function() {
                                     const rawRes = <%- JSON.stringify(item.aiResponse) %>;
-                                    let textToRender = "ការទាញយកទិន្នន័យបានជោគជ័យ";
-                                    
-                                    if (typeof rawRes === 'string') {
-                                        textToRender = rawRes;
-                                    } else if (rawRes && typeof rawRes === 'object') {
-                                        textToRender = rawRes.explanation || rawRes.response || rawRes.answer || rawRes.humorous_response || rawRes.summary || "រួចរាល់។";
-                                    }
-                                    
-                                    document.getElementById("content-<%= item._id %>").innerHTML = marked.parse(textToRender);
+                                    let text = typeof rawRes === 'string' ? rawRes : (rawRes.response || rawRes.explanation || rawRes.answer || rawRes.summary || "រួចរាល់។");
+                                    document.getElementById("content-<%= item._id %>").innerHTML = marked.parse(text);
                                 })();
                             </script>
-
-                            <% if (item.aiResponse && (item.aiResponse.fixed_code || item.aiResponse.full_code_snippet)) { %>
-                                <div class="mt-6 rounded-xl bg-black/40 border border-white/5 overflow-hidden">
-                                    <div class="px-4 py-2 bg-white/5 border-b border-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                        Source_Code_Output
-                                    </div>
-                                    <pre class="p-6 overflow-x-auto text-sm text-cyan-400 font-mono"><code><%= item.aiResponse.fixed_code || item.aiResponse.full_code_snippet %></code></pre>
-                                </div>
-                            <% } %>
                         </div>
                     </div>
                 </div>
             <% }) %>
         <% } else { %>
             <div class="magic-card p-20 text-center">
-                <div class="text-6xl mb-6 opacity-30">📂</div>
-                <h3 class="text-xl font-bold text-slate-400 uppercase tracking-widest">រកមិនឃើញដានជើងមេរៀនទេ</h3>
-                <p class="text-slate-500 italic mt-2">សាកល្បងវាយពាក្យស្វែងរកផ្សេង ឬចាប់ផ្ដើមសួរ AI ឥឡូវនេះ!</p>
-                <a href="/" class="mt-8 inline-block px-8 py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-500 transition-all">ត្រលប់ទៅទំព័រដើម</a>
+                <div class="text-6xl mb-6 opacity-20">🕳️</div>
+                <h3 class="text-xl font-bold text-slate-500 uppercase">រកមិនឃើញដានជើងទេ</h3>
+                <a href="/" class="mt-8 inline-block px-8 py-3 bg-purple-600 text-white rounded-xl font-bold text-xs uppercase hover:bg-purple-500 transition-all">ចាប់ផ្ដើមសួរ AI ឥឡូវនេះ</a>
             </div>
         <% } %>
     </div>
@@ -218,60 +130,52 @@
 <%- include('partials/footer') %>
 
 <script>
-    // ១. Background Animation (រង្វើល និងយឺត មិនឱ្យវិលមុខ)
+    // ១. Deletion Logic
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'តើបងច្បាស់ទេ?',
+            text: "ចង់លុបដានជើងនៃការសន្ទនានេះចោលមែនទេ? លុបហើយយកវិញអត់បានទេណា!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#a855f7',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'បាទ! លុបចោលទៅ',
+            cancelButtonText: 'កុំអី លួចទុកមើលម្នាក់ឯង',
+            background: '#0f172a',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // បាញ់ទៅ API លុប (បងត្រូវបង្កើត Route DELETE /history/:id នៅ backend ផង)
+                fetch(`/history/${id}`, { method: 'DELETE' })
+                .then(res => {
+                    if(res.ok) {
+                        document.getElementById(`card-${id}`).style.transform = 'scale(0.9)';
+                        document.getElementById(`card-${id}`).style.opacity = '0';
+                        setTimeout(() => document.getElementById(`card-${id}`).remove(), 300);
+                    }
+                });
+            }
+        })
+    }
+
+    // ២. Background Animation (រង្វើល និងយឺត)
     const canvas = document.getElementById("neural-bg");
     const ctx = canvas.getContext("2d");
     let dots = [];
-    let mouse = { x: null, y: null };
-    window.addEventListener("mousemove", (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
-
     function init() {
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        dots = [];
-        const count = window.innerWidth < 768 ? 30 : 50;
-        for (let i = 0; i < count; i++) {
-            dots.push({ 
-                x: Math.random() * canvas.width, 
-                y: Math.random() * canvas.height, 
-                vx: (Math.random() - 0.5) * 0.25, 
-                vy: (Math.random() - 0.5) * 0.25, 
-                size: Math.random() * 1.5 
-            });
-        }
+        dots = []; const count = window.innerWidth < 768 ? 20 : 40;
+        for (let i = 0; i < count; i++) { dots.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2, size: Math.random() * 1.5 }); }
     }
-
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "<%= theme || '#a855f7' %>";
-        ctx.strokeStyle = "rgba(168, 85, 247, 0.05)";
         dots.forEach(d => {
             d.x += d.vx; d.y += d.vy;
-            if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
-            if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-            let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-            if (dist < 150) {
-                ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
-            }
+            if (d.x < 0 || d.x > canvas.width) d.vx *= -1; if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
             ctx.beginPath(); ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2); ctx.fill();
         });
         requestAnimationFrame(draw);
     }
-    init(); draw();
-    window.addEventListener("resize", init);
-
-    // ២. Copy Function
-    function copyEntry(id) {
-        navigator.clipboard.writeText(id);
-        Swal.fire({
-            title: 'ចម្លងបានសម្រេច!',
-            text: 'ID: ' + id,
-            icon: 'success',
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            background: '#1e293b',
-            color: '#fff'
-        });
-    }
+    init(); draw(); window.addEventListener("resize", init);
 </script>

@@ -10,7 +10,7 @@ const admin = require("firebase-admin"); // បន្ថែមគ្រឿងផ
 const viewRoutes = require("./routes/viewRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
-const historyRoutes = require('./routes/history');
+const historyRoutes = require("./routes/history");
 
 // ២. ចុះឈ្មោះផ្លូវមេ (Prefix)
 // បើប្អូនដាក់ '/history' នៅទីនេះ...
@@ -42,7 +42,11 @@ if (!admin.apps.length) {
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+// កែសម្រួលកូដរបស់បងមកបែបនេះ៖
+const io = new Server(server, {
+  cors: { origin: "*" },
+  maxHttpBufferSize: 1e7, // កំណត់ត្រឹម ១០ MB (10,000,000 bytes)
+});
 
 // --- ២. Middleware កំពូលសុវត្ថិភាព ---
 app.use(express.json()); // អាន idToken ពី frontend
@@ -78,15 +82,17 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(session({
-  secret: 'keyboard cat', // ដាក់ Key ងាប់ៗរបស់បងទៅ
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    // កំណត់ទៅ ២៤ ម៉ោង
-    maxAge: 24 * 60 * 60 * 1000 
-  }
-}));
+app.use(
+  session({
+    secret: "keyboard cat", // ដាក់ Key ងាប់ៗរបស់បងទៅ
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      // កំណត់ទៅ ២៤ ម៉ោង
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  }),
+);
 
 // --- ៤. បម្រើឯកសារ Static & View Engine ---
 app.use(express.static("public"));
@@ -97,9 +103,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", authRoutes);
 app.use("/user", userRoutes);
 app.use("/", viewRoutes);
-app.use('/history', historyRoutes);
-
-
+app.use("/history", historyRoutes);
 
 // --- ៦. Socket Connection សម្រាប់ AI Tutor ---
 io.on("connection", (socket) => {

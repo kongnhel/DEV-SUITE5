@@ -19,7 +19,6 @@
     line-height: 1.6;
   }
 
-  /* ១. Background បែបស្ងប់ស្ងាត់ ជួយឱ្យផ្ដោតអារម្មណ៍រៀន */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -31,7 +30,6 @@
     pointer-events: none;
   }
 
-  /* ២. Card Design៖ សាមញ្ញ ថ្លៃថ្នូរ និងមានសណ្ដាប់ធ្នាប់ */
   .magic-card {
     background: var(--card-bg);
     backdrop-filter: blur(15px);
@@ -42,7 +40,22 @@
     transition: all 0.3s ease;
   }
 
-  /* ៣. Input Styles */
+  /* --- Markdown Styling --- */
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3 {
+    color: var(--primary);
+    font-weight: 700;
+    margin-top: 1rem;
+  }
+  .markdown-content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+  }
+  .markdown-content strong {
+    color: var(--secondary);
+  }
+
   .big-input {
     background: rgba(15, 23, 42, 0.8) !important;
     border: 1px solid var(--border-light) !important;
@@ -53,15 +66,35 @@
     outline: none;
     font-size: 1.1rem;
     line-height: 1.8;
-    transition: all 0.3s ease;
+    transition: 0.3s;
   }
 
-  .big-input:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  /* Image Upload Zone */
+  .upload-btn-zone {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .btn-upload-mini {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-light);
+    padding: 10px 15px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #lessonPreview {
+    max-width: 100%;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    border: 1px solid var(--primary);
+    display: none;
   }
 
-  /* ៤. Button Styles */
   .btn-study {
     background: linear-gradient(135deg, var(--primary), var(--secondary));
     color: white;
@@ -72,24 +105,16 @@
     border: none;
     cursor: pointer;
     font-size: 1.1rem;
-    transition: all 0.3s ease;
+    transition: 0.3s;
     text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
-  .btn-study:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
-  }
-
-  /* ៥. Result Text Style */
   .summary-box {
     border-left: 8px solid var(--primary);
     background: rgba(255, 255, 255, 0.03);
     padding: 2.5rem;
     border-radius: 24px;
   }
-
   .shimmer-text {
     background: linear-gradient(90deg, #fff, var(--primary), #fff);
     background-size: 200% auto;
@@ -102,7 +127,6 @@
       background-position: 200% center;
     }
   }
-
   .feature-icon {
     font-size: 2.5rem;
     margin-bottom: 1rem;
@@ -130,69 +154,50 @@
       STUDY BUDDY
     </h1>
 
-    <div class="max-w-3xl mx-auto space-y-6">
+    <div class="max-w-3xl mx-auto space-y-6 text-center">
       <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
-        "រៀនឱ្យឆ្លាត មិនមែនរៀនឱ្យហត់! ហើយអំបិលដដែលដូចអត់រៀន ឱ្យបង AI ក្លាយជា
-        <span class="text-indigo-400 font-bold">Assistant</span>
-        ផ្ទាល់ខ្លួនរបស់អ្នក!"
+        "រៀនឱ្យឆ្លាត មិនមែនរៀនឱ្យហត់! បើអំបិលដដែល ឱ្យបង AI ជួយសម្រួល!"
       </p>
-      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        បងធុញនឹងការអានមេរៀនច្រើនៗមែនទេ?
-        <strong class="text-indigo-400">Study Buddy</strong>
-        នឹងជួយបងសង្ខេបចំណុចសំខាន់ៗ និងបង្កើត Quiz
-        ដើម្បីតេស្តខួរក្បាលបងភ្លាមៗ។ មិនថាជាមេរៀនវិទ្យាសាស្ត្រ
-        ឬប្រវត្តិសាស្ត្រ បោះវាចូលមក ចាំអូនជួយសម្រួលឱ្យ "ភ្លឺភ្នែក" ហ្មង! 😂
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-      <div class="magic-card p-8">
-        <span class="feature-icon">📜</span>
-        <h4 class="text-white font-bold mb-2 uppercase text-xs">សង្ខេបរហ័ស</h4>
-        <p class="text-slate-400 text-xs font-light">
-          បំប្លែងមេរៀនរាប់សិបទំព័រ ឱ្យមកនៅត្រឹមចំណុចខ្លឹមៗបំផុត។
-        </p>
-      </div>
-      <div class="magic-card p-8">
-        <span class="feature-icon">🧩</span>
-        <h4 class="text-white font-bold mb-2 uppercase text-xs">
-          តេស្តសមត្ថភាព
-        </h4>
-        <p class="text-slate-400 text-xs font-light">
-          បង្កើតសំណួរ Quiz ភ្លាមៗ ដើម្បីជួយឱ្យបងចងចាំមេរៀនបានយូរ។
-        </p>
-      </div>
-      <div class="magic-card p-8">
-        <span class="feature-icon">🔥</span>
-        <h4 class="text-white font-bold mb-2 uppercase text-xs">
-          កម្លាំងចិត្ត
-        </h4>
-        <p class="text-slate-400 text-xs font-light">
-          ទទួលបានពាក្យលើកទឹកចិត្តកំប្លែងៗ ដើម្បីឱ្យបងមានកម្លាំងរៀនបន្ត។
-        </p>
-      </div>
     </div>
   </header>
 
   <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 md:gap-12 items-start">
     <section class="xl:col-span-5">
       <div class="magic-card p-8 md:p-10">
-        <div class="flex items-center gap-4 mb-8">
-          <span class="text-2xl">📥</span>
-          <div>
-            <h3 class="text-lg font-bold text-white uppercase tracking-tight">
-              បញ្ចូលមេរៀន
-            </h3>
-            <p class="text-xs text-slate-500 uppercase">
-              Input Knowledge Block
-            </p>
+        <div class="flex items-center justify-between mb-8">
+          <div class="flex items-center gap-4">
+            <span class="text-2xl">📥</span>
+            <h3 class="text-lg font-bold text-white uppercase">បញ្ចូលមេរៀន</h3>
           </div>
+          <button
+            onclick="clearAll()"
+            class="text-[10px] text-slate-500 hover:text-red-400 uppercase tracking-widest"
+          >
+            Clear
+          </button>
         </div>
+
+        <div class="upload-btn-zone">
+          <button
+            onclick="document.getElementById('lessonImgInput').click()"
+            class="btn-upload-mini"
+          >
+            📸 ថតរូបមេរៀន / បោះរូបភាពចូល
+          </button>
+          <input
+            type="file"
+            id="lessonImgInput"
+            hidden
+            accept="image/*"
+            onchange="handleImage(this)"
+          />
+        </div>
+        <img id="lessonPreview" src="" alt="Lesson Preview" />
 
         <textarea
           id="studyContent"
-          class="big-input h-80 md:h-[450px] resize-none"
-          placeholder="បិទភ្ជាប់អត្ថបទមេរៀនដែលប្អូនចង់ឱ្យបងជួយ... (ឧទាហរណ៍៖ ច្បាប់រូបវិទ្យា ឬ ប្រវត្តិសាស្ត្រ)"
+          class="big-input h-80 md:h-[350px] resize-none"
+          placeholder="បិទភ្ជាប់អត្ថបទមេរៀន ឬរូបភាពសៀវភៅ..."
         ></textarea>
 
         <button onclick="processStudy()" id="btnAction" class="btn-study mt-8">
@@ -210,22 +215,31 @@
           class="w-12 h-12 border-4 border-white/5 border-t-indigo-500 rounded-full animate-spin mb-6"
         ></div>
         <p
-          class="text-indigo-400 text-xs font-bold uppercase tracking-[0.3em] animate-pulse"
+          class="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.3em] animate-pulse"
         >
-          កំពុងវិភាគ និងសង្ខេបមេរៀន...
+          កំពុងវិភាគមេរៀន និងរៀបចំ Quiz...
         </p>
       </div>
 
       <div id="resultArea" class="hidden space-y-8">
         <div class="summary-box">
-          <h4
-            class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-6 flex items-center gap-3"
-          >
-            <span class="h-px w-10 bg-indigo-500/30"></span> សេចក្ដីសង្ខេបមេរៀន
-          </h4>
+          <div class="flex justify-between items-center mb-6">
+            <h4
+              class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] flex items-center gap-3"
+            >
+              <span class="h-px w-10 bg-indigo-500/30"></span>
+              សេចក្ដីសង្ខេបមេរៀន
+            </h4>
+            <button
+              onclick="copySummary()"
+              class="text-[10px] text-slate-400 hover:text-white uppercase"
+            >
+              Copy 📋
+            </button>
+          </div>
           <div
             id="summaryText"
-            class="text-xl md:text-2xl font-light text-slate-200 leading-relaxed italic"
+            class="markdown-content text-slate-200 leading-relaxed"
           ></div>
         </div>
 
@@ -256,8 +270,9 @@
 
 <script>
   const socket = io();
+  let base64Lesson = null;
 
-  // ១. Background Animation (រង្វើល និងយឺត)
+  // ១. Background Animation
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
@@ -309,29 +324,38 @@
   draw();
   window.addEventListener("resize", init);
 
-  // ២. Study Logic
+  // ២. Image Handling
+  function handleImage(input) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      document.getElementById("lessonPreview").src = reader.result;
+      document.getElementById("lessonPreview").style.display = "block";
+      base64Lesson = reader.result.split(",")[1];
+    };
+    if (file) reader.readAsDataURL(file);
+  }
+
+  function clearAll() {
+    document.getElementById("studyContent").value = "";
+    document.getElementById("lessonPreview").style.display = "none";
+    base64Lesson = null;
+  }
+
+  // ៣. Study Logic
   function processStudy() {
     const content = document.getElementById("studyContent").value.trim();
     const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
 
-    if (!content)
-      return Swal.fire({
-        text: "ដាក់មេរៀនឱ្យអូនមើលសិនបង​ កុំចង់រៀនកាត់! 😂",
-        icon: "info",
-        confirmButtonColor: "#6366f1",
-      });
-    if (!firebaseUid)
-      return Swal.fire({
-        text: "សូមចូលគណនីសិនបង!",
-        icon: "warning",
-        confirmButtonColor: "#6366f1",
-      });
+    if (!content && !base64Lesson)
+      return Swal.fire({ text: "ដាក់មេរៀនឱ្យអូនមើលសិនបង! 😂", icon: "info" });
 
     document.getElementById("loading").classList.remove("hidden");
     document.getElementById("resultArea").classList.add("hidden");
     document.getElementById("btnAction").disabled = true;
 
-    socket.emit("study_assist", { content, firebaseUid });
+    // ផ្ញើទាំងអត្ថបទ និងរូបភាព
+    socket.emit("study_assist", { content, image: base64Lesson, firebaseUid });
   }
 
   socket.on("study_result", (res) => {
@@ -339,9 +363,15 @@
     document.getElementById("resultArea").classList.remove("hidden");
     document.getElementById("btnAction").disabled = false;
 
-    typeWriter("summaryText", res.summary);
+    // ប្រើ Markdown Render សម្រាប់សេចក្ដីសង្ខេប
+    document.getElementById("summaryText").innerHTML = marked.parse(
+      res.summary,
+    );
+    // កូដដែលបងគួរប្រើ
     document.getElementById("motivationText").innerText =
-      "“ " + res.funny_motivation + " ”";
+      "“ " +
+      (res.funny_motivation || "ខំរៀនទៅប្អូន កុំឱ្យអំបិលដដែល! 😂") +
+      " ”";
 
     const container = document.getElementById("quizContainer");
     container.innerHTML = "";
@@ -355,13 +385,15 @@
           ${q.options
             .map(
               (opt) => `
-            <button onclick="checkAnswer(this, '${opt}', '${q.answer}')" class="text-left p-4 rounded-xl bg-black/30 border border-white/5 hover:bg-indigo-600/20 transition-all text-sm">
+            <button onclick="checkAnswer(this, '${opt}', '${q.answer}', '${q.explanation || "រៀនបន្ថែមទៀតណា!"}')" 
+                    class="text-left p-4 rounded-xl bg-black/30 border border-white/5 hover:bg-indigo-600/20 transition-all text-sm">
               ${opt}
             </button>
           `,
             )
             .join("")}
         </div>
+        <div id="expl-${idx}" class="hidden mt-4 p-4 rounded-lg bg-indigo-500/10 text-xs italic text-slate-300 border-l-2 border-indigo-500"></div>
       `;
       container.appendChild(card);
     });
@@ -370,29 +402,33 @@
       .scrollIntoView({ behavior: "smooth" });
   });
 
-  function checkAnswer(btn, selected, correct) {
+  function checkAnswer(btn, selected, correct, explanation) {
     const parent = btn.parentElement;
+    const explBox = parent.nextElementSibling;
+
     if (selected === correct) {
       btn.classList.add("bg-emerald-500", "text-black", "border-emerald-400");
-      btn.innerHTML += " ✨ (ត្រឹមត្រូវ!)";
+      btn.innerHTML += " ✨";
     } else {
       btn.classList.add("bg-red-500", "text-white", "border-red-400");
-      btn.innerHTML += " 💀 (ខុសហើយ!)";
+      btn.innerHTML += " 💀";
     }
+
+    explBox.innerHTML = `<strong>ការពន្យល់៖</strong> ${explanation}`;
+    explBox.classList.remove("hidden");
     parent.querySelectorAll("button").forEach((b) => (b.disabled = true));
   }
 
-  function typeWriter(id, text) {
-    let i = 0;
-    const el = document.getElementById(id);
-    el.innerHTML = "";
-    function type() {
-      if (i < text.length) {
-        el.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, 15);
-      }
-    }
-    type();
+  function copySummary() {
+    const text = document.getElementById("summaryText").innerText;
+    navigator.clipboard.writeText(text);
+    Swal.fire({
+      text: "ចម្លងរួចរាល់!",
+      icon: "success",
+      timer: 1000,
+      showConfirmButton: false,
+    });
   }
 </script>
+
+<%- include('partials/footer') %>

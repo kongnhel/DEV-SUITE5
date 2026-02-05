@@ -21,9 +21,10 @@
     color: #f1f5f9;
     margin: 0;
     line-height: 1.7;
+    overflow-x: hidden;
   }
 
-  /* ១. Background បែបថ្លៃថ្នូរ (Modern Khmer Heritage) */
+  /* ១. Background បែបថ្លៃថ្នូរ */
   #neural-bg {
     position: fixed;
     top: 0;
@@ -34,7 +35,6 @@
     opacity: 0.15;
     pointer-events: none;
   }
-
   .bg-pattern {
     position: fixed;
     inset: 0;
@@ -44,7 +44,15 @@
     pointer-events: none;
   }
 
-  /* ២. Card Design៖ ស្អាត បែបសាមញ្ញ មិនឆើតឆាយ */
+  /* ២. Layout Optimization (PC & Mobile) */
+  .sage-container {
+    max-width: 1200px; /* ពង្រីកឱ្យពេញ PC */
+    width: 95%;
+    margin: 20px auto;
+    position: relative;
+    z-index: 10;
+  }
+
   .magic-card {
     background: var(--card-bg);
     backdrop-filter: blur(20px);
@@ -55,61 +63,93 @@
     transition: all 0.3s ease;
   }
 
-  .magic-card:hover {
-    border-color: var(--royal-gold);
-    background: rgba(30, 41, 59, 0.85);
+  /* --- Chat Box Style --- */
+  #chatDisplay {
+    max-height: 450px;
+    overflow-y: auto;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+  }
+  #chatDisplay::-webkit-scrollbar {
+    width: 5px;
+  }
+  #chatDisplay::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 10px;
   }
 
-  /* ៣. Input & Dropdown Styles */
+  .bubble {
+    max-width: 85%;
+    padding: 18px;
+    border-radius: 22px;
+    font-size: 1rem;
+    animation: fadeInUp 0.5s ease;
+    line-height: 1.7;
+  }
+  .user-bubble {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border: 1px solid var(--border-light);
+    border-bottom-right-radius: 4px;
+  }
+  .sage-bubble {
+    align-self: flex-start;
+    background: rgba(212, 175, 55, 0.05);
+    border-left: 5px solid var(--royal-gold);
+    border-bottom-left-radius: 4px;
+  }
+
+  .sage-label {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: var(--royal-gold);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+  }
+
+  /* --- Input Area --- */
   .input-custom {
     background: rgba(15, 23, 42, 0.8) !important;
     border: 1px solid var(--border-light) !important;
-    border-radius: 24px !important;
+    border-radius: 20px !important;
     color: white !important;
-    padding: 1.5rem !important;
+    padding: 1rem !important;
     width: 100%;
     outline: none;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+    font-size: 1rem;
+    transition: 0.3s;
   }
 
-  .input-custom:focus {
-    border-color: var(--royal-gold) !important;
-    box-shadow: 0 0 0 4px var(--gold-glow) !important;
+  #imgPreview {
+    max-width: 150px;
+    border-radius: 12px;
+    border: 2px solid var(--royal-gold);
+    margin: 10px 0;
+    display: none;
   }
 
-  .select-custom {
-    background: rgba(15, 23, 42, 0.9);
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
-    color: var(--royal-gold);
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    font-weight: 600;
-  }
-
-  /* ៤. Button Styles */
+  /* --- Button Styles --- */
   .btn-khmer {
     background: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
     color: #0f172a !important;
     font-weight: 800;
-    padding: 1.2rem 2.5rem;
-    border-radius: 20px;
+    padding: 12px 30px;
+    border-radius: 15px;
     border: none;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: 0.3s;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 1rem;
+    font-size: 0.9rem;
+  }
+  .btn-khmer:disabled {
+    filter: grayscale(1);
+    cursor: not-allowed;
   }
 
-  .btn-khmer:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px var(--gold-glow);
-    filter: brightness(1.1);
-  }
-
-  /* ៥. Promote Page Styles */
   .shimmer-gold {
     background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
     background-size: 200% auto;
@@ -117,7 +157,6 @@
     -webkit-text-fill-color: transparent;
     animation: shine 6s linear infinite;
   }
-
   @keyframes shine {
     to {
       background-position: 200% center;
@@ -136,136 +175,121 @@
     letter-spacing: 2px;
   }
 
-  .prose-custom {
-    line-height: 1.8;
-    color: #cbd5e1;
-    font-size: 1.1rem;
+  @media (max-width: 768px) {
+    .sage-container {
+      margin: 10px auto;
+    }
+    .bubble {
+      max-width: 92%;
+      font-size: 0.9rem;
+    }
+    .shimmer-gold {
+      font-size: 2.5rem;
+    }
+    .btn-khmer {
+      width: 100%;
+    }
   }
-  .prose-custom strong {
-    color: var(--royal-gold);
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
 
 <canvas id="neural-bg"></canvas>
 <div class="bg-pattern"></div>
 
-<main class="max-w-7xl mx-auto px-6 py-12 relative">
-  <header class="text-center mb-16 animate-in fade-in duration-1000">
-    <div class="flex justify-center mb-6">
+<main class="sage-container">
+  <header class="text-center mb-10 animate-in fade-in duration-1000">
+    <div class="flex justify-center mb-4">
       <span class="heritage-badge">Ancient Wisdom x AI Intelligence</span>
     </div>
-
     <h2
-      class="text-5xl md:text-8xl font-black shimmer-gold mb-8 uppercase italic leading-none"
+      class="text-5xl md:text-7xl font-black shimmer-gold mb-4 uppercase italic leading-none"
     >
       មគ្គុទ្ទេសក៍វប្បធម៌
     </h2>
-
-    <div class="max-w-3xl mx-auto space-y-6">
-      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
-        "បើកក្រាំងមាសនៃប្រវត្តិសាស្ត្រខ្មែរ តាមរយៈ <br />
-        <span class="text-yellow-500 font-bold">មន្តអាគមឌីជីថល</span>!"
-      </p>
-      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        តើបងចង់ដឹងពីអាថ៌កំបាំងនៃប្រាសាទបុរាណ
-        ឬទំនៀមទម្លាប់ខ្មែរដែលបាត់បង់មែនទេ?
-        <strong class="text-yellow-600">AI Culture Guide</strong>
-        នឹងក្លាយជាមគ្គុទ្ទេសក៍ឆ្លាតវៃ
-        ចាំបកស្រាយរាល់ចម្ងល់វប្បធម៌ជូនបងយ៉ាងកំប្លែង និងស៊ីជម្រៅបំផុត។
-        បោះចម្ងល់បងចូលមក ចាំអូនជួយចារក្នុងក្រាំងមាសឱ្យ! 😂
-      </p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-      <div class="magic-card p-8">
-        <span class="text-4xl mb-4 block">🏯</span>
-        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
-          ក្រាំងចំណេះដឹងបុរាណ
-        </h4>
-        <p class="text-slate-400 text-xs font-light">
-          ទាញយកទិន្នន័យពីសម័យមហានគរ មកបង្ហាញក្នុងមួយពព្រិចភ្នែក។
-        </p>
-      </div>
-      <div class="magic-card p-8">
-        <span class="text-4xl mb-4 block">📜</span>
-        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
-          អ្នកនិទានរឿងវៃឆ្លាត
-        </h4>
-        <p class="text-slate-400 text-xs font-light">
-          ការបកស្រាយបែបមន្តអាគម ងាយយល់ និងមានតុងកំប្លែងៗ។
-        </p>
-      </div>
-      <div class="magic-card p-8">
-        <span class="text-4xl mb-4 block">✨</span>
-        <h4 class="text-yellow-500 font-bold mb-2 uppercase text-xs">
-          ការផ្ទៀងផ្ទាត់ច្បាស់លាស់
-        </h4>
-        <p class="text-slate-400 text-xs font-light">
-          ប្រើ AI ដើម្បីផ្ទៀងផ្ទាត់ទិន្នន័យប្រវត្តិសាស្ត្រឱ្យបានត្រឹមត្រូវ។
-        </p>
-      </div>
-    </div>
+    <p class="text-slate-400 italic text-sm md:text-base">
+      "បើកក្រាំងមាសនៃប្រវត្តិសាស្ត្រខ្មែរ តាមរយៈភ្នែកទិព្វ AI"
+    </p>
   </header>
 
-  <div class="max-w-4xl mx-auto space-y-12">
-    <section class="magic-card p-8 md:p-12 shadow-2xl">
-      <textarea
-        id="questionInput"
-        class="input-custom h-40 md:h-52 resize-none no-scrollbar"
-        placeholder="ឧទាហរណ៍៖ តើប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងគោលបំណងអ្វី?"
-      ></textarea>
+  <div class="magic-card p-6 md:p-10">
+    <div id="chatDisplay">
+      <div class="bubble sage-bubble">
+        <div class="sage-label">Lork Ta Sage</div>
+        ចម្រើនពរចៅៗ! ចង់ដឹងអាថ៌កំបាំងបុរាណអីខ្លះ? បើមានរូបភាពប្រាសាទ វត្ថុបុរាណ
+        ឬសម្លៀកបំពាក់ បោះមកឱ្យលោកតាជួយមើលក៏បាន!
+      </div>
+    </div>
 
+    <div id="loading" class="hidden text-center py-6">
       <div
-        class="flex flex-col lg:flex-row items-center justify-between gap-8 mt-10"
-      >
-        <div class="w-full lg:w-1/2">
-          <label
-            class="block text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-3 ml-2"
-            >របៀបបកស្រាយ (Wisdom Style)</label
-          >
-          <select id="answerType" class="input-custom py-4 !text-yellow-200">
-            <option value="brief">✨ សង្ខេបខ្លី ខ្លឹម (Brief Wisdom)</option>
-            <option value="detailed">📜 ពន្យល់លម្អិត (Ancient Archives)</option>
-          </select>
-        </div>
-
-        <button
-          onclick="askAI()"
-          id="btnAsk"
-          class="btn-khmer w-full lg:w-auto"
-        >
-          សាកសួរអ្នកជំនាញ AI
-        </button>
-      </div>
-    </section>
-
-    <div id="loading" class="hidden py-16 text-center">
-      <div class="relative w-20 h-20 mx-auto mb-8">
-        <div
-          class="absolute inset-0 border-4 border-yellow-500/10 rounded-full"
-        ></div>
-        <div
-          class="absolute inset-0 border-4 border-t-yellow-500 rounded-full animate-spin"
-        ></div>
-      </div>
+        class="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mx-auto mb-4"
+      ></div>
       <p
-        class="text-yellow-500 text-xs font-bold animate-pulse uppercase tracking-[0.4em]"
+        class="text-yellow-500 text-[10px] font-bold animate-pulse uppercase tracking-widest"
       >
         កំពុងស្រាវជ្រាវក្រាំងមាស...
       </p>
     </div>
 
-    <div
-      id="responseSection"
-      class="hidden animate-in slide-in-from-bottom-6 duration-700"
-    >
-      <div class="magic-card p-10 md:p-14 border-l-[12px] border-yellow-600">
-        <div
-          class="text-[10px] font-bold text-yellow-600/50 uppercase tracking-[0.3em] mb-8"
-        >
-          Chronicle Extraction Result
+    <hr
+      style="
+        border: 0;
+        border-top: 1px solid var(--border-light);
+        margin: 25px 0;
+      "
+    />
+
+    <div class="space-y-4">
+      <center><img id="imgPreview" src="" alt="Artifact Preview" /></center>
+
+      <textarea
+        id="questionInput"
+        class="input-custom h-24 md:h-32 resize-none"
+        placeholder="ឧទាហរណ៍៖ តើហនុមានជានរណា? (ប្អូនអាចបោះរូបភាពចូលបាន)"
+      ></textarea>
+
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex gap-2 w-full md:w-auto">
+          <button
+            onclick="document.getElementById('fileInput').click()"
+            class="btn-khmer !bg-slate-800 !text-white !border !border-yellow-500/30 text-xs"
+          >
+            📸 រូបភាព
+          </button>
+          <input
+            type="file"
+            id="fileInput"
+            hidden
+            accept="image/*"
+            onchange="previewImg(this)"
+          />
+
+          <select
+            id="answerType"
+            class="btn-khmer !bg-slate-900 !text-yellow-500 text-xs"
+          >
+            <option value="brief">✨ សង្ខេបខ្លឹម</option>
+            <option value="detailed">📜 ពន្យល់លម្អិត</option>
+          </select>
         </div>
-        <div id="responseText" class="prose-custom italic"></div>
+
+        <button
+          onclick="askSage()"
+          id="btnAction"
+          class="btn-khmer w-full md:w-auto"
+        >
+          សួរលោកតាឥសី 🔥
+        </button>
       </div>
     </div>
   </div>
@@ -273,20 +297,16 @@
 
 <%- include('partials/footer') %>
 
+<script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
+  let base64Img = null;
   let isWaiting = false;
 
-  // ១. Background Animation (រង្វើល និងយឺត)
+  // ១. Background Animation
   const canvas = document.getElementById("neural-bg");
   const ctx = canvas.getContext("2d");
   let dots = [];
-  let mouse = { x: null, y: null };
-  window.addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-
   function init() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -302,23 +322,14 @@
       });
     }
   }
-
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "<%= theme || '#d4af37' %>";
-    ctx.strokeStyle = "rgba(212, 175, 55, 0.05)";
     dots.forEach((d) => {
       d.x += d.vx;
       d.y += d.vy;
       if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
       if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 150) {
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(mouse.x, mouse.y);
-        ctx.stroke();
-      }
       ctx.beginPath();
       ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
       ctx.fill();
@@ -329,62 +340,95 @@
   draw();
   window.addEventListener("resize", init);
 
-  // ២. AI Interaction Logic
-  function askAI() {
+  // ២. Image Handling
+  function previewImg(input) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      document.getElementById("imgPreview").src = e.target.result;
+      document.getElementById("imgPreview").style.display = "block";
+      base64Img = e.target.result.split(",")[1];
+    };
+    if (file) reader.readAsDataURL(file);
+  }
+
+  // ៣. Typewriter Effect
+  function typeWriter(element, text) {
+    let i = 0;
+    element.innerHTML = "";
+    function typing() {
+      if (i < text.length) {
+        element.innerHTML = marked.parse(text.substring(0, i + 1));
+        i++;
+        setTimeout(typing, 15);
+        const display = document.getElementById("chatDisplay");
+        display.scrollTop = display.scrollHeight;
+      }
+    }
+    typing();
+  }
+
+  // ៤. Logic Interaction
+  async function askSage() {
     if (isWaiting) return;
-    const question = document.getElementById("questionInput").value.trim();
+    const input = document.getElementById("questionInput");
+    const question = input.value.trim();
     const type = document.getElementById("answerType").value;
     const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
 
-    if (!firebaseUid)
-      return Swal.fire({
-        text: "សូមចូលគណនីសិនប្អូន!",
-        icon: "warning",
-        confirmButtonColor: "#d4af37",
-      });
-    if (!question)
-      return Swal.fire({
-        text: "តើបងចង់ដឹងអ្វីដែរ?",
-        icon: "question",
-        confirmButtonColor: "#d4af37",
-      });
+    if (!question && !base64Img) return alert("សួរលោកតាមួយមាត់មកចៅ! 😂");
+    if (!firebaseUid) return alert("សូមចូលគណនីសិនប្អូន!");
 
-    toggleState(true);
-    socket.emit("ask_culture", { question, type, firebaseUid });
+    // បង្ហាញសារ User
+    const chatDisplay = document.getElementById("chatDisplay");
+    const userDiv = document.createElement("div");
+    userDiv.className = "bubble user-bubble";
+    let userContent = question;
+    if (base64Img)
+      userContent += `<br><img src="data:image/jpeg;base64,${base64Img}" style="max-width:200px; border-radius:10px; margin-top:10px;">`;
+    userDiv.innerHTML = userContent;
+    chatDisplay.appendChild(userDiv);
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+    // Loading State
+    isWaiting = true;
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("btnAction").disabled = true;
+
+    socket.emit("ask_culture", {
+      question,
+      image: base64Img,
+      type,
+      firebaseUid,
+    });
+
+    input.value = "";
+    document.getElementById("imgPreview").style.display = "none";
   }
 
   socket.on("culture_result", (data) => {
-    toggleState(false);
-    document.getElementById("responseSection").classList.remove("hidden");
-    document.getElementById("responseText").innerHTML = marked.parse(
-      data.response,
-    );
-    document
-      .getElementById("responseSection")
-      .scrollIntoView({ behavior: "smooth" });
+    isWaiting = false;
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("btnAction").disabled = false;
+
+    const chatDisplay = document.getElementById("chatDisplay");
+    const sageDiv = document.createElement("div");
+    sageDiv.className = "bubble sage-bubble";
+    const textTarget = document.createElement("div");
+    sageDiv.innerHTML = `<div class="sage-label">Lork Ta Sage</div>`;
+    sageDiv.appendChild(textTarget);
+    chatDisplay.appendChild(sageDiv);
+
+    typeWriter(textTarget, data.response);
+    base64Img = null;
   });
 
   socket.on("error_occured", (msg) => {
-    toggleState(false);
-    Swal.fire({
-      icon: "error",
-      title: "Oops!",
-      text: msg,
-      background: "#0f172a",
-      color: "#fff",
-    });
+    isWaiting = false;
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("btnAction").disabled = false;
+    alert(msg);
   });
-
-  function toggleState(loading) {
-    isWaiting = loading;
-    const btn = document.getElementById("btnAsk");
-    const loader = document.getElementById("loading");
-    btn.disabled = loading;
-    if (loading) {
-      loader.classList.remove("hidden");
-      document.getElementById("responseSection").classList.add("hidden");
-    } else {
-      loader.classList.add("hidden");
-    }
-  }
 </script>
+
+<%- include('partials/footer') %>

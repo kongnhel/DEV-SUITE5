@@ -129,38 +129,49 @@ module.exports = (socket) => {
   });
 
   // --- ២. AI KHMER CULTURE GUIDE ---
-  socket.on("ask_culture", async (data) => {
-    if (isRateLimited(socket.id)) return;
-    const { question, type, firebaseUid } = data;
+// controller.js - AI KHMER CULTURE GUIDE
+socket.on("ask_culture", async (data) => {
+    const { question, image, type, firebaseUid } = data;
     try {
-      const lengthHint =
-        type === "detailed"
-          ? "ពន្យល់ឱ្យលម្អិត និងស៊ីជម្រៅ"
-          : "សង្ខេបខ្លីៗ តែខ្លឹម";
-      const prompt = `You are a Khmer Culture Expert. 
-                STRICT RULES:
-                1. Language: Funny and witty Khmer ONLY.
-                2. If the question is NOT about Khmer culture/history, refuse in a funny Khmer way.
-                3. Format: ${lengthHint}.
-                Question: "${question}"`;
+        const user = await findUserByUid(firebaseUid);
+        socket.cultureHistory = socket.cultureHistory || [];
+        const context = socket.cultureHistory.slice(-4).join("\n");
 
-      const result = await aiModel.generateContent(prompt);
-      const aiResponseText = result.response.text();
+        const prompt = `
+            You are 'Lork Ta Sage' (លោកតាឥសី), a wise, ancient, yet funny Khmer guardian of knowledge.
+            Context of current conversation: ${context}
 
-      const user = await findUserByUid(firebaseUid);
-      if (user) {
-        await ChatHistory.create({
-          toolName: "KHMER_CULTURE",
-          userInput: question,
-          aiResponse: { response: aiResponseText },
-          userId: user._id,
-        });
-      }
-      socket.emit("culture_result", { response: aiResponseText });
+            STRICT RULES:
+            1. Speak in a mix of ancient and modern Khmer slang. Use terms like 'ចៅឯង', 'ក្រាំងមាស', 'មន្តអាគម'.
+            2. If an image is provided (temple, artifact, cloth), analyze it like a legendary archaeologist.
+            3. If the question isn't about Khmer culture, refuse by saying you only protect Khmer heritage!
+            4. Format: ${type === "detailed" ? "Deep wisdom" : "Short & sharp"}.
+            5. Use Markdown for styling.
+        `;
+
+        let generativeContent = [prompt + "\nQuestion: " + question];
+        if (image) {
+            generativeContent.push({ inlineData: { data: image, mimeType: "image/jpeg" } });
+        }
+
+        const result = await aiModel.generateContent(generativeContent);
+        const aiResponseText = result.response.text();
+
+        socket.cultureHistory.push(`User: ${question}\nSage: ${aiResponseText}`);
+
+        if (user) {
+            await ChatHistory.create({
+                toolName: "KHMER_CULTURE",
+                userInput: question || "Analyzed an image",
+                aiResponse: { response: aiResponseText },
+                userId: user._id,
+            });
+        }
+        socket.emit("culture_result", { response: aiResponseText });
     } catch (e) {
-      socket.emit("error_occured", "មគ្គុទ្ទេសក៍សន្លប់បាត់: " + e.message);
+        socket.emit("error_occured", "លោកតាឥសីកំពុងសមាធិ ហៅអត់ឮទេ៖ " + e.message);
     }
-  });
+});
 
   // --- ៣. AI LOGIC VISUALIZER ---
   socket.on("visualize_logic", async (data) => {
@@ -195,37 +206,65 @@ module.exports = (socket) => {
   });
 
   // --- ៤. AI STUDY ASSISTANT ---
+  // controller.js - STUDY_ASSISTANT update
   socket.on("study_assist", async (data) => {
-    if (isRateLimited(socket.id)) return;
-    const { content, firebaseUid } = data;
+    const { content, image, firebaseUid } = data; // ថែម image (base64)
     try {
-      const prompt = `You are a helpful Khmer Study Buddy.
+      const user = await findUserByUid(firebaseUid);
+
+      // ១. ទាញ History មកវិញខ្លះដើម្បីឱ្យវាដឹងថាទើបរៀនដល់ណា
+      const history = await ChatHistory.find({
+        userId: user?._id,
+        toolName: "STUDY_ASSISTANT",
+      })
+        .sort({ createdAt: -1 })
+        .limit(3);
+
+      const historyContext = history
+        .reverse()
+        .map(
+          (h) =>
+            `Previous Lesson: ${h.userInput}\nSummary: ${h.aiResponse.summary}`,
+        )
+        .join("\n");
+
+      const prompt = `You are an elite Khmer Study Buddy. 
+                Context of recent studies: ${historyContext}
+                
+                TASK: Summarize the input and create a quiz.
                 STRICT RULES:
-                1. Answer EVERYTHING in Khmer language ONLY.
-                2. Return ONLY JSON:
+                1. Answer in Khmer only.
+                2. If the input is an image (handwritten note or textbook), analyze it carefully.
+                3. Return ONLY JSON:
                 {
-                  "summary": "សង្ខេបមេរៀនឱ្យងាយយល់",
-                  "key_concepts": ["ចំណុចទី១", "ចំណុចទី២", "ចំណុចទី៣"],
-                  "quiz": [{"question": "សំណួរតេស្តសមត្ថភាព", "options": ["ក", "ខ", "គ", "ឃ"], "answer": "ក"}],
-                  "funny_motivation": "ពាក្យលើកទឹកចិត្តបែបកំប្លែង"
+                  "summary": "សង្ខេបឱ្យខ្លឹម និងងាយយល់បំផុត (Markdown format enabled)",
+                  "key_concepts": ["...", "..."],
+                  "quiz": [{"question": "...", "options": ["...", "..."], "answer": "...", "explanation": "ហេតុអ្វីបានជាចម្លើយនេះត្រឹមត្រូវ"}],
+                  "funny_motivation": "ពាក្យលើកទឹកចិត្តបែបដៀមដាមតិចៗតែមានកម្លាំងចិត្ត"
                 }
                 Analyze: "${content}"`;
 
-      const result = await aiModel.generateContent(prompt);
+      let generativeContent = [prompt];
+      if (image) {
+        generativeContent.push({
+          inlineData: { data: image, mimeType: "image/jpeg" },
+        });
+      }
+
+      const result = await aiModel.generateContent(generativeContent);
       const aiData = parseAIJson(result.response.text());
 
-      const user = await findUserByUid(firebaseUid);
       if (user) {
         await ChatHistory.create({
           toolName: "STUDY_ASSISTANT",
-          userInput: content.substring(0, 100) + "...",
+          userInput: content || "Sent an image lesson",
           aiResponse: aiData,
           userId: user._id,
         });
       }
       socket.emit("study_result", aiData);
     } catch (e) {
-      socket.emit("error_occured", "AI រៀនមិនទាន់ចេះទេ: " + e.message);
+      socket.emit("error_occured", "AI ចង់សន្លប់ពេលឃើញមេរៀនបង៖ " + e.message);
     }
   });
 
@@ -262,52 +301,64 @@ module.exports = (socket) => {
     }
   });
 
-  // --- ៦. AI TUTOR ---
-  socket.on("ask_tutor", async (data) => {
-    if (isRateLimited(socket.id)) return;
-    const { topic, mode, firebaseUid } = data;
+// controller.js - AI TUTOR
+socket.on("ask_tutor", async (data) => {
+    const { topic, image, mode, firebaseUid } = data;
     try {
-      const user = await findUserByUid(firebaseUid);
-      if (!user) return socket.emit("error_occured", "សូម Login សិនម៉ូយ!");
+        const user = await findUserByUid(firebaseUid);
+        if (!user) return socket.emit("error_occured", "សូម Login សិនបង!");
 
-      const style =
-        mode === "kid"
-          ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ (ភាសាសាមញ្ញបំផុត)"
-          : "ពន្យល់បែបអាជីព និងងាយយល់";
-      const prompt = `You are an expert Khmer Teacher. 
-        STRICT RULES:
-        1. Answer EVERYTHING in Khmer.
-        2. Topic: "${topic}" | Style: ${style}
-        3. Return ONLY valid JSON with this structure:
-        {
-          "title": "ចំណងជើងមេរៀន",
-          "explanation": "ការបកស្រាយសង្ខេប",
-          "key_points": [
-            {"label": "ចំណុចសំខាន់ទី១", "desc": "ការពិពណ៌នាទី១"},
-            {"label": "ចំណុចសំខាន់ទី២", "desc": "ការពិពណ៌នាទី២"}
-          ],
-          "examples": ["ឧទាហរណ៍១", "ឧទាហរណ៍២"],
-          "fun_fact": "រឿងគួរឱ្យចាប់អារម្មណ៍"
-        }`;
+        // ១. បង្កើត Session Memory (រលាយបាត់ពេល Refresh)
+        socket.tutorHistory = socket.tutorHistory || [];
+        const context = socket.tutorHistory.slice(-4).join("\n");
 
-      const result = await aiModel.generateContent(prompt);
-      const aiData = parseAIJson(result.response.text());
+        const style = mode === "kid" ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ" : "ពន្យល់បែបអាជីព តែងាយយល់";
+        
+        const prompt = `You are an expert Khmer Teacher.
+                [SESSION CONTEXT]: ${context}
+                
+                TASK: Explain the topic clearly and provide specific examples.
+                STRICT RULES:
+                1. Answer EVERYTHING in Khmer.
+                2. If an image is provided (like an exercise or textbook page), analyze and explain it.
+                3. Return ONLY valid JSON:
+                {
+                  "title": "ចំណងជើងមេរៀន",
+                  "explanation": "ការបកស្រាយលម្អិត (Markdown enabled)",
+                  "key_points": [{"label": "...", "desc": "..."}],
+                  "examples": ["...", "..."],
+                  "fun_fact": "..."
+                }
+                Topic: "${topic}" | Style: ${style}`;
 
-      await ChatHistory.create({
-        toolName: "AI_TUTOR",
-        userInput: topic,
-        aiResponse: aiData,
-        userId: user._id,
-      });
-      socket.emit("tutor_result", aiData);
+        let generativeContent = [prompt];
+        if (image) {
+            generativeContent.push({ inlineData: { data: image, mimeType: "image/jpeg" } });
+        }
+
+        const result = await aiModel.generateContent(generativeContent);
+        const aiData = parseAIJson(result.response.text());
+
+        // ២. បញ្ចូលទៅក្នុង Session Memory ដើម្បីឱ្យគ្រូដឹងថាទើបពន្យល់រឿងអី
+        socket.tutorHistory.push(`User asks: ${topic}\nAI explains: ${aiData.title}`);
+
+        await ChatHistory.create({
+            toolName: "AI_TUTOR",
+            userInput: topic || "Analyzed an image",
+            aiResponse: aiData,
+            userId: user._id,
+        });
+
+        socket.emit("tutor_result", aiData);
     } catch (e) {
-      socket.emit("error_occured", "បញ្ហាបច្ចេកទេស: " + e.message);
+        socket.emit("error_occured", "គ្រូ AI គាំងខួរក្បាលបន្តិចហើយ៖ " + e.message);
     }
-  });
+});
+
+  // controller.js
 
   // controller.js
   socket.on("vent_out", async (data) => {
-    // ទទួលយក message, image, firebaseUid និង personality (rage ឬ sweet) ពី frontend
     const { message, image, firebaseUid, personality } = data;
 
     try {
@@ -315,7 +366,11 @@ module.exports = (socket) => {
       if (!user)
         return socket.emit("error_occured", "រកអ្នកប្រើប្រាស់មិនឃើញទេ!");
 
-      // ១. បណ្ណាល័យបទចម្រៀង (Song Library)
+      // ១. បង្កើតកន្លែងផ្ទុក History បណ្ដោះអាសន្នលើ Socket (វានឹងរលាយបាត់ពេល Refresh)
+      // យើងរក្សាទុកតែក្នុងអារេ (Array) នៃ Socket នេះប៉ុណ្ណោះ
+      socket.sessionHistory = socket.sessionHistory || [];
+
+      // ២. បណ្ណាល័យបទចម្រៀង
       const songLibrary = `
     - បទស្រឡាញ់គេម្នាក់ឯង (Sweet/Crush): "sl_ke_mneak_eng.mp3", "ពេលវេលាមិនសំ.mp3"
     - បទគេសុំបែក (Sad/Breakup): "កុំចោលបង.mp3"
@@ -323,64 +378,54 @@ module.exports = (socket) => {
     - បទលើកទឹកចិត្ត (High Value/Strong): "ពេលវេលាមិនសំ.mp3"
     `;
 
-      // ២. ទាញ Chat History ចំនួន ៥ ឃ្លាចុងក្រោយ
-      const history = await ChatHistory.find({ userId: user._id })
-        .sort({ createdAt: -1 })
-        .limit(5);
+      // ៣. រៀបចំ Context ចេញពី Session History (យកតែ ៦ ឃ្លាចុងក្រោយដែលទើប Chat រួច)
+      const chatContext = socket.sessionHistory.slice(-6).join("\n\n");
 
-      let chatContext = history
-        .reverse()
-        .map((h) => `User: ${h.userInput}\nAI: ${h.aiResponse}`)
-        .join("\n");
-
-      // ៣. កំណត់ចរិតលក្ខណៈ (Personality) ផ្អែកលើការរើសរបស់ User
+      // ៤. កំណត់ចរិតលក្ខណៈ (Personality)
       let systemRole = "";
       if (personality === "sweet") {
-        systemRole = `You are 'Sweet Angel Healer', a very gentle, empathetic, and soft-spoken Khmer soul. 
-                    Use sweet and healing words like 'ប្អូនសម្លាញ់', 'កុំយំអី', 'បងនៅទីនេះ'. Focus on deep emotional healing.`;
+        systemRole = `You are 'Sweet Angel Healer', a very gentle Khmer soul. 
+                    You focus on deep emotional healing and empathy.`;
       } else {
-        systemRole = `You are 'Senior Dev Healer', a witty, toxic, sarcastic, yet deeply caring Khmer mentor. 
-                    Speak like a real human friend in 2026, using Khmer slang (ង៉ាង, បែកស្លុយ). Roast first, heal later.`;
+        systemRole = `You are 'Senior Dev Healer', a witty, toxic, sarcastic Khmer mentor. 
+                    If you see in context that the user was just reviewing code, roast their code and love life together!`;
       }
 
-      // ៤. រៀបចំ Prompt ជាមួយការណែនាំពិសេសសម្រាប់បទចម្រៀង
+      // ៥. រៀបចំ Prompt ឱ្យដឹងរឿងដែលកំពុង Chat បច្ចុប្បន្ន
       const prompt = `
         ${systemRole}
 
-        Context of previous conversation:
+        CURRENT SESSION CONTEXT (Conversation within this session):
         ${chatContext}
 
         Current User Input: "${message}"
         
         INSTRUCTIONS:
-        - Analyze the image if provided (chat screenshots or photos).
+        - Maintain continuity with the Session Context provided above.
         - STEP 1 (The Reaction): Respond based on your personality (${personality}).
-        - STEP 2 (The Truth/Advice): Help them see their value and give 1-2 tips to become a High Value person.
-        - STEP 3 (The Song): Pick ONE song from this library:
-        ${songLibrary}
-        - IMPORTANT SONG PHRASE: Before showing the song tag, you MUST say: "មើលតាមស្ថានភាពប្អូនសមនិងបងនេះណាស់ រឺក៏ចាំបងជូនមួយបទ".
-        - STEP 4 (Interaction): End with a question to keep them talking.
-
-        RULES:
-        - Use ONLY natural Khmer. No AI-style formatting.
-        - Song format at the VERY END: [SONG: filename.mp3]
+        - STEP 2 (The Truth/Advice): Help them see their value and be a High Value person.
+        - STEP 3 (The Song): Pick ONE from: ${songLibrary}
+        - IMPORTANT: Say "មើលតាមស្ថានភាពប្អូនសមនិងបងនេះណាស់ " before the song tag.
+        - Use 2026 Khmer slang. Answer in Khmer ONLY.
+        - Song format: [SONG: filename.mp3]
         `;
 
-      // ៥. រៀបចំ Data ផ្ញើទៅ Gemini (Support Multimodal - Image)
+      // ៦. រៀបចំ Data ផ្ញើទៅ Gemini
       let generativeContent = [prompt];
       if (image) {
         generativeContent.push({
-          inlineData: {
-            data: image, // base64 string
-            mimeType: "image/jpeg",
-          },
+          inlineData: { data: image, mimeType: "image/jpeg" },
         });
       }
 
       const result = await aiModel.generateContent(generativeContent);
       const aiData = result.response.text();
 
-      // ៦. រក្សាទុកក្នុង Chat History
+      // ៧. បន្ថែមការសន្ទនាថ្មីចូលក្នុង Socket Memory (ឱ្យ AI ចាំក្នុង Chat បន្តបន្ទាប់)
+      socket.sessionHistory.push(`User: ${message}`);
+      socket.sessionHistory.push(`AI: ${aiData}`);
+
+      // ៨. រក្សាទុកក្នុង Database សម្រាប់តែ Logging ប៉ុណ្ណោះ (មិនយកមកឱ្យ AI ចាំទេ)
       await ChatHistory.create({
         toolName: "LOVE_HEALER_RAGE",
         userInput: message || "Sent an image",
@@ -388,14 +433,13 @@ module.exports = (socket) => {
         userId: user._id,
       });
 
-      // ៧. បាញ់លទ្ធផលទៅ Frontend វិញ
       socket.emit("rage_result", {
         response: aiData,
-        personality: personality, // បញ្ជាក់ personality ទៅវិញដើម្បីឱ្យ frontend រៀបចំ UI
+        personality: personality,
       });
     } catch (e) {
       console.error(e);
-      socket.emit("error_occured", "AI រវល់ដើរលេងបាត់ហើយបង៖ " + e.message);
+      socket.emit("error_occured", "AI គាំងព្រោះនឹកសង្សារចាស់៖ " + e.message);
     }
   });
 
