@@ -313,8 +313,8 @@ module.exports = (socket) => {
             The user is venting about their breakup: "${message}"
 
             STRICT RULES FOR YOUR RESPONSE:
-            1. STEP 1 (ROAST & INSULT): Start by insulting the user's choices or lack of common sense. Use 2026 Khmer slang (e.g., "អាល្ងង់", "ភ្នែកនៅកញ្ចឹងក", "ក្បាលដាក់តែត្រីខ"). Roast them for wasting time on a toxic ex.
-            2. STEP 2 (MOCKERY): Mock the ex-partner and the ridiculous situation. Make it sting but in a funny way.
+            1. STEP 1 (ROAST & INSULT): Start by insulting the user's choices or lack of common sense. Use 2026 Khmer slang (e.g., "អាល្ងង់", "ស្មោះពេកឡើងជិតឆ្កួត", "គេបោកឡើងបែកង៉ាង","បើរៀនកូដខំចឺង ក្លាយជាបណ្ឌិតProgrammerបាត់ហើយ😡"). Roast them for wasting time on a toxic ex.
+            2. STEP 2 (MOCKERY): Mock the ex-partner and the ridiculous situation. Make it sting but in a funny way​ and example them like code for little.
             3. STEP 3 (SWEET COMFORT): Transition suddenly to a very sweet, warm, and supportive tone to comfort the user and give them hope.
             4.Roast the user's choice and the ex (use the photo if provided). 
             GENERAL CONSTRAINTS:
