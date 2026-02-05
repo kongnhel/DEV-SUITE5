@@ -1,5 +1,7 @@
 <%- include('partials/header') %>
 
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
 <style>
   :root {
     --dark-bg: #0f172a;
@@ -7,6 +9,7 @@
     --flame-orange: #f59e0b;
     --glass-bg: rgba(30, 41, 59, 0.7);
     --border-color: rgba(255, 255, 255, 0.1);
+    --pink-sweet: #ec4899;
   }
 
   body {
@@ -14,6 +17,37 @@
     background-color: var(--dark-bg);
     color: #f1f5f9;
     overflow-x: hidden;
+  }
+
+  /* --- Mood Animation Overlay --- */
+  #moodOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: 2s ease;
+  }
+  /* បទសេដ៖ ឱ្យអេក្រង់ងងឹតខៀវបន្តិច (Rainy Vibe) */
+  .mood-sad {
+    background: radial-gradient(
+      circle,
+      rgba(15, 23, 42, 0.4) 0%,
+      rgba(0, 0, 50, 0.7) 100%
+    );
+    opacity: 1 !important;
+  }
+  /* បទផ្អែម៖ ឱ្យអេក្រង់ផ្កាឈូកស្រាល (Sweet Vibe) */
+  .mood-sweet {
+    background: radial-gradient(
+      circle,
+      rgba(236, 72, 153, 0.2) 0%,
+      rgba(15, 23, 42, 0.6) 100%
+    );
+    opacity: 1 !important;
   }
 
   #fireCanvas {
@@ -27,38 +61,42 @@
   }
 
   .rage-container {
-    max-width: 800px;
+    max-width: 1200px; /* ពង្រីកឱ្យពេញអេក្រង់ PC */
+    width: 95%;
     margin: 40px auto;
     padding: 20px;
     position: relative;
     z-index: 10;
   }
 
-  /* --- Promo Section --- */
-  .promo-banner {
-    display: grid;
-    grid-template-cols: repeat(auto-fit, minmax(200px, 1fr));
+  /* --- Personality Selector --- */
+  .personality-selector {
+    display: flex;
+    justify-content: center;
     gap: 15px;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
   }
-
-  .promo-item {
-    background: rgba(255, 255, 255, 0.03);
+  .persona-btn {
+    padding: 10px 25px;
+    border-radius: 30px;
     border: 1px solid var(--border-color);
-    padding: 15px;
-    border-radius: 16px;
-    text-align: center;
-  }
-
-  .promo-icon {
-    font-size: 1.5rem;
-    margin-bottom: 8px;
-    display: block;
-  }
-  .promo-text {
-    font-size: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
     color: #94a3b8;
-    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .persona-btn.active {
+    border-color: var(--flame-orange);
+    color: white;
+    background: var(--flame-orange);
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+  .persona-btn.active.sweet {
+    background: var(--pink-sweet);
+    border-color: var(--pink-sweet);
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
   }
 
   .love-card {
@@ -70,17 +108,89 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   }
 
-  .vent-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    text-align: center;
-    background: linear-gradient(to right, #ff4d4d, #f59e0b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
+  #chatHistory {
+    max-height: 550px;
+    overflow-y: auto;
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 10px;
+  }
+  #chatHistory::-webkit-scrollbar {
+    width: 5px;
+  }
+  #chatHistory::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
   }
 
-  /* --- Upload Zone --- */
+  .chat-bubble {
+    max-width: 75%;
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 1rem;
+    line-height: 1.7;
+    animation: fadeInUp 0.4s ease;
+  }
+  .user-bubble {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #334155, #1e293b);
+    border: 1px solid var(--border-color);
+    border-bottom-right-radius: 4px;
+  }
+  .ai-bubble {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 5px solid var(--flame-orange);
+    border-bottom-left-radius: 4px;
+  }
+  .ai-bubble.sweet-mode {
+    border-left-color: var(--pink-sweet);
+  }
+
+  .ai-label {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: var(--flame-orange);
+    margin-bottom: 10px;
+    text-transform: uppercase;
+  }
+  .sweet-mode .ai-label {
+    color: var(--pink-sweet);
+  }
+
+  .song-lead-in {
+    font-style: italic;
+    color: #94a3b8;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    display: block;
+    border-top: 1px solid var(--border-color);
+    padding-top: 10px;
+  }
+
+  .song-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: var(--pink-sweet);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: 0.3s;
+  }
+  .song-btn.is-playing {
+    background: var(--flame-orange);
+    animation: pulse 1.5s infinite;
+  }
+
+  /* --- Original Effects --- */
   .upload-zone {
     border: 2px dashed var(--border-color);
     border-radius: 18px;
@@ -88,60 +198,44 @@
     text-align: center;
     margin-bottom: 20px;
     cursor: pointer;
-    transition: 0.3s;
     background: rgba(15, 23, 42, 0.5);
   }
-
-  .upload-zone:hover {
-    border-color: var(--rage-red);
-    background: rgba(239, 68, 68, 0.05);
-  }
-
   #previewImage {
-    max-width: 150px;
+    max-width: 200px;
     border-radius: 12px;
     margin-top: 15px;
     display: none;
     border: 2px solid var(--rage-red);
   }
-
-  /* --- Burning Effect --- */
   #ventArea {
     width: 100%;
-    height: 200px;
+    height: 120px;
     background: rgba(15, 23, 42, 0.8);
     border: 2px solid var(--border-color);
     border-radius: 18px;
     padding: 20px;
     color: #ff9f9f;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     resize: none;
     outline: none;
-    transition: all 0.5s ease;
   }
-
   .is-burning {
-    animation: burn-away 2s forwards;
+    animation: burn-away 1.5s forwards;
     pointer-events: none;
     filter: blur(8px) brightness(2);
-    transform: translateY(-20px) scale(0.95);
     opacity: 0;
   }
-
   @keyframes burn-away {
     0% {
       transform: scale(1);
-      filter: blur(0);
       opacity: 1;
       color: #ff4d4d;
     }
     100% {
-      transform: scale(0.9) translateY(-30px);
-      filter: blur(10px);
+      transform: scale(0.9) translateY(-20px);
       opacity: 0;
     }
   }
-
   .btn-burn {
     background: linear-gradient(45deg, #ce1212, #ff5f00);
     color: white;
@@ -149,20 +243,11 @@
     padding: 15px 40px;
     border-radius: 14px;
     font-weight: 700;
-    font-size: 1.1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 12px;
-    box-shadow: 0 10px 20px rgba(206, 18, 18, 0.3);
-    transition: 0.3s;
   }
-
-  .btn-burn:disabled {
-    background: #334155;
-    cursor: not-allowed;
-  }
-
   .spinner {
     width: 20px;
     height: 20px;
@@ -172,24 +257,22 @@
     animation: spin 0.8s linear infinite;
     display: none;
   }
-
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
   }
-
   #loadingSkeleton {
     display: none;
-    margin-top: 40px;
+    margin-top: 15px;
   }
   .skeleton-line {
-    height: 20px;
+    height: 15px;
     background: rgba(255, 255, 255, 0.05);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     border-radius: 4px;
-    position: relative;
     overflow: hidden;
+    position: relative;
   }
   .skeleton-line::after {
     content: "";
@@ -208,59 +291,72 @@
       transform: translateX(100%);
     }
   }
-
-  #aiResponseWrapper {
-    margin-top: 40px;
-    display: none;
-  }
-  .ai-bubble {
-    background: rgba(255, 255, 255, 0.03);
-    border-left: 4px solid var(--flame-orange);
-    padding: 25px;
-    border-radius: 16px;
-    animation: fadeInUp 0.5s ease;
-  }
-  .ai-name {
-    font-size: 0.8rem;
-    font-weight: 900;
-    color: var(--flame-orange);
-    margin-bottom: 8px;
-    text-transform: uppercase;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 </style>
+
+<div id="moodOverlay"></div>
 
 <canvas id="fireCanvas"></canvas>
 
 <div class="rage-container">
-  <div class="promo-banner">
-    <div class="promo-item">
-      <span class="promo-icon">🎭</span>
-      <span class="promo-text">ជេរដៀលបញ្ឈឺ រួចលួងលោមតាមក្រោយ</span>
-    </div>
-    <div class="promo-item">
-      <span class="promo-icon">🖼️</span>
-      <span class="promo-text"
-        >Upload រូបថតសង្សារចាស់ យកមកដុតកម្ទេចឱ្យក្លាយជាផេះ</span
-      >
-    </div>
-    <div class="promo-item">
-      <span class="promo-icon">🔥</span>
-      <span class="promo-text"
-        >AI នឹងជួយ Roast មនុស្សម្នាក់ហ្នឹងឱ្យដាច់ផ្ងារ</span
-      >
-    </div>
+  <div class="personality-selector">
+    <button
+      onclick="setPersonality('rage')"
+      id="rageBtn"
+      class="persona-btn active"
+    >
+      🔥 Version កាច (Rage Mode:ដៀលjmហើយហាស់)
+    </button>
+    <button
+      onclick="setPersonality('sweet')"
+      id="sweetBtn"
+      class="persona-btn sweet"
+    >
+      💖  Version ស្លូត (Sweet Mode:បែបផ្អែមដូចទឹកឃ្មុំ)
+    </button>
   </div>
 
   <div class="love-card">
-    <h2 class="vent-title">THE LOVE HEALER: RAGE MODE</h2>
+    <h2 class="vent-title">LOVE HEALER: RAGE MODE</h2>
+
+    <div id="chatHistory">
+      <div class="ai-bubble">
+        <div class="ai-label">Senior Dev Healer</div>
+        សួស្តីអាហ្វ្រេន! ថ្ងៃនេះ មិចហើយជីវិតស្នេហា? សមនឹងឱ្យបងជេរឱ្យភ្លឺភ្នែកតែម្ដង!
+        បើមាន Screenshot ឆាតគេ ឬរូបថតគេ បោះមក បងជួយវិភាគមើល បើមិនកើតដុតឱ្យខ្ទេច!
+      </div>
+    </div>
+
+    <div id="loadingSkeleton">
+      <div class="ai-label" id="loaderLabel">
+        Senior Dev កំពុងពិនិត្យ...
+      </div>
+      <div class="skeleton-line" style="width: 100%"></div>
+      <div class="skeleton-line" style="width: 70%"></div>
+    </div>
+
+    <hr
+      style="
+        border: 0;
+        border-top: 1px solid var(--border-color);
+        margin: 30px 0;
+      "
+    />
 
     <div
       class="upload-zone"
       onclick="document.getElementById('imageInput').click()"
     >
-      <span class="text-slate-400 text-sm"
-        >📸 ចុចទីនេះដើម្បីបោះរូបវាចូលក្នុងភ្នក់ភ្លើង</span
-      >
+      <span class="text-slate-400">📸 ចុចដើម្បីបោះរូបភាព (Chat ឬ Ex)</span>
       <input
         type="file"
         id="imageInput"
@@ -273,30 +369,14 @@
 
     <textarea
       id="ventArea"
-      placeholder="សរសេរពាក្យជេរ ឬរៀបរាប់ពីចរិតថោកទាបរបស់វា..."
+      placeholder="សរសេររៀបរាប់ពីទង្វើថោកទាបរបស់វា..."
     ></textarea>
 
     <div class="flex justify-center mt-8">
       <button onclick="executeBurn()" id="burnBtn" class="btn-burn">
         <div id="btnSpinner" class="spinner"></div>
-        <span id="btnText">🔥 ដុតកម្ទេចចោល</span>
+        <span id="btnText">🔥 បញ្ជូនទៅដុត</span>
       </button>
-    </div>
-
-    <div id="loadingSkeleton">
-      <div class="ai-name">Senior Dev កំពុងពិនិត្យមុខវា រួចរៀបចំជេរ...</div>
-      <div class="skeleton-line" style="width: 100%"></div>
-      <div class="skeleton-line" style="width: 90%"></div>
-    </div>
-
-    <div id="aiResponseWrapper">
-      <div class="ai-bubble">
-        <div class="ai-name">Senior Dev Healer (AI)</div>
-        <p
-          id="aiResponseText"
-          class="text-slate-300 italic leading-relaxed"
-        ></p>
-      </div>
     </div>
   </div>
 </div>
@@ -308,6 +388,39 @@
   const ctx = canvas.getContext("2d");
   let particles = [];
   let base64Image = null;
+  let currentAudio = null;
+  let selectedPersonality = "rage";
+
+  // --- Dual Personality Toggle ---
+  function setPersonality(type) {
+    selectedPersonality = type;
+    document
+      .getElementById("rageBtn")
+      .classList.toggle("active", type === "rage");
+    document
+      .getElementById("sweetBtn")
+      .classList.toggle("active", type === "sweet");
+    document.getElementById("loaderLabel").innerText =
+      type === "rage"
+        ? "Senior Dev កំពុងពិនិត្យមុខវា..."
+        : "Angel Healer កំពុងយំជាមួយប្អូន...";
+  }
+
+  // --- Typing Effect Function ---
+  function typeWriter(element, text, speed = 20) {
+    let i = 0;
+    element.innerHTML = "";
+    function typing() {
+      if (i < text.length) {
+        element.innerHTML = marked.parse(text.substring(0, i + 1));
+        i++;
+        setTimeout(typing, speed);
+        document.getElementById("chatHistory").scrollTop =
+          document.getElementById("chatHistory").scrollHeight;
+      }
+    }
+    typing();
+  }
 
   function previewFile() {
     const preview = document.getElementById("previewImage");
@@ -321,7 +434,40 @@
     if (file) reader.readAsDataURL(file);
   }
 
-  // Particle System
+  // --- Mood Animation Control ---
+  function toggleSong(filename, btn) {
+    const overlay = document.getElementById("moodOverlay");
+
+    // កំណត់ Mood តាមឈ្មោះ File (បងអាចថែម Mood តាមចិត្ត)
+    if (filename.includes("sad") || filename.includes("tok_prik")) {
+      overlay.className = "mood-sad";
+    } else {
+      overlay.className = "mood-sweet";
+    }
+
+    if (
+      currentAudio &&
+      !currentAudio.paused &&
+      currentAudio.src.includes(filename)
+    ) {
+      currentAudio.pause();
+      btn.classList.remove("is-playing");
+      overlay.className = "";
+      return;
+    }
+
+    if (currentAudio) currentAudio.pause();
+    currentAudio = new Audio(`/songs/${filename}`);
+    currentAudio.play();
+    btn.classList.add("is-playing");
+
+    currentAudio.onended = () => {
+      btn.classList.remove("is-playing");
+      overlay.className = "";
+    };
+  }
+
+  // --- Particle System ---
   class Particle {
     constructor(x, y) {
       this.x = x;
@@ -343,17 +489,13 @@
       ctx.fill();
     }
   }
-
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update();
-      particles[i].draw();
-      if (particles[i].opacity <= 0) {
-        particles.splice(i, 1);
-        i--;
-      }
-    }
+    particles.forEach((p, i) => {
+      p.update();
+      p.draw();
+      if (p.opacity <= 0) particles.splice(i, 1);
+    });
     requestAnimationFrame(animate);
   }
   window.addEventListener("resize", () => {
@@ -366,27 +508,19 @@
 
   async function executeBurn() {
     const ventArea = document.getElementById("ventArea");
+    const chatHistory = document.getElementById("chatHistory");
     const burnBtn = document.getElementById("burnBtn");
-    const preview = document.getElementById("previewImage");
     const message = ventArea.value.trim();
 
     if (!message && !base64Image) {
-      alert("ជេរតិចមកបង ឬបោះរូបវាចូលមក! 😂");
+      alert("ជេរតិចមកបង! 😂");
       return;
     }
 
-    // ១. បន្ថែម Sound Effect ជាមួយការដោះស្រាយ Error
-    // ប្រើ Link ពី Pixabay ឬ Local file គឺមានសុវត្ថិភាពជាង
-const fireSound = new Audio('/audio/fire-burn.mp3'); 
-    fireSound.volume = 0.6;
-    // fireSound.volume = 0.5;
+    const fireSound = new Audio("/audio/fire-burn.mp3");
+    fireSound.volume = 0.5;
+    fireSound.play().catch(() => {});
 
-    fireSound.play().catch((error) => {
-      console.warn("សំឡេងមិនដើរដោយសារ Browser ប្លុក: ", error.message);
-      // បើសំឡេង Error ក៏ App នៅតែដើរដុតបានដែរ
-    });
-
-    // ២. Animation ភ្លើងឆេះ
     const rect = ventArea.getBoundingClientRect();
     for (let i = 0; i < 150; i++) {
       setTimeout(() => {
@@ -399,41 +533,75 @@ const fireSound = new Audio('/audio/fire-burn.mp3');
       }, i * 5);
     }
 
-    // ៣. បង្ហាញ Loading និងដុតអត្ថបទ/រូបភាព
+    const userDiv = document.createElement("div");
+    userDiv.className = "chat-bubble user-bubble";
+    let userContent = message;
+    if (base64Image) {
+      userContent += `<br><img src="data:image/jpeg;base64,${base64Image}" class="chat-img-preview" style="max-width:300px">`;
+    }
+    userDiv.innerHTML = userContent;
+    chatHistory.appendChild(userDiv);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
     burnBtn.disabled = true;
     document.getElementById("btnSpinner").style.display = "block";
-    document.getElementById("btnText").innerText = "កំពុងដុត...";
+    document.getElementById("loadingSkeleton").style.display = "block";
     ventArea.classList.add("is-burning");
-    if (preview.style.display === "block") preview.classList.add("is-burning");
 
-    setTimeout(() => {
-      document.getElementById("loadingSkeleton").style.display = "block";
-    }, 500);
-
-    // ៤. ផ្ញើទៅ Gemini 2.5 Flash តាមរយៈ Socket
+    // បញ្ជូនទាំង Message និង Personality
     socket.emit("vent_out", {
       message: message,
       image: base64Image,
+      personality: selectedPersonality,
       firebaseUid: "<%= user ? user.firebaseUid : '' %>",
     });
+
+    ventArea.value = "";
+    document.getElementById("previewImage").style.display = "none";
   }
 
   socket.on("rage_result", (data) => {
+    const chatHistory = document.getElementById("chatHistory");
     document.getElementById("loadingSkeleton").style.display = "none";
-    document.getElementById("aiResponseWrapper").style.display = "block";
-    document.getElementById("aiResponseText").innerText = data.response;
-
-    document.getElementById("ventArea").value = "";
-    document.getElementById("ventArea").classList.remove("is-burning");
-    document.getElementById("previewImage").style.display = "none";
-    document.getElementById("previewImage").classList.remove("is-burning");
     document.getElementById("burnBtn").disabled = false;
     document.getElementById("btnSpinner").style.display = "none";
-    document.getElementById("btnText").innerText = "🔥 ដុតកម្ទេចចោល";
+    document.getElementById("ventArea").classList.remove("is-burning");
+
+    let responseText = data.response;
+    let songTag = responseText.match(/\[SONG: (.*?)\]/);
+    let cleanText = responseText.replace(/\[SONG: .*?\]/g, "").trim();
+
+    const aiDiv = document.createElement("div");
+    aiDiv.className = `chat-bubble ai-bubble ${selectedPersonality === "sweet" ? "sweet-mode" : ""}`;
+
+    const textContainer = document.createElement("div");
+    aiDiv.innerHTML = `<div class="ai-label">${selectedPersonality === "rage" ? "Senior Dev Healer" : "Sweet Angel Healer"}</div>`;
+    aiDiv.appendChild(textContainer);
+
+    if (songTag && songTag[1]) {
+      const fileName = songTag[1];
+      const leadIn = document.createElement("span");
+      leadIn.className = "song-lead-in";
+      leadIn.innerText = "មើលតាមស្ថានភាពប្អូនសមនិងបងនេះណាស់ រឺក៏ចាំបងជូនមួយបទ";
+
+      const songBtn = document.createElement("button");
+      songBtn.className = "song-btn";
+      songBtn.innerHTML = `🎵 ស្ដាប់ចម្រៀង៖ ${fileName.replace(".mp3", "").replace(/_/g, " ")}`;
+      songBtn.onclick = () => toggleSong(fileName, songBtn);
+
+      aiDiv.appendChild(leadIn);
+      aiDiv.appendChild(songBtn);
+    }
+
+    chatHistory.appendChild(aiDiv);
+    typeWriter(textContainer, cleanText);
     base64Image = null;
-    document
-      .getElementById("aiResponseWrapper")
-      .scrollIntoView({ behavior: "smooth" });
+  });
+
+  socket.on("error_occured", (msg) => {
+    alert(msg);
+    document.getElementById("loadingSkeleton").style.display = "none";
+    document.getElementById("burnBtn").disabled = false;
   });
 </script>
 

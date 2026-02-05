@@ -305,39 +305,97 @@ module.exports = (socket) => {
     }
   });
 
+  // controller.js
   socket.on("vent_out", async (data) => {
-    const { message, firebaseUid } = data; // យកតែ Text
+    // ទទួលយក message, image, firebaseUid និង personality (rage ឬ sweet) ពី frontend
+    const { message, image, firebaseUid, personality } = data;
+
     try {
-      // កែសម្រួល Prompt ថ្មី៖ បោះបង់ការនិយាយរឿងកូដ មកនិយាយបែបមនុស្សឌឺដង និងលួងលោមវិញ
-      const prompt = `You are a toxic yet deeply caring Khmer human friend. 
-            The user is venting about their breakup: "${message}"
-
-            STRICT RULES FOR YOUR RESPONSE:
-            1. STEP 1 (ROAST & INSULT): Start by insulting the user's choices or lack of common sense. Use 2026 Khmer slang (e.g., "អាល្ងង់", "ស្មោះពេកឡើងជិតឆ្កួត", "គេបោកឡើងបែកង៉ាង","បើរៀនកូដខំចឺង ក្លាយជាបណ្ឌិតProgrammerបាត់ហើយ😡"). Roast them for wasting time on a toxic ex.
-            2. STEP 2 (MOCKERY): Mock the ex-partner and the ridiculous situation. Make it sting but in a funny way​ and example them like code for little.
-            3. STEP 3 (SWEET COMFORT): Transition suddenly to a very sweet, warm, and supportive tone to comfort the user and give them hope.
-            4.Roast the user's choice and the ex (use the photo if provided). 
-            GENERAL CONSTRAINTS:
-            - NO CODING METAPHORS (No 'malware', 'bugs', or 'resets'). Speak like a real person in a coffee shop.
-            - LANGUAGE: Use natural, expressive Khmer only.
-            - FORMAT: Concise but impactful. Use emojis that transition from 🚩🙄🔥 to 💖✨🙏.`;
-
-      const result = await aiModel.generateContent(prompt);
-      const aiData = result.response.text();
-
-      // រក្សាទុកក្នុង Chat History របស់គ្រូ
       const user = await findUserByUid(firebaseUid);
-      if (user) {
-        await ChatHistory.create({
-          toolName: "LOVE_HEALER_RAGE",
-          userInput: message,
-          aiResponse: aiData,
-          userId: user._id,
+      if (!user)
+        return socket.emit("error_occured", "រកអ្នកប្រើប្រាស់មិនឃើញទេ!");
+
+      // ១. បណ្ណាល័យបទចម្រៀង (Song Library)
+      const songLibrary = `
+    - បទស្រឡាញ់គេម្នាក់ឯង (Sweet/Crush): "sl_ke_mneak_eng.mp3", "ពេលវេលាមិនសំ.mp3"
+    - បទគេសុំបែក (Sad/Breakup): "កុំចោលបង.mp3"
+    - បទឌឺដង/កាច (Rage/Roast): "លុប.mp3"
+    - បទលើកទឹកចិត្ត (High Value/Strong): "ពេលវេលាមិនសំ.mp3"
+    `;
+
+      // ២. ទាញ Chat History ចំនួន ៥ ឃ្លាចុងក្រោយ
+      const history = await ChatHistory.find({ userId: user._id })
+        .sort({ createdAt: -1 })
+        .limit(5);
+
+      let chatContext = history
+        .reverse()
+        .map((h) => `User: ${h.userInput}\nAI: ${h.aiResponse}`)
+        .join("\n");
+
+      // ៣. កំណត់ចរិតលក្ខណៈ (Personality) ផ្អែកលើការរើសរបស់ User
+      let systemRole = "";
+      if (personality === "sweet") {
+        systemRole = `You are 'Sweet Angel Healer', a very gentle, empathetic, and soft-spoken Khmer soul. 
+                    Use sweet and healing words like 'ប្អូនសម្លាញ់', 'កុំយំអី', 'បងនៅទីនេះ'. Focus on deep emotional healing.`;
+      } else {
+        systemRole = `You are 'Senior Dev Healer', a witty, toxic, sarcastic, yet deeply caring Khmer mentor. 
+                    Speak like a real human friend in 2026, using Khmer slang (ង៉ាង, បែកស្លុយ). Roast first, heal later.`;
+      }
+
+      // ៤. រៀបចំ Prompt ជាមួយការណែនាំពិសេសសម្រាប់បទចម្រៀង
+      const prompt = `
+        ${systemRole}
+
+        Context of previous conversation:
+        ${chatContext}
+
+        Current User Input: "${message}"
+        
+        INSTRUCTIONS:
+        - Analyze the image if provided (chat screenshots or photos).
+        - STEP 1 (The Reaction): Respond based on your personality (${personality}).
+        - STEP 2 (The Truth/Advice): Help them see their value and give 1-2 tips to become a High Value person.
+        - STEP 3 (The Song): Pick ONE song from this library:
+        ${songLibrary}
+        - IMPORTANT SONG PHRASE: Before showing the song tag, you MUST say: "មើលតាមស្ថានភាពប្អូនសមនិងបងនេះណាស់ រឺក៏ចាំបងជូនមួយបទ".
+        - STEP 4 (Interaction): End with a question to keep them talking.
+
+        RULES:
+        - Use ONLY natural Khmer. No AI-style formatting.
+        - Song format at the VERY END: [SONG: filename.mp3]
+        `;
+
+      // ៥. រៀបចំ Data ផ្ញើទៅ Gemini (Support Multimodal - Image)
+      let generativeContent = [prompt];
+      if (image) {
+        generativeContent.push({
+          inlineData: {
+            data: image, // base64 string
+            mimeType: "image/jpeg",
+          },
         });
       }
-      socket.emit("rage_result", { response: aiData });
+
+      const result = await aiModel.generateContent(generativeContent);
+      const aiData = result.response.text();
+
+      // ៦. រក្សាទុកក្នុង Chat History
+      await ChatHistory.create({
+        toolName: "LOVE_HEALER_RAGE",
+        userInput: message || "Sent an image",
+        aiResponse: aiData,
+        userId: user._id,
+      });
+
+      // ៧. បាញ់លទ្ធផលទៅ Frontend វិញ
+      socket.emit("rage_result", {
+        response: aiData,
+        personality: personality, // បញ្ជាក់ personality ទៅវិញដើម្បីឱ្យ frontend រៀបចំ UI
+      });
     } catch (e) {
-      socket.emit("error_occured", "AI ជេរអត់ចេញទេបង៖ " + e.message);
+      console.error(e);
+      socket.emit("error_occured", "AI រវល់ដើរលេងបាត់ហើយបង៖ " + e.message);
     }
   });
 
