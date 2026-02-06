@@ -18,7 +18,7 @@
     .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(to right, rgba(255, 255, 255, 0.01) 1px, transparent 1px), linear-gradient(to bottom, rgba(255, 255, 255, 0.01) 1px, transparent 1px); background-size: 40px 40px; mask-image: radial-gradient(circle at 50% 50%, black, transparent 95%); z-index: -10; }
 
     .magic-card { background: var(--card-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 24px; border: 1px solid var(--border-light); transition: 0.3s; }
-    .magic-card:hover { border-color: var(--primary); }
+    .magic-card:hover { border-color: var(--primary); transform: translateY(-2px); }
 
     .search-container { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border: 1px solid var(--border-light); border-radius: 20px; padding: 1.5rem; }
     .input-custom { background: rgba(0, 0, 0, 0.3) !important; border: 1px solid var(--border-light) !important; border-radius: 12px !important; color: white !important; padding: 0.75rem 1rem !important; }
@@ -27,6 +27,7 @@
     .badge-love { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
     .badge-culture { background: rgba(212, 175, 55, 0.1); color: #d4af37; border: 1px solid rgba(212, 175, 55, 0.2); }
     .badge-code { background: rgba(34, 211, 238, 0.1); color: #22d3ee; border: 1px solid rgba(34, 211, 238, 0.2); }
+    .badge-architect { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
 
     .shimmer-text { background: linear-gradient(90deg, #fff, var(--primary), #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 8s linear infinite; }
     @keyframes shine { to { background-position: 200% center; } }
@@ -55,6 +56,7 @@
             <div class="lg:col-span-4">
                 <select name="tool" class="input-custom w-full cursor-pointer text-xs font-bold uppercase tracking-widest">
                     <option value="ALL" <%= currentTool === 'ALL' ? 'selected' : '' %>>គ្រប់ផ្នែកទាំងអស់ (All Tools)</option>
+                    <option value="ARCHITECT_AI" <%= currentTool === 'ARCHITECT_AI' ? 'selected' : '' %>>🏗️ Architect AI</option>
                     <option value="LOVE_HEALER_RAGE" <%= currentTool === 'LOVE_HEALER_RAGE' ? 'selected' : '' %>>🔥 Love Healer</option>
                     <option value="CODE_REVIEWER" <%= currentTool === 'CODE_REVIEWER' ? 'selected' : '' %>>💻 Code Reviewer</option>
                     <option value="STUDY_ASSISTANT" <%= currentTool === 'STUDY_ASSISTANT' ? 'selected' : '' %>>📖 Study Buddy</option>
@@ -64,7 +66,7 @@
             </div>
 
             <div class="lg:col-span-3">
-                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold text-xs hover:opacity-90 transition-all uppercase tracking-widest">ស្វែងរកទិន្នន័យ</button>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl font-bold text-xs hover:opacity-90 transition-all uppercase tracking-widest shadow-lg shadow-indigo-500/20">ស្វែងរកទិន្នន័យ</button>
             </div>
         </form>
     </div>
@@ -83,6 +85,7 @@
                            if(item.toolName.includes('LOVE')) badgeClass = "badge-love";
                            if(item.toolName.includes('CULTURE')) badgeClass = "badge-culture";
                            if(item.toolName.includes('CODE')) badgeClass = "badge-code";
+                           if(item.toolName.includes('ARCHITECT')) badgeClass = "badge-architect";
                         %>
                         <span class="px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest <%= badgeClass %>">
                             <%= item.toolName %>
@@ -109,7 +112,19 @@
                             <script>
                                 (function() {
                                     const rawRes = <%- JSON.stringify(item.aiResponse) %>;
-                                    let text = typeof rawRes === 'string' ? rawRes : (rawRes.response || rawRes.explanation || rawRes.answer || rawRes.summary || "រួចរាល់។");
+                                    let text = "";
+                                    
+                                    if (typeof rawRes === 'string') {
+                                        text = rawRes;
+                                    } else {
+                                        // ឆែកមើលគ្រប់លទ្ធភាពនៃ Response Object (រួមទាំង ARCHITECT_AI)
+                                        if (rawRes.plan_title && rawRes.overview) {
+                                            text = `### ${rawRes.plan_title}\n\n${rawRes.overview}`;
+                                        } else {
+                                            text = rawRes.plan_title || rawRes.response || rawRes.explanation || rawRes.answer || rawRes.summary || "រួចរាល់។";
+                                        }
+                                    }
+                                    
                                     document.getElementById("content-<%= item._id %>").innerHTML = marked.parse(text);
                                 })();
                             </script>
@@ -130,7 +145,7 @@
 <%- include('partials/footer') %>
 
 <script>
-    // ១. Deletion Logic
+    // ១. Deletion Logic (កែសម្រួល URL ឱ្យត្រូវនឹង Route Backend បង)
     function confirmDelete(id) {
         Swal.fire({
             title: 'តើបងច្បាស់ទេ?',
@@ -145,20 +160,33 @@
             color: '#fff'
         }).then((result) => {
             if (result.isConfirmed) {
-                // បាញ់ទៅ API លុប (បងត្រូវបង្កើត Route DELETE /history/:id នៅ backend ផង)
+                // បាញ់ទៅ API លុប (ត្រូវប្រាកដថាបងមាន Route: DELETE /history/:id)
                 fetch(`/history/${id}`, { method: 'DELETE' })
                 .then(res => {
                     if(res.ok) {
-                        document.getElementById(`card-${id}`).style.transform = 'scale(0.9)';
-                        document.getElementById(`card-${id}`).style.opacity = '0';
-                        setTimeout(() => document.getElementById(`card-${id}`).remove(), 300);
+                        const card = document.getElementById(`card-${id}`);
+                        card.style.transform = 'scale(0.9)';
+                        card.style.opacity = '0';
+                        setTimeout(() => card.remove(), 300);
+                        Swal.fire({
+                            title: 'លុបរួចរាល់!',
+                            text: 'ដានជើងនេះត្រូវបានកម្ចាត់ចេញពី Memory Vault ហើយ។',
+                            icon: 'success',
+                            background: '#0f172a',
+                            color: '#fff',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire('Error!', 'មិនអាចលុបទិន្នន័យបានទេ សាកម្ដងទៀតបង!', 'error');
                     }
-                });
+                })
+                .catch(err => Swal.fire('Error!', 'Server មានបញ្ហាហើយបងប្រុស!', 'error'));
             }
         })
     }
 
-    // ២. Background Animation (រង្វើល និងយឺត)
+    // ២. Background Animation (Neural Connectors)
     const canvas = document.getElementById("neural-bg");
     const ctx = canvas.getContext("2d");
     let dots = [];

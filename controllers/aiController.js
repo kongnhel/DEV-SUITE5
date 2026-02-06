@@ -1,3 +1,7 @@
+const pdfParseLib = require("pdf-parse");
+const pdfParse = pdfParseLib.default || pdfParseLib;
+
+const mammoth = require("mammoth");
 const ChatHistory = require("../models/ChatHistory");
 const textToSpeech = require("@google-cloud/text-to-speech");
 const ttsClient = new textToSpeech.TextToSpeechClient();
@@ -17,6 +21,8 @@ const isRateLimited = (socketId) => {
   userRateLimits.set(socketId, now);
   return false;
 };
+console.log("PDF TYPE:", typeof pdfParse);
+console.log(pdfParse);
 
 /**
  * មុខងារជំនួយសម្រាប់សម្អាត និង Parse JSON ចេញពី AI Response
@@ -112,16 +118,21 @@ module.exports = (socket) => {
       const result = await aiModel.generateContent(prompt);
       const aiData = parseAIJson(result.response.text());
 
-      if (user) {
+if (user) {
+        // --- យុទ្ធសាស្ត្ររក្សាទុក៖ រួមបញ្ចូលទាំង Roast, Review និង Fixed Code ---
+        const historyResponse = { 
+          ...aiData, 
+          // រៀបចំ Markdown សម្រាប់ឱ្យទំព័រ History បង្ហាញបានគ្រប់ជ្រុងជ្រោយ
+          response: `### 🎭 Roast\n${aiData.humorous_response}\n\n### 🛠️ Technical Review\n${aiData.technical_review}\n\n### ✅ កូដដែលបានកែរួច (Fixed Code)\n\`\`\`javascript\n${aiData.fixed_code}\n\`\`\``
+        };
+
         await ChatHistory.create({
           toolName: "CODE_REVIEWER",
-          userInput: `Comment: ${userComment} | Code: ${code.substring(0, 100)}`,
-          aiResponse: aiData,
+          userInput: `Comment: ${userComment} | Code: ${code.substring(0, 50)}...`,
+          aiResponse: historyResponse, // រក្សាទុក Object ធំដែលមានកូដនៅខាងក្នុង
           userId: user._id,
         });
       }
-
-      // ៧. បោះលទ្ធផលទៅឱ្យ Client (EJS)
       socket.emit("review_result", aiData);
     } catch (e) {
       socket.emit("error_occured", "Senior Dev វិលមុខហើយ: " + e.message);
@@ -129,15 +140,15 @@ module.exports = (socket) => {
   });
 
   // --- ២. AI KHMER CULTURE GUIDE ---
-// controller.js - AI KHMER CULTURE GUIDE
-socket.on("ask_culture", async (data) => {
+  // controller.js - AI KHMER CULTURE GUIDE
+  socket.on("ask_culture", async (data) => {
     const { question, image, type, firebaseUid } = data;
     try {
-        const user = await findUserByUid(firebaseUid);
-        socket.cultureHistory = socket.cultureHistory || [];
-        const context = socket.cultureHistory.slice(-4).join("\n");
+      const user = await findUserByUid(firebaseUid);
+      socket.cultureHistory = socket.cultureHistory || [];
+      const context = socket.cultureHistory.slice(-4).join("\n");
 
-        const prompt = `
+      const prompt = `
             You are 'Lork Ta Sage' (លោកតាឥសី), a wise, ancient, yet funny Khmer guardian of knowledge.
             Context of current conversation: ${context}
 
@@ -149,29 +160,31 @@ socket.on("ask_culture", async (data) => {
             5. Use Markdown for styling.
         `;
 
-        let generativeContent = [prompt + "\nQuestion: " + question];
-        if (image) {
-            generativeContent.push({ inlineData: { data: image, mimeType: "image/jpeg" } });
-        }
+      let generativeContent = [prompt + "\nQuestion: " + question];
+      if (image) {
+        generativeContent.push({
+          inlineData: { data: image, mimeType: "image/jpeg" },
+        });
+      }
 
-        const result = await aiModel.generateContent(generativeContent);
-        const aiResponseText = result.response.text();
+      const result = await aiModel.generateContent(generativeContent);
+      const aiResponseText = result.response.text();
 
-        socket.cultureHistory.push(`User: ${question}\nSage: ${aiResponseText}`);
+      socket.cultureHistory.push(`User: ${question}\nSage: ${aiResponseText}`);
 
-        if (user) {
-            await ChatHistory.create({
-                toolName: "KHMER_CULTURE",
-                userInput: question || "Analyzed an image",
-                aiResponse: { response: aiResponseText },
-                userId: user._id,
-            });
-        }
-        socket.emit("culture_result", { response: aiResponseText });
+      if (user) {
+        await ChatHistory.create({
+          toolName: "KHMER_CULTURE",
+          userInput: question || "Analyzed an image",
+          aiResponse: { response: aiResponseText },
+          userId: user._id,
+        });
+      }
+      socket.emit("culture_result", { response: aiResponseText });
     } catch (e) {
-        socket.emit("error_occured", "លោកតាឥសីកំពុងសមាធិ ហៅអត់ឮទេ៖ " + e.message);
+      socket.emit("error_occured", "លោកតាឥសីកំពុងសមាធិ ហៅអត់ឮទេ៖ " + e.message);
     }
-});
+  });
 
   // --- ៣. AI LOGIC VISUALIZER ---
   socket.on("visualize_logic", async (data) => {
@@ -301,20 +314,23 @@ socket.on("ask_culture", async (data) => {
     }
   });
 
-// controller.js - AI TUTOR
-socket.on("ask_tutor", async (data) => {
+  // controller.js - AI TUTOR
+  socket.on("ask_tutor", async (data) => {
     const { topic, image, mode, firebaseUid } = data;
     try {
-        const user = await findUserByUid(firebaseUid);
-        if (!user) return socket.emit("error_occured", "សូម Login សិនបង!");
+      const user = await findUserByUid(firebaseUid);
+      if (!user) return socket.emit("error_occured", "សូម Login សិនបង!");
 
-        // ១. បង្កើត Session Memory (រលាយបាត់ពេល Refresh)
-        socket.tutorHistory = socket.tutorHistory || [];
-        const context = socket.tutorHistory.slice(-4).join("\n");
+      // ១. បង្កើត Session Memory (រលាយបាត់ពេល Refresh)
+      socket.tutorHistory = socket.tutorHistory || [];
+      const context = socket.tutorHistory.slice(-4).join("\n");
 
-        const style = mode === "kid" ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ" : "ពន្យល់បែបអាជីព តែងាយយល់";
-        
-        const prompt = `You are an expert Khmer Teacher.
+      const style =
+        mode === "kid"
+          ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ"
+          : "ពន្យល់បែបអាជីព តែងាយយល់";
+
+      const prompt = `You are an expert Khmer Teacher.
                 [SESSION CONTEXT]: ${context}
                 
                 TASK: Explain the topic clearly and provide specific examples.
@@ -331,29 +347,36 @@ socket.on("ask_tutor", async (data) => {
                 }
                 Topic: "${topic}" | Style: ${style}`;
 
-        let generativeContent = [prompt];
-        if (image) {
-            generativeContent.push({ inlineData: { data: image, mimeType: "image/jpeg" } });
-        }
-
-        const result = await aiModel.generateContent(generativeContent);
-        const aiData = parseAIJson(result.response.text());
-
-        // ២. បញ្ចូលទៅក្នុង Session Memory ដើម្បីឱ្យគ្រូដឹងថាទើបពន្យល់រឿងអី
-        socket.tutorHistory.push(`User asks: ${topic}\nAI explains: ${aiData.title}`);
-
-        await ChatHistory.create({
-            toolName: "AI_TUTOR",
-            userInput: topic || "Analyzed an image",
-            aiResponse: aiData,
-            userId: user._id,
+      let generativeContent = [prompt];
+      if (image) {
+        generativeContent.push({
+          inlineData: { data: image, mimeType: "image/jpeg" },
         });
+      }
 
-        socket.emit("tutor_result", aiData);
+      const result = await aiModel.generateContent(generativeContent);
+      const aiData = parseAIJson(result.response.text());
+
+      // ២. បញ្ចូលទៅក្នុង Session Memory ដើម្បីឱ្យគ្រូដឹងថាទើបពន្យល់រឿងអី
+      socket.tutorHistory.push(
+        `User asks: ${topic}\nAI explains: ${aiData.title}`,
+      );
+
+      await ChatHistory.create({
+        toolName: "AI_TUTOR",
+        userInput: topic || "Analyzed an image",
+        aiResponse: aiData,
+        userId: user._id,
+      });
+
+      socket.emit("tutor_result", aiData);
     } catch (e) {
-        socket.emit("error_occured", "គ្រូ AI គាំងខួរក្បាលបន្តិចហើយ៖ " + e.message);
+      socket.emit(
+        "error_occured",
+        "គ្រូ AI គាំងខួរក្បាលបន្តិចហើយ៖ " + e.message,
+      );
     }
-});
+  });
 
   // controller.js
 
@@ -440,6 +463,126 @@ socket.on("ask_tutor", async (data) => {
     } catch (e) {
       console.error(e);
       socket.emit("error_occured", "AI គាំងព្រោះនឹកសង្សារចាស់៖ " + e.message);
+    }
+  });
+
+  // --- ARCHITECT_AI Logic ---
+  socket.on("create_flow", async (data) => {
+    const { goal, fileData, fileType, mode, firebaseUid } = data;
+
+    try {
+      // ១. ផ្ទៀងផ្ទាត់ User
+      const user = await findUserByUid(firebaseUid);
+      if (!user) {
+        return socket.emit(
+          "error_occured",
+          "ចូលគណនីសិនបង! កុំមកលួចគូរប្លង់ឱ្យសង្សារអី 😂",
+        );
+      }
+
+      let extractedText = "";
+      let isImage = false;
+
+      // ២. ដំណើរការបូមទិន្នន័យពី File (Multi-Format Support)
+      if (fileData) {
+        const buffer = Buffer.from(fileData, "base64");
+
+        try {
+          if (fileType === "application/pdf") {
+            // ការប្រើប្រាស់ pdf-parse ដែលត្រឹមត្រូវ
+            const dataBuffer = await pdfParse(buffer);
+            extractedText = "\n[ទិន្នន័យពី PDF]: " + dataBuffer.text;
+          } else if (
+            fileType ===
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ) {
+            const docData = await mammoth.extractRawText({ buffer });
+            extractedText = "\n[ទិន្នន័យពី Word]: " + docData.value;
+          } else if (fileType.startsWith("image/")) {
+            isImage = true; // ទុកឱ្យ Vision AI មើលរូបភាពដោយផ្ទាល់
+          }
+        } catch (err) {
+          console.error("Extraction Error:", err);
+          extractedText = "\n[បញ្ជាក់៖ មិនអាចបូមអត្ថបទពី File នេះបានទេ]";
+        }
+      }
+
+      const prompt = `You are 'The Architect', a world-class strategic planner and Khmer tech mentor.
+      
+      CONTEXT FROM ATTACHMENT: ${extractedText}
+      USER GOAL: "${goal}"
+      MODE: ${mode}
+
+      TASK: Deeply analyze the provided context and the user's goal to build a high-value, professional roadmap. 
+      If the context is about an IoT project (like the Khmer Smart Farm), provide specific hardware and software integration steps.
+
+      STRICT RULES:
+      1. LANGUAGE: Khmer (Natural, witty, professional, and highly encouraging). Use 2026 Khmer dev slang.
+      2. TECH STACK: If mode is 'project', recommend a modern Tech Stack (e.g., Node.js, Laravel, ESP32, MongoDB, React Native).
+      3. [CRITICAL] MERMAID SYNTAX:
+         - Format: 'graph TD'.
+         - EVERY node label MUST be enclosed in double quotes ("") to prevent syntax errors with special characters.
+         - EXAMPLE: A["សិក្សាគម្រោង (Round 1)"] --> B["រៀបចំ Hardware"].
+         - Do NOT use special characters like (), [], or : outside of double quotes.
+      4. OUTPUT FORMAT: Return ONLY valid JSON.
+      
+      JSON STRUCTURE:
+      {
+        "plan_title": "ចំណងជើងផែនការដ៏មុតស្រួច",
+        "overview": "ការរៀបរាប់យុទ្ធសាស្ត្ររួម (Markdown enabled - clear and professional)",
+        "steps": [
+          {
+            "phase": "ដំណាក់កាលទី...",
+            "tasks": ["Task 1", "Task 2"],
+            "pro_tip": "តិចនិកពិសេសពី Architect សម្រាប់ដំណាក់កាលនេះ"
+          }
+        ],
+        "mermaid_flow": "graph TD syntax here",
+        "estimated_time": "រយៈពេលរំពឹងទុកដើម្បីសម្រេចជោគជ័យ"
+      }`;
+
+      // ៤. ផ្ញើទៅកាន់ Gemini (ជាមួយសមត្ថភាពមើលរូបភាព)
+      let generativeContent = [prompt];
+      if (isImage) {
+        generativeContent.push({
+          inlineData: { data: fileData, mimeType: fileType },
+        });
+      }
+
+      const result = await aiModel.generateContent(generativeContent);
+      const aiData = parseAIJson(result.response.text());
+      if (aiData.mermaid_flow) {
+        // ស្វែងរកអត្ថបទក្នុង [] ហើយថែម "" បើអត់ទាន់មាន
+        aiData.mermaid_flow = aiData.mermaid_flow.replace(
+          /\[([^"\]\n]+)\]/g,
+          '["$1"]',
+        );
+
+        // លុប ```mermaid ចេញក្រែងលោ AI ថែមមកនាំតែឆ្ងល់
+        aiData.mermaid_flow = aiData.mermaid_flow
+          .replace(/```mermaid|```/gi, "")
+          .trim();
+      }
+
+      socket.emit("flow_result", aiData);
+
+      // ៥. រក្សាទុក History ចូល Database
+      await ChatHistory.create({
+        toolName: "ARCHITECT_AI",
+        userInput: `[${mode.toUpperCase()}] ${goal || "ប្លង់ចេញពី File"}`,
+        userImage: isImage ? fileData : null,
+        aiResponse: aiData,
+        userId: user._id,
+      });
+
+      // ៦. បាញ់លទ្ធផលទៅ Frontend
+      socket.emit("flow_result", aiData);
+    } catch (e) {
+      console.error("Architect Error:", e);
+      socket.emit(
+        "error_occured",
+        "Architect វិលមុខនឹង File ហ្នឹងបន្តិចហើយបង៖ " + e.message,
+      );
     }
   });
 

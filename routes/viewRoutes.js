@@ -9,6 +9,7 @@ const authMiddleware = require('../middleware/auth');
 
 router.get("/", authMiddleware,viewController.getIndex);
 router.get("/culture", authMiddleware, viewController.getCulture);
+router.get("/architect", authMiddleware, viewController.getPlanner);
 router.get("/visualizer", authMiddleware, viewController.getVisualizer);
 router.get("/study-buddy", authMiddleware, viewController.getStudyBuddy);
 router.get("/kida", authMiddleware, viewController.getKida);

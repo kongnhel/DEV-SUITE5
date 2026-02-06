@@ -9,6 +9,9 @@ exports.getIndex = (req, res) => {
 exports.getCulture = (req, res) => {
     res.render("culture", { title: "Khmer Culture", pageKey: "culture", theme: "#ffd700" }); // ពណ៌មាស
 };
+exports.getPlanner = (req, res) => {
+    res.render("architect", { title: "Architect AI", pageKey: "architect", theme: "#f97316" }); // ពណ៌ទឹកក្រូច
+};
 
 exports.getVisualizer = (req, res) => {
     res.render("visualizer", { title: "Logic Visualizer", pageKey: "visualizer", theme: "#a855f7" }); // ពណ៌ស្វាយ
@@ -29,6 +32,7 @@ exports.getTutor = (req, res) => {
 exports.getLoveGuru = (req, res) => {
     res.render("love-guru", { title: "Love Guru", pageKey: "love", theme: "#f472b6" }); // ពណ៌ផ្កាឈូក
 };
+
 
 exports.getHistory = async (req, res) => {
     try {

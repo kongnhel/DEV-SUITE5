@@ -1,0 +1,424 @@
+<%- include('partials/header') %>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: false, theme: "dark" });
+</script>
+
+<style>
+  :root {
+    --primary: #10b981;
+    --primary-glow: rgba(16, 185, 129, 0.4);
+    --bg-dark: #070b14;
+    --card-bg: rgba(15, 23, 42, 0.65);
+    --border-color: rgba(16, 185, 129, 0.2);
+  }
+
+  body {
+    font-family: "Kantumruy Pro", sans-serif;
+    background-color: var(--bg-dark);
+    color: #f1f5f9;
+    overflow-x: hidden;
+  }
+
+  /* --- Premium Animations --- */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  .shimmer-text {
+    background: linear-gradient(90deg, #10b981, #6366f1, #10b981);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 4s linear infinite;
+  }
+
+  /* --- Layout & Container --- */
+  .architect-container {
+    max-width: 1100px;
+    width: 95%;
+    margin: 30px auto;
+    position: relative;
+    z-index: 10;
+  }
+
+  .magic-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 24px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @media (min-width: 768px) {
+    .magic-card {
+      padding: 40px;
+    }
+  }
+
+  /* --- Promotion Tags --- */
+  .promo-banner {
+    background: linear-gradient(
+      135deg,
+      rgba(16, 185, 129, 0.05),
+      rgba(99, 102, 241, 0.05)
+    );
+    border: 1px dashed var(--primary);
+    border-radius: 20px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  .feature-tag {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    display: inline-block;
+    margin: 4px;
+  }
+
+  /* --- Input & Buttons --- */
+  .mode-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  .mode-btn {
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 20px;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex: 1;
+    text-align: center;
+    min-width: 120px;
+  }
+  .mode-btn.active {
+    background: var(--primary);
+    color: #070b14;
+    box-shadow: 0 0 20px var(--primary-glow);
+    border-color: var(--primary);
+  }
+
+  .input-custom {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: 20px !important;
+    color: white !important;
+    padding: 1.2rem !important;
+    width: 100%;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.3s;
+  }
+  .input-custom:focus {
+    border-color: var(--primary) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .btn-download {
+    background: #f1f5f9;
+    color: #0f172a;
+    font-weight: 900;
+    padding: 12px 24px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+  .btn-download:hover {
+    background: var(--primary);
+    transform: translateY(-3px);
+  }
+
+  /* --- Mermaid & Results --- */
+  .mermaid-wrapper {
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+    width: 100%;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #filePreview {
+    max-width: 150px;
+    border-radius: 16px;
+    border: 2px solid var(--primary);
+    display: none;
+    margin: 15px auto;
+    filter: drop-shadow(0 0 10px var(--primary-glow));
+  }
+</style>
+
+<canvas id="neural-bg"></canvas>
+
+<main class="architect-container">
+  <header class="text-center mb-10">
+    <div class="flex justify-center flex-wrap gap-2 mb-4">
+      <span class="feature-tag">Smart Vision Extraction 📸</span>
+      <span class="feature-tag">Neural Strategy Logic 🤖</span>
+    </div>
+    <h1
+      class="text-5xl md:text-8xl font-black italic uppercase leading-tight mb-4 shimmer-text"
+    >
+      Architect AI
+    </h1>
+    <p class="text-slate-300 text-lg md:text-2xl font-bold italic mb-3">
+      "បិសាចផែនការ! ឈប់វង្វេងផ្លូវ ឱ្យ AI បង្ហាញផ្លូវបង!"
+    </p>
+    <p class="text-slate-500 text-sm max-w-2xl mx-auto px-4 leading-relaxed">
+      វិភាគ PDF, Word ឬរូបភាពបានភ្លាមៗ។ គ្រាន់តែបោះគំនិតចូល អូននឹងរៀបចំ Roadmap
+      និង Flowchart ឱ្យបងក្នុងរយៈពេលតែប៉ុន្មានវិនាទី! 🚀
+    </p>
+  </header>
+
+  <section class="magic-card mb-10">
+    <div class="mode-group">
+      <button onclick="setMode('project', this)" class="mode-btn active">
+        🚀 Project Planner
+      </button>
+      <button onclick="setMode('study', this)" class="mode-btn">
+        📚 Study Roadmap
+      </button>
+      <button onclick="setMode('solution', this)" class="mode-btn">
+        🛠️ Solution Finder
+      </button>
+    </div>
+
+    <div class="flex flex-col items-center mb-8">
+      <button
+        onclick="document.getElementById('masterFile').click()"
+        class="bg-slate-800 border border-slate-700 text-slate-300 px-8 py-3 rounded-xl hover:bg-slate-700 hover:text-white transition-all flex items-center gap-2"
+      >
+        <span>📎 បោះ File (PDF, Pic, Word) ចូលមកបង!</span>
+      </button>
+      <input
+        type="file"
+        id="masterFile"
+        hidden
+        accept="image/*,.pdf,.docx"
+        onchange="handleFile(this)"
+      />
+      <span
+        id="fileNameDisplay"
+        class="text-xs font-bold text-emerald-400 italic mt-3"
+      ></span>
+      <img id="filePreview" src="" alt="Preview" />
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4">
+      <input
+        type="text"
+        id="goalInput"
+        class="input-custom"
+        placeholder="តើបងចង់ឱ្យអូនរៀបផែនការរឿងអ្វីដែរ? (ឧ. ចង់បង្កើត App លក់អីវ៉ាន់)"
+      />
+      <button
+        onclick="buildPlan()"
+        id="btnAction"
+        class="bg-emerald-500 text-slate-950 font-black px-10 py-4 rounded-2xl hover:scale-105 transition-all uppercase shadow-lg shadow-emerald-500/20"
+      >
+        កសាងផែនការ 🔥
+      </button>
+    </div>
+  </section>
+
+  <div id="loading" class="hidden text-center py-20">
+    <div
+      class="w-16 h-16 border-4 border-emerald-500/10 border-t-emerald-500 rounded-full animate-spin mx-auto mb-6"
+    ></div>
+    <p
+      class="text-emerald-500 font-black animate-pulse uppercase tracking-[0.2em] text-sm"
+    >
+      Architect កំពុងផ្ដោតអារម្មណ៍គូរប្លង់ឱ្យបង...
+    </p>
+  </div>
+
+  <div
+    id="resultArea"
+    class="hidden space-y-10 animate-in slide-in-from-bottom-10 duration-700"
+  >
+    <div class="flex justify-end px-4">
+      <button onclick="downloadPlan()" class="btn-download shadow-xl">
+        Download Roadmap (PDF) 📥
+      </button>
+    </div>
+
+    <div id="pdf-content">
+      <div
+        class="magic-card p-8 md:p-12 border-l-[10px] border-emerald-500 mb-8 mx-2"
+      >
+        <h2
+          id="planTitle"
+          class="text-3xl md:text-5xl font-black text-emerald-400 mb-6 leading-tight"
+        ></h2>
+        <div
+          id="planOverview"
+          class="text-lg md:text-xl text-slate-300 leading-relaxed opacity-90"
+        ></div>
+      </div>
+
+      <div class="magic-card p-6 md:p-10 mb-8 mx-2">
+        <h4
+          class="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-6"
+        >
+          Visual Architecture Flow 📊
+        </h4>
+        <div class="mermaid-wrapper">
+          <div id="mermaidContainer" class="mermaid"></div>
+        </div>
+      </div>
+
+      <div
+        id="stepsContainer"
+        class="grid grid-cols-1 lg:grid-cols-2 gap-6 mx-2"
+      ></div>
+    </div>
+  </div>
+</main>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let currentMode = "project";
+  let globalFileData = null;
+  let globalFileType = null;
+
+  // ១. បូមទិន្នន័យពី File (Logic ដើមរបស់បង ១០០%)
+  function handleFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    document.getElementById("fileNameDisplay").innerText =
+      "Selected: " + file.name;
+    globalFileType = file.type;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (file.type.startsWith("image/")) {
+        document.getElementById("filePreview").src = e.target.result;
+        document.getElementById("filePreview").style.display = "block";
+      } else {
+        document.getElementById("filePreview").style.display = "none";
+      }
+      globalFileData = e.target.result.split(",")[1];
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function setMode(mode, btn) {
+    currentMode = mode;
+    document
+      .querySelectorAll(".mode-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  async function buildPlan() {
+    const goal = document.getElementById("goalInput").value.trim();
+    const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
+    if (!goal && !globalFileData) return alert("ប្រាប់គោលដៅបងមក កុំអៀនអី! 😂");
+    if (!firebaseUid) return alert("ចូលគណនីសិនបងប្រុស!");
+
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("resultArea").classList.add("hidden");
+    document.getElementById("btnAction").disabled = true;
+
+    socket.emit("create_flow", {
+      goal,
+      fileData: globalFileData,
+      fileType: globalFileType,
+      mode: currentMode,
+      firebaseUid,
+    });
+  }
+
+  socket.on("flow_result", async (data) => {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("resultArea").classList.remove("hidden");
+    document.getElementById("btnAction").disabled = false;
+
+    document.getElementById("planTitle").innerText = data.plan_title;
+    document.getElementById("planOverview").innerHTML = data.overview;
+
+    const mermaidDiv = document.getElementById("mermaidContainer");
+    mermaidDiv.removeAttribute("data-processed");
+    mermaidDiv.innerHTML = data.mermaid_flow;
+    await mermaid.run();
+
+    // បង្ហាញជំហាន (Steps) ជា Grid យ៉ាងស្អាត
+    document.getElementById("stepsContainer").innerHTML = data.steps
+      .map(
+        (s, i) => `
+      <div class="magic-card !p-8 border-t-4 border-emerald-500/30 h-full">
+        <div class="flex items-center gap-4 mb-6">
+          <span class="w-12 h-12 bg-emerald-500 text-slate-950 flex items-center justify-center rounded-full font-black text-xl">#${i + 1}</span>
+          <h3 class="text-emerald-400 font-black text-2xl">${s.phase}</h3>
+        </div>
+        <ul class="space-y-4 mb-8">
+          ${s.tasks.map((t) => `<li class="flex gap-3 text-slate-300 italic"><span class="text-emerald-500">✅</span> ${t}</li>`).join("")}
+        </ul>
+        <div class="p-4 bg-emerald-500/5 rounded-2xl border border-emerald-400/10 text-sm text-emerald-300">
+          <strong>💡 Architect Tip:</strong> ${s.pro_tip}
+        </div>
+      </div>
+    `,
+      )
+      .join("");
+
+    document
+      .getElementById("resultArea")
+      .scrollIntoView({ behavior: "smooth" });
+    globalFileData = null;
+    globalFileType = null;
+    document.getElementById("fileNameDisplay").innerText = "";
+    document.getElementById("filePreview").style.display = "none";
+  });
+
+  function downloadPlan() {
+    const element = document.getElementById("pdf-content");
+    const title = document.getElementById("planTitle").innerText || "Roadmap";
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: `Architect_Plan_${title.replace(/\s+/g, "_")}.pdf`,
+      image: { type: "jpeg", quality: 1.0 },
+      html2canvas: {
+        scale: 3,
+        useCORS: true,
+        letterRendering: true,
+        backgroundColor: "#070b14",
+      },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    };
+    html2pdf().set(opt).from(element).save();
+  }
+
+  socket.on("error_occured", (msg) => {
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("btnAction").disabled = false;
+    alert(msg);
+  });
+</script>
+
+<%- include('partials/footer') %>

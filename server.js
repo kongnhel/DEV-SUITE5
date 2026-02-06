@@ -45,7 +45,7 @@ const server = http.createServer(app);
 // កែសម្រួលកូដរបស់បងមកបែបនេះ៖
 const io = new Server(server, {
   cors: { origin: "*" },
-  maxHttpBufferSize: 1e7, // កំណត់ត្រឹម ១០ MB (10,000,000 bytes)
+maxHttpBufferSize: 1e8,
 });
 
 // --- ២. Middleware កំពូលសុវត្ថិភាព ---
