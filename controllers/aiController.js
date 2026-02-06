@@ -118,12 +118,12 @@ module.exports = (socket) => {
       const result = await aiModel.generateContent(prompt);
       const aiData = parseAIJson(result.response.text());
 
-if (user) {
+      if (user) {
         // --- យុទ្ធសាស្ត្ររក្សាទុក៖ រួមបញ្ចូលទាំង Roast, Review និង Fixed Code ---
-        const historyResponse = { 
-          ...aiData, 
+        const historyResponse = {
+          ...aiData,
           // រៀបចំ Markdown សម្រាប់ឱ្យទំព័រ History បង្ហាញបានគ្រប់ជ្រុងជ្រោយ
-          response: `### 🎭 Roast\n${aiData.humorous_response}\n\n### 🛠️ Technical Review\n${aiData.technical_review}\n\n### ✅ កូដដែលបានកែរួច (Fixed Code)\n\`\`\`javascript\n${aiData.fixed_code}\n\`\`\``
+          response: `### 🎭 Roast\n${aiData.humorous_response}\n\n### 🛠️ Technical Review\n${aiData.technical_review}\n\n### ✅ កូដដែលបានកែរួច (Fixed Code)\n\`\`\`javascript\n${aiData.fixed_code}\n\`\`\``,
         };
 
         await ChatHistory.create({
@@ -314,17 +314,31 @@ if (user) {
     }
   });
 
-  // controller.js - AI TUTOR
+  // --- AI TUTOR (Update: Auto-Translate Logic) ---
   socket.on("ask_tutor", async (data) => {
     const { topic, image, mode, firebaseUid } = data;
+    const khmerRegex = /[\u1780-\u17FF]/;
+
     try {
       const user = await findUserByUid(firebaseUid);
       if (!user) return socket.emit("error_occured", "សូម Login សិនបង!");
 
-      // ១. បង្កើត Session Memory (រលាយបាត់ពេល Refresh)
+      let finalTopic = topic;
+
+      // ១. ប្រព័ន្ធបកប្រែស្វ័យប្រវត្តិ (Auto-Translate)
+      // បើ Topic ជាភាសាបរទេស (អត់មានអក្សរខ្មែរ) យើងឱ្យ Gemini បកប្រែវាជាខ្មែរសិន
+      if (topic && !khmerRegex.test(topic)) {
+        const translatePrompt = `Translate this phrase to Khmer language directly and only return the translated text: "${topic}"`;
+        const translationResult =
+          await aiModel.generateContent(translatePrompt);
+        finalTopic = translationResult.response.text().trim();
+
+        console.log(`🔄 Translated "${topic}" to "${finalTopic}"`);
+      }
+
+      // ២. រៀបចំ Prompt សម្រាប់គ្រូពន្យល់ (ប្រើ Topic ដែលបកប្រែរួច)
       socket.tutorHistory = socket.tutorHistory || [];
       const context = socket.tutorHistory.slice(-4).join("\n");
-
       const style =
         mode === "kid"
           ? "ពន្យល់ដូចក្មេងអាយុ ៥ ឆ្នាំ"
@@ -332,20 +346,18 @@ if (user) {
 
       const prompt = `You are an expert Khmer Teacher.
                 [SESSION CONTEXT]: ${context}
-                
-                TASK: Explain the topic clearly and provide specific examples.
+                TASK: Explain the topic clearly in Khmer.
                 STRICT RULES:
                 1. Answer EVERYTHING in Khmer.
-                2. If an image is provided (like an exercise or textbook page), analyze and explain it.
-                3. Return ONLY valid JSON:
+                2. Return ONLY valid JSON:
                 {
                   "title": "ចំណងជើងមេរៀន",
-                  "explanation": "ការបកស្រាយលម្អិត (Markdown enabled)",
+                  "explanation": "ការបកស្រាយលម្អិត (Markdown)",
                   "key_points": [{"label": "...", "desc": "..."}],
                   "examples": ["...", "..."],
                   "fun_fact": "..."
                 }
-                Topic: "${topic}" | Style: ${style}`;
+                Topic: "${finalTopic}" | Style: ${style}`;
 
       let generativeContent = [prompt];
       if (image) {
@@ -357,14 +369,13 @@ if (user) {
       const result = await aiModel.generateContent(generativeContent);
       const aiData = parseAIJson(result.response.text());
 
-      // ២. បញ្ចូលទៅក្នុង Session Memory ដើម្បីឱ្យគ្រូដឹងថាទើបពន្យល់រឿងអី
-      socket.tutorHistory.push(
-        `User asks: ${topic}\nAI explains: ${aiData.title}`,
-      );
+      // ៣. រក្សាទុក History និងបាញ់លទ្ធផល
+      socket.tutorHistory.push(`User: ${finalTopic}\nAI: ${aiData.title}`);
 
       await ChatHistory.create({
         toolName: "AI_TUTOR",
-        userInput: topic || "Analyzed an image",
+        userInput:
+          topic + (finalTopic !== topic ? ` (Translated: ${finalTopic})` : ""),
         aiResponse: aiData,
         userId: user._id,
       });
@@ -373,7 +384,7 @@ if (user) {
     } catch (e) {
       socket.emit(
         "error_occured",
-        "គ្រូ AI គាំងខួរក្បាលបន្តិចហើយ៖ " + e.message,
+        "គ្រូ AI វិលមុខនឹងការបកប្រែបន្តិចហើយបង៖ " + e.message,
       );
     }
   });
