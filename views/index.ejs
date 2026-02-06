@@ -1,17 +1,24 @@
 <%- include('partials/header') %>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link
+  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+  rel="stylesheet"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
 
 <style>
   :root {
     --primary: <%= theme || "#22d3ee" %>;
     --secondary: #6366f1;
-    --bg-dark: #0f172a;
-    --card-bg: rgba(30, 41, 59, 0.7);
+    --bg-dark: #070b14;
+    --card-bg: rgba(15, 23, 42, 0.7);
     --border-light: rgba(255, 255, 255, 0.1);
     /* Mood Variables */
     --mood-color: var(--primary);
-    --mood-glow: rgba(34, 211, 238, 0.1);
+    --mood-glow: rgba(34, 211, 238, 0.2);
+    --aura-opacity: 0.15;
   }
 
   body {
@@ -19,139 +26,220 @@
     color: #e2e8f0;
     font-family: "Kantumruy Pro", sans-serif;
     margin: 0;
-    line-height: 1.6;
-    transition: background-color 1s ease; /* បន្ថែម Transition សម្រាប់ដូរពណ៌ផ្ទៃក្រោយ */
+    transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-x: hidden;
   }
 
-  /* ១. Background បែបស្ងប់ស្ងាត់ មិនឱ្យរំខានភ្នែក */
+  /* --- ១. FX & Layering --- */
+  #fx-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+  }
   #neural-bg {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     z-index: -20;
-    opacity: 0.1;
+    opacity: 0.15;
     pointer-events: none;
   }
 
-  .hero-glow {
+  .mood-aura {
     background: radial-gradient(
-      circle at 50% 50%,
+      circle at center,
       var(--mood-glow) 0%,
-      transparent 70%
+      transparent 80%
     );
     position: fixed;
     inset: 0;
-    z-index: -10;
+    z-index: -15;
     pointer-events: none;
-    transition: all 1s ease;
+    transition: all 1.5s ease;
+    opacity: var(--aura-opacity);
   }
 
-  /* Mood States - បន្ថែមថ្មី */
+  /* --- ២. Mood States (COLOR PERMANENCE) --- */
+  /* Angry: ភ្លើងឆេះ និងអក្សរក្រហម */
   .mood-angry {
     --mood-color: #f43f5e;
-    --mood-glow: rgba(244, 63, 94, 0.2);
+    --mood-glow: rgba(244, 63, 94, 0.6);
+    --bg-dark: #1a0505;
+    --aura-opacity: 0.45;
   }
-  .mood-impressed {
-    --mood-color: #fbbf24;
-    --mood-glow: rgba(251, 191, 36, 0.2);
+  .mood-angry #aiJoke {
+    color: #f43f5e !important;
+    text-shadow: 0 0 15px rgba(244, 63, 94, 0.5);
+    font-weight: 900;
   }
-  .mood-confused {
-    --mood-color: #a855f7;
-    --mood-glow: rgba(168, 85, 247, 0.2);
-  }
-
-  /* ២. Card Design៖ បែបសាមញ្ញ ថ្លៃថ្នូរ មិនឆើតឆាយ */
-  .magic-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-radius: 24px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
-    transition: all 0.3s ease;
-  }
-
-  .magic-card:hover {
-    border-color: var(--mood-color); /* កែពី primary មក mood-color */
-  }
-
-  /* ៣. Inputs & Code Editor */
-  .input-group label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #94a3b8;
-    margin-bottom: 8px;
-    margin-left: 4px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .input-custom {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border: 1px solid var(--border-light) !important;
-    border-radius: 16px !important;
-    color: white !important;
-    padding: 1rem 1.25rem !important;
-    width: 100%;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-
-  .code-area {
-    font-family: "Fira Code", "Courier New", monospace;
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--primary) !important;
-    resize: none;
-  }
-
-  .input-custom:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1) !important;
-  }
-
-  /* ៤. Button Style */
-  .btn-evolution {
-    background: linear-gradient(
-      135deg,
-      var(--mood-color),
-      var(--secondary)
-    ); /* កែពី primary មក mood-color */
-    color: #0f172a;
-    font-weight: 800;
-    padding: 1.1rem;
-    border-radius: 18px;
-    width: 100%;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 10px 15px -3px rgba(34, 211, 238, 0.3);
-  }
-
-  .btn-evolution:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 25px -5px rgba(34, 211, 238, 0.4);
-    filter: brightness(1.1);
-  }
-
-  /* ៥. Output & Result Area */
-  .shimmer-text {
-    background: linear-gradient(
-      90deg,
-      #fff,
-      var(--mood-color),
-      #fff
-    ); /* កែពី primary មក mood-color */
+  .mood-angry .shimmer-text {
+    background: linear-gradient(90deg, #fff, #f43f5e, #fff);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 8s linear infinite;
+  }
+
+  /* Impressed: ផ្កាភ្លើងមាស និងអក្សរលឿង */
+  .mood-impressed {
+    --mood-color: #fbbf24;
+    --mood-glow: rgba(251, 191, 36, 0.45);
+    --bg-dark: #0f1105;
+    --aura-opacity: 0.35;
+  }
+  .mood-impressed #aiJoke {
+    color: #fbbf24 !important;
+    text-shadow: 0 0 15px rgba(251, 191, 36, 0.5);
+  }
+
+  /* Confused: សញ្ញាសួរ និងអក្សរស្វាយ */
+  .mood-confused {
+    --mood-color: #a855f7;
+    --mood-glow: rgba(168, 85, 247, 0.45);
+    --bg-dark: #0a0514;
+    --aura-opacity: 0.35;
+  }
+  .mood-confused #aiJoke {
+    color: #a855f7 !important;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+  }
+
+  /* --- ៣. Particle Animations --- */
+  /* Fire */
+  .fire-p {
+    position: absolute;
+    bottom: -50px;
+    background: linear-gradient(to top, #f43f5e, #fbbf24);
+    border-radius: 50%;
+    filter: blur(10px);
+    animation: fire-rise 1.5s infinite ease-out;
+  }
+  @keyframes fire-rise {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0.8;
+    }
+    100% {
+      transform: translateY(-105vh) scale(3);
+      opacity: 0;
+    }
+  }
+
+  /* Sparkle */
+  .sparkle-p {
+    position: absolute;
+    background: #fbbf24;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #fbbf24;
+    animation: twinkle 1s infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      transform: scale(0);
+      opacity: 0;
+    }
+    50% {
+      transform: scale(1.3);
+      opacity: 1;
+    }
+  }
+
+  /* Question Mark */
+  .q-mark {
+    position: absolute;
+    color: #a855f7;
+    font-weight: 900;
+    animation: q-float 4s infinite linear;
+    opacity: 0.5;
+    font-family: serif;
+  }
+  @keyframes q-float {
+    0% {
+      transform: translateY(110vh) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-15vh) rotate(360deg);
+    }
+  }
+
+  /* Screen Shake */
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    25% {
+      transform: translate(-5px, 2px);
+    }
+    50% {
+      transform: translate(5px, -2px);
+    }
+    75% {
+      transform: translate(-2px, -4px);
+    }
+  }
+  .shake-effect {
+    animation: shake 0.3s infinite;
+  }
+
+  /* --- ៤. UI Components --- */
+  .magic-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(25px);
+    border-radius: 35px;
+    border: 1px solid var(--border-light);
+    transition: 0.4s ease;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+  .magic-card:hover {
+    border-color: var(--mood-color);
+    box-shadow: 0 0 30px var(--mood-glow);
+  }
+
+  .input-custom {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: 22px !important;
+    color: white !important;
+    padding: 1.2rem !important;
+    outline: none;
+    transition: 0.3s;
+    width: 100%;
+  }
+  .input-custom:focus {
+    border-color: var(--mood-color) !important;
+    box-shadow: 0 0 0 4px var(--mood-glow) !important;
+  }
+  .code-area {
+    font-family: "Fira Code", monospace;
+    color: var(--mood-color) !important;
+  }
+
+  .btn-evolution {
+    background: linear-gradient(135deg, var(--mood-color), var(--secondary));
+    color: #070b14;
+    font-weight: 950;
+    padding: 1.3rem;
+    border-radius: 22px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    transition: 0.4s;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    box-shadow: 0 15px 35px -10px var(--mood-glow);
+  }
+  .btn-evolution:hover:not(:disabled) {
+    transform: scale(1.03);
+    filter: brightness(1.2);
+  }
+
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--mood-color), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
   }
   @keyframes shine {
     to {
@@ -159,104 +247,80 @@
     }
   }
 
-  .prose-reviewer {
-    line-height: 1.8;
-    color: #cbd5e1;
-    font-size: 1.05rem;
-  }
-  .prose-reviewer strong {
-    color: var(--primary);
-  }
-
-  .code-output-container {
-    background: #010409;
-    border-radius: 16px;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-  }
-
-  /* បន្ថែមក្នុង <style> */
   .ai-speaking {
-    border: 2px solid var(--mood-color) !important;
-    box-shadow: 0 0 20px var(--mood-glow);
-    animation: pulse-border 2s infinite;
+    border: 4px solid var(--mood-color) !important;
+    animation: pulse-border 1.5s infinite;
   }
-
   @keyframes pulse-border {
-    0% {
-      transform: scale(1);
+    0%,
+    100% {
+      box-shadow: 0 0 20px var(--mood-glow);
     }
     50% {
-      transform: scale(1.01);
-    }
-    100% {
-      transform: scale(1);
+      box-shadow: 0 0 50px var(--mood-glow);
     }
   }
 </style>
 
+<div id="fx-layer"></div>
+<div class="mood-aura"></div>
 <canvas id="neural-bg"></canvas>
-<div id="hero-glow-layer" class="hero-glow fixed inset-0 -z-10"></div>
 
 <main class="max-w-7xl mx-auto px-6 py-12 relative">
-  <header class="text-center mb-16 animate-in fade-in duration-700">
+  <header class="text-center mb-16 animate-in fade-in duration-1000">
     <div
-      class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 mb-6"
+      class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 mb-8"
     >
       <span
         id="mood-dot"
-        class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"
+        class="w-3 h-3 rounded-full bg-cyan-400 animate-ping"
       ></span>
-      <span
-        class="text-cyan-400 text-[10px] font-bold uppercase tracking-widest"
-        >Evolution System V2.6</span
+      <span class="text-white text-[11px] font-black uppercase tracking-[0.3em]"
+        >Neural Evolution V2.6 Online</span
       >
     </div>
-
     <h2
-      class="text-5xl md:text-8xl font-black shimmer-text mb-8 uppercase italic leading-none"
+      class="text-7xl md:text-9xl font-black shimmer-text mb-10 uppercase italic tracking-tighter leading-none"
     >
       EVOLUTION
     </h2>
-
-    <div class="max-w-3xl mx-auto space-y-6">
-      <p class="text-xl md:text-3xl font-light text-slate-200 leading-snug">
-        "កុំឱ្យកូដបែកថ្នាំ បំផ្លាញក្តីស្រមៃប្អូន! ឱ្យបង AI ជួយ
-        <span class="text-cyan-400 font-bold">កែលម្អកូដ</span>
-        ឱ្យកាន់តែអស្ចារ្យ!"
-      </p>
-      <p class="text-slate-400 text-base md:text-lg italic leading-relaxed">
-        បងធុញនឹង Error មែនទេ?
-        <strong class="text-cyan-400">Evolution</strong> នឹងប្រើប្រាស់ Neural
-        Engine ដើម្បីវិភាគកូដបងយ៉ាងស៊ីជម្រៅ។
-      </p>
-    </div>
+    <p
+      class="text-xl md:text-3xl font-light text-slate-300 italic max-w-4xl mx-auto leading-relaxed"
+    >
+      "កុំឱ្យកូដបែកថ្នាំ បំផ្លាញក្តីស្រមៃប្អូន! ឱ្យបង AI ជួយ
+      <span class="text-secondary font-bold">កែលម្អកូដ</span> ឱ្យកាន់តែ High
+      Value!"
+    </p>
   </header>
 
-  <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-    <section class="xl:col-span-6 space-y-6">
-      <div class="magic-card p-8 md:p-10 shadow-xl">
+  <div class="grid grid-cols-1 xl:grid-cols-12 gap-10 items-start">
+    <section class="xl:col-span-6 space-y-8">
+      <div class="magic-card p-10 shadow-2xl">
         <div class="space-y-8">
           <div class="input-group">
-            <label>អារម្មណ៍ចំពោះកូដនេះ (Optional)</label>
+            <label
+              class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-3 block"
+              >អារម្មណ៍របស់បង</label
+            >
             <textarea
               id="userComment"
-              class="input-custom h-24 resize-none"
+              class="input-custom h-28 resize-none"
               placeholder="តើបងមានអារម្មណ៍យ៉ាងណាជាមួយកូដនេះ?"
             ></textarea>
           </div>
-
           <div class="input-group">
-            <label>បញ្ចូលកូដដែលចង់ឱ្យអូន Review</label>
+            <label
+              class="text-[11px] font-black text-slate-500 uppercase tracking-widest ml-1 mb-3 block"
+              >បិទភ្ជាប់កូដ (Code Input)</label
+            >
             <textarea
               id="code"
-              class="input-custom code-area h-96 md:h-[500px] no-scrollbar shadow-inner"
-              placeholder="// បិទភ្ជាប់កូដដែលញ៉េរញ៉ៃរបស់បងនៅទីនេះ..."
+              class="input-custom code-area h-[550px] no-scrollbar"
+              placeholder="// បោះកូដដែលបងចង់ឱ្យអូនជេរនៅទីនេះ..."
             ></textarea>
           </div>
-
           <button onclick="sendCode()" id="btnSend" class="btn-evolution">
-            ចាប់ផ្ដើមពិនិត្យកូដ
+            វិវត្តន៍កូដឥឡូវនេះ 🔥
           </button>
         </div>
       </div>
@@ -265,13 +329,13 @@
     <section class="xl:col-span-6">
       <div
         id="loading"
-        class="hidden magic-card p-32 flex flex-col items-center justify-center"
+        class="hidden magic-card p-48 flex flex-col items-center justify-center"
       >
         <div
-          class="w-12 h-12 border-4 border-white/5 border-t-cyan-500 rounded-full animate-spin mb-6"
+          class="w-16 h-16 border-4 border-white/5 border-t-secondary rounded-full animate-spin mb-8"
         ></div>
         <p
-          class="text-cyan-500 text-xs font-bold uppercase tracking-[0.3em] animate-pulse"
+          class="text-secondary font-black animate-pulse uppercase tracking-[0.4em] text-xs"
         >
           កំពុងវិភាគ Logic នៃកូដ...
         </p>
@@ -279,55 +343,60 @@
 
       <div
         id="aiSection"
-        class="hidden space-y-6 animate-in slide-in-from-bottom-6 duration-700"
+        class="hidden space-y-8 animate-in slide-in-from-bottom-12 duration-700"
       >
         <div
           id="aiMoodCard"
-          class="magic-card p-8 md:p-10 border-l-[10px] border-cyan-500 bg-cyan-500/5"
+          class="magic-card p-10 border-l-[15px] transition-all"
         >
           <div
             id="aiMood"
-            class="text-[10px] font-bold text-cyan-400/60 uppercase tracking-widest mb-4"
+            class="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] mb-6"
           ></div>
           <div
             id="aiJoke"
-            class="text-lg md:text-2xl font-light text-white italic leading-relaxed"
+            class="text-2xl md:text-4xl font-light italic leading-snug mb-8"
           ></div>
           <button
             onclick="speakResponse()"
-            class="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-cyan-400 hover:text-white transition-all"
+            class="flex items-center gap-3 text-xs font-black uppercase text-secondary hover:text-white transition-all bg-white/5 px-8 py-3 rounded-2xl border border-white/5"
           >
-            <span>🔊 ស្តាប់សំឡេង AI</span>
+            <span>🔊 ស្ដាប់សំឡេង AI</span>
           </button>
         </div>
 
-        <div class="magic-card p-8 md:p-10">
+        <div class="magic-card p-10">
           <h4
-            class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-6 flex items-center gap-3"
+            class="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-8 flex items-center gap-4"
           >
-            <span class="w-8 h-px bg-slate-700"></span> លទ្ធផលនៃការវិភាគ
+            <span class="w-12 h-px bg-slate-800"></span> Technical Review
           </h4>
-          <div id="aiReview" class="prose-reviewer"></div>
+          <div
+            id="aiReview"
+            class="prose prose-invert max-w-none text-slate-300 leading-loose prose-strong:text-secondary"
+          ></div>
         </div>
 
-        <div class="code-output-container">
+        <div
+          class="rounded-[2.5rem] overflow-hidden border border-white/10 bg-[#010409]"
+        >
           <div
-            class="px-6 py-4 bg-white/5 border-b border-white/5 flex justify-between items-center"
+            class="px-10 py-6 bg-white/5 border-b border-white/5 flex justify-between items-center"
           >
             <span
-              class="text-[10px] font-bold text-slate-500 uppercase italic tracking-wider"
+              class="text-[10px] font-black text-slate-500 uppercase italic tracking-[0.2em]"
               >Evolution_Fixed_Source.js</span
             >
             <button
               onclick="copyCode()"
-              class="text-[10px] font-bold text-cyan-400 hover:text-white transition-all uppercase tracking-widest border border-cyan-500/20 px-4 py-1.5 rounded-lg"
+              class="text-[10px] font-black text-secondary hover:text-white transition-all border border-secondary/20 px-6 py-2.5 rounded-xl"
             >
-              ចម្លងកូដ
+              COPY CODE
             </button>
           </div>
           <pre
-            class="p-6 md:p-8 overflow-x-auto"
-          ><code id="fixedCode" class="language-javascript text-sm md:text-base"></code></pre>
+            class="p-10 overflow-x-auto"
+          ><code id="fixedCode" class="language-javascript text-base"></code></pre>
         </div>
       </div>
     </section>
@@ -336,135 +405,65 @@
 
 <%- include('partials/footer') %>
 
-<link
-  href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
-  rel="stylesheet"
-/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-
 <script>
   const socket = io();
-  const btnSend = document.getElementById("btnSend");
-  const loading = document.getElementById("loading");
-  const aiSection = document.getElementById("aiSection");
-  let lastAIJoke = ""; // រក្សាទុកសម្រាប់អានសំឡេង
+  const fxLayer = document.getElementById("fx-layer");
+  let lastAIJoke = "";
 
-  // ១. Background Animation
-  const canvas = document.getElementById("neural-bg");
-  const ctx = canvas.getContext("2d");
-  let dots = [];
-  let mouse = { x: null, y: null };
-  window.addEventListener("mousemove", (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
+  // ១. Advanced Visual FX Logic (Fire, Sparkles, Q-Marks)
+  function triggerMoodFX(sentiment) {
+    const s = sentiment.toLowerCase();
+    const body = document.body;
+    fxLayer.innerHTML = ""; // Clear old particles
+    body.classList.remove(
+      "mood-angry",
+      "mood-impressed",
+      "mood-confused",
+      "shake-effect",
+    );
 
-  function init() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    dots = [];
-    const count = window.innerWidth < 768 ? 30 : 60;
-    for (let i = 0; i < count; i++) {
-      dots.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: (Math.random() - 0.5) * 0.2,
-        size: Math.random() * 1.5,
-      });
+    if (s.includes("angry") || s.includes("roasted")) {
+      body.classList.add("mood-angry", "shake-effect");
+      createParticles("fire-p", 50); // បាញ់ភ្លើង ៥០ គ្រាប់
+      setTimeout(() => body.classList.remove("shake-effect"), 2500);
+    } else if (
+      s.includes("impressed") ||
+      s.includes("good") ||
+      s.includes("jealous")
+    ) {
+      body.classList.add("mood-impressed");
+      createParticles("sparkle-p", 70); // ផ្កាភ្លើង ៧០ គ្រាប់
+    } else if (s.includes("confused") || s.includes("error")) {
+      body.classList.add("mood-confused");
+      createParticles("q-mark", 20); // សញ្ញាសួរ ២០ គ្រាប់
     }
   }
 
-  function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "<%= theme || '#00f2ff' %>";
-    ctx.strokeStyle = "rgba(34, 211, 238, 0.03)";
-    dots.forEach((d) => {
-      d.x += d.vx;
-      d.y += d.vy;
-      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
-      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
-      let dist = Math.hypot(mouse.x - d.x, mouse.y - d.y);
-      if (dist < 150) {
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(mouse.x, mouse.y);
-        ctx.stroke();
+  function createParticles(type, count) {
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement("div");
+      p.className = type;
+      p.style.left = Math.random() * 100 + "vw";
+      p.style.animationDelay = Math.random() * 2 + "s";
+
+      if (type === "fire-p") {
+        const size = Math.random() * 45 + 20;
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+      } else if (type === "sparkle-p") {
+        const size = Math.random() * 6 + 2;
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+        p.style.top = Math.random() * 100 + "vh";
+      } else if (type === "q-mark") {
+        p.innerText = "?";
+        p.style.fontSize = Math.random() * 25 + 20 + "px";
       }
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    requestAnimationFrame(draw);
-  }
-  init();
-  draw();
-  window.addEventListener("resize", init);
-
-  // មុខងារ Mood Indicator - បន្ថែមថ្មី
-  function applyMood(sentiment) {
-    const s = sentiment.toLowerCase();
-    const body = document.body;
-    const moodCard = document.getElementById("aiMoodCard");
-
-    // Reset classes
-    body.classList.remove("mood-angry", "mood-impressed", "mood-confused");
-    moodCard.classList.remove("ai-speaking");
-
-    if (s.includes("angry") || s.includes("roasted"))
-      body.classList.add("mood-angry");
-    else if (s.includes("impressed") || s.includes("good"))
-      body.classList.add("mood-impressed");
-    else if (s.includes("confused")) body.classList.add("mood-confused");
-
-    setTimeout(() => moodCard.classList.add("ai-speaking"), 100);
+      fxLayer.appendChild(p);
+    }
   }
 
-  // មុខងារ Voice - បន្ថែមថ្មី
-  // function speakResponse() {
-  //   if ("speechSynthesis" in window && lastAIJoke) {
-  //     const msg = new SpeechSynthesisUtterance(lastAIJoke);
-  //     msg.lang = "km-KH"; // ភាសាខ្មែរ
-  //     window.speechSynthesis.speak(msg);
-  //   }
-  // }
-
-  let audioData = null;
-  // មុខងារនិយាយខ្មែរដោយប្រើ Google Translate TTS (Free & Work 100%)
-  function speakResponse() {
-    if (!lastAIJoke) return;
-
-    // ១. បង្កើត URL សម្រាប់ហៅសំឡេងខ្មែរពី Google
-    // យើងប្រើ encodeURIComponent ដើម្បីការពារបញ្ហាអក្សរខ្មែរក្នុង URL
-    const text = encodeURIComponent(lastAIJoke);
-    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${text}&tl=km&client=tw-ob`;
-
-    // ២. បង្កើត Audio Object រួចឱ្យវា Play
-    const audio = new Audio(ttsUrl);
-
-    // បន្ថែម Visual Effect ពេលកំពុងនិយាយ (ប្តូរពណ៌ Card ឱ្យរំញ័រ)
-    const moodCard = document.getElementById("aiMoodCard");
-    moodCard.classList.add("ai-speaking");
-
-    audio
-      .play()
-      .then(() => {
-        console.log("AI កំពុងនិយាយភាសាខ្មែរ...");
-      })
-      .catch((e) => {
-        console.error("ការ Play សំឡេងមានបញ្ហា៖ ", e);
-        // បើ Google ប្លុក (ករណីចុចញាប់ពេក) យើងប្រើ Backup ធម្មតា
-        const msg = new SpeechSynthesisUtterance(lastAIJoke);
-        msg.lang = "km-KH";
-        window.speechSynthesis.speak(msg);
-      });
-
-    // ឈប់រំញ័រពេលនិយាយចប់ (ប្រហែល ៣-៥ វិនាទីតាមប្រវែងអក្សរ)
-    audio.onended = () => {
-      moodCard.classList.remove("ai-speaking");
-    };
-  }
-  // ២. AI Review Interaction
+  // ២. Socket Interaction
   function sendCode() {
     const code = document.getElementById("code").value.trim();
     const userComment = document.getElementById("userComment").value;
@@ -474,29 +473,24 @@
       return Swal.fire({
         text: "បោះកូដចូលមកអាបង! 😂",
         icon: "info",
-        confirmButtonColor: "#22d3ee",
-      });
-    if (!firebaseUid)
-      return Swal.fire({
-        text: "សូមចូលគណនីសិនបង!",
-        icon: "warning",
-        confirmButtonColor: "#22d3ee",
+        background: "#0f172a",
+        color: "#fff",
       });
 
-    loading.classList.remove("hidden");
-    aiSection.classList.add("hidden");
-    btnSend.disabled = true;
+    document.getElementById("loading").classList.remove("hidden");
+    document.getElementById("aiSection").classList.add("hidden");
+    document.getElementById("btnSend").disabled = true;
 
     socket.emit("review_code", { code, userComment, firebaseUid });
   }
 
   socket.on("review_result", (res) => {
-    loading.classList.add("hidden");
-    aiSection.classList.remove("hidden");
-    btnSend.disabled = false;
+    document.getElementById("loading").classList.add("hidden");
+    document.getElementById("aiSection").classList.remove("hidden");
+    document.getElementById("btnSend").disabled = false;
 
-    lastAIJoke = res.humorous_response; // រក្សាទុកសម្រាប់និយាយ
-    applyMood(res.sentiment); // អនុវត្តពណ៌តាមអារម្មណ៍
+    lastAIJoke = res.humorous_response;
+    triggerMoodFX(res.sentiment); // TRIGGER FX!
 
     document.getElementById("aiMood").innerText =
       "Neural_Mood: " + res.sentiment;
@@ -509,17 +503,24 @@
     );
 
     const codeContainer = document.getElementById("fixedCode");
-    codeContainer.textContent =
-      res.fixed_code || "// លទ្ធផលកូដនឹងបង្ហាញនៅទីនេះ។";
+    codeContainer.textContent = res.fixed_code || "// Perfect Logic!";
     Prism.highlightElement(codeContainer);
-    aiSection.scrollIntoView({ behavior: "smooth" });
 
-    if (res.audioBase64) {
-      audioData = res.audioBase64;
-      // ចង់ឱ្យវាអានភ្លាមៗពេល Result ចេញក៏បាន
-      speakResponse();
-    }
+    if (res.sentiment.toLowerCase().includes("angry")) speakResponse();
   });
+
+  // ៣. Speech & Typing Helpers
+  function speakResponse() {
+    if (!lastAIJoke) return;
+    const text = encodeURIComponent(lastAIJoke);
+    const audio = new Audio(
+      `https://translate.google.com/translate_tts?ie=UTF-8&q=${text}&tl=km&client=tw-ob`,
+    );
+    const moodCard = document.getElementById("aiMoodCard");
+    moodCard.classList.add("ai-speaking");
+    audio.play();
+    audio.onended = () => moodCard.classList.remove("ai-speaking");
+  }
 
   function typeWriter(id, text) {
     let i = 0;
@@ -529,7 +530,7 @@
       if (i < text.length) {
         el.innerHTML += text.charAt(i);
         i++;
-        setTimeout(type, 15);
+        setTimeout(type, 18);
       }
     }
     type();
@@ -539,7 +540,7 @@
     const code = document.getElementById("fixedCode").textContent;
     navigator.clipboard.writeText(code);
     Swal.fire({
-      text: "ចម្លងកូដបានជោគជ័យ!(ចេះតែ Ctrl+C និង Ctrl + V ហា) 😂",
+      text: "ចម្លងរួចរាល់! យកទៅប្រើឱ្យ High Value ណា!",
       icon: "success",
       toast: true,
       position: "top-end",
@@ -547,4 +548,43 @@
       timer: 2000,
     });
   }
+
+  // Neural Background Logic
+  const canvas = document.getElementById("neural-bg");
+  const ctx = canvas.getContext("2d");
+  let dots = [];
+  function init() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    dots = [];
+    for (let i = 0; i < 45; i++) {
+      dots.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        size: Math.random() * 2,
+      });
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const moodColor = getComputedStyle(document.documentElement)
+      .getPropertyValue("--mood-color")
+      .trim();
+    ctx.fillStyle = moodColor;
+    dots.forEach((d) => {
+      d.x += d.vx;
+      d.y += d.vy;
+      if (d.x < 0 || d.x > canvas.width) d.vx *= -1;
+      if (d.y < 0 || d.y > canvas.height) d.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  init();
+  draw();
+  window.addEventListener("resize", init);
 </script>
