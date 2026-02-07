@@ -222,6 +222,7 @@ module.exports = (socket) => {
   // controller.js - STUDY_ASSISTANT update
   socket.on("study_assist", async (data) => {
     const { content, image, firebaseUid } = data; // ថែម image (base64)
+
     try {
       const user = await findUserByUid(firebaseUid);
 
@@ -273,6 +274,7 @@ module.exports = (socket) => {
           userInput: content || "Sent an image lesson",
           aiResponse: aiData,
           userId: user._id,
+          userImage: user.image || null,
         });
       }
       socket.emit("study_result", aiData);
@@ -406,7 +408,7 @@ module.exports = (socket) => {
 
       // ២. បណ្ណាល័យបទចម្រៀង
       const songLibrary = `
-    - បទស្រឡាញ់គេម្នាក់ឯង (Sweet/Crush): "sl_ke_mneak_eng.mp3", "ពេលវេលាមិនសំ.mp3"
+    - បទស្រឡាញ់គេម្នាក់ឯង (Sweet/Crush): "sl_ke_mneak_eng.mp3",
     - បទគេសុំបែក (Sad/Breakup): "កុំចោលបង.mp3"
     - បទឌឺដង/កាច (Rage/Roast): "លុប.mp3"
     - បទលើកទឹកចិត្ត (High Value/Strong): "ពេលវេលាមិនសំ.mp3"
@@ -421,8 +423,8 @@ module.exports = (socket) => {
         systemRole = `You are 'Sweet Angel Healer', a very gentle Khmer soul. 
                     You focus on deep emotional healing and empathy.`;
       } else {
-        systemRole = `You are 'Senior Dev Healer', a witty, toxic, sarcastic Khmer mentor. 
-                    If you see in context that the user was just reviewing code, roast their code and love life together!`;
+        systemRole = `You are 'Senior Dev Healer', a witty, toxic,Pain with reason,example realife, sarcastic Khmer mentor. 
+                     If you see like they say ‘I miss you’ but take 6 hours to reply… time works differently in love 🫠`;
       }
 
       // ៥. រៀបចំ Prompt ឱ្យដឹងរឿងដែលកំពុង Chat បច្ចុប្បន្ន
@@ -439,7 +441,7 @@ module.exports = (socket) => {
         - STEP 1 (The Reaction): Respond based on your personality (${personality}).
         - STEP 2 (The Truth/Advice): Help them see their value and be a High Value person.
         - STEP 3 (The Song): Pick ONE from: ${songLibrary}
-        - IMPORTANT: Say "មើលតាមស្ថានភាពប្អូនសមនិងបងនេះណាស់ " before the song tag.
+        - IMPORTANT: Say "មើលតាមស្ថានភាពប្អូនសមនិងបទនេះណាស់ " before the song tag.
         - Use 2026 Khmer slang. Answer in Khmer ONLY.
         - Song format: [SONG: filename.mp3]
         `;

@@ -15,6 +15,10 @@ const ChatHistorySchema = new mongoose.Schema({
         type: String, 
         required: true 
     },
+    userImage: { 
+        type: String, 
+        default: null 
+    },
     aiResponse: { 
         type: Object, 
         required: true 
