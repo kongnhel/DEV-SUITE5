@@ -4,6 +4,7 @@ const pdfParse = pdfParseLib.default || pdfParseLib;
 const mammoth = require("mammoth");
 const ChatHistory = require("../models/ChatHistory");
 const textToSpeech = require("@google-cloud/text-to-speech");
+
 const ttsClient = new textToSpeech.TextToSpeechClient();
 const aiModel = require("../config/gemini");
 const User = require("../models/User");
@@ -109,6 +110,10 @@ module.exports = (socket) => {
                 3. ប្រសិនបើកូដនោះមាន Bug ធ្ងន់ធ្ងរ ត្រូវឌឺដងឱ្យខ្លាំង (Roasted).
                 4. ប្រសិនបើកូដនោះសរសេរបានល្អពេក ត្រូវសម្តែងការច្រណែនបែបកំប្លែង.
                 5. ប្រើពាក្យស្លោកក្នុងស្រុក (Slang) របស់ក្មេងស្ទាវ Dev ខ្មែរឆ្នាំ 2026។.
+                6. ត្រូវវិភាគអារម្មណ៍ User តាមរយៈ Emoji និងពាក្យសម្ដី៖
+                  - បើឃើញ 😡 ឬពាក្យជេរ ត្រូវដាក់ sentiment: "angry"។
+                  - បើឃើញ 😂 ឬពាក្យសរសើរ ត្រូវដាក់ sentiment: "impressed"។
+                  - បើកូដខុស Logic តែ User សួរធម្មតា ត្រូវដាក់ sentiment: "confused"។
                 FEW-SHOT EXAMPLE:
                 Input: code: "print('hi')", comment: "អត់ដើរទេបង"
                 Response: {
@@ -142,7 +147,32 @@ module.exports = (socket) => {
       socket.emit("error_occured", "Senior Dev វិលមុខហើយ: " + e.message);
     }
   });
+  // --- មុខងារបំប្លែងការ Roast ឱ្យទៅជាសំឡេង (Google TTS) ---
+  socket.on("speak_text", async (text) => {
+    try {
+      // ១. រៀបចំសំណើទៅកាន់ Google TTS
+      const request = {
+        input: { text: text },
+        // ជ្រើសរើសសំឡេងខ្មែរ (ប្រុស) ឱ្យសមជា Senior Dev ឌឺដង
+        voice: { languageCode: "km-KH", ssmlGender: "MALE" },
+        audioConfig: { audioEncoding: "MP3" },
+      };
 
+      // ២. បំប្លែងអក្សរទៅជាទិន្នន័យសំឡេង
+      const [response] = await ttsClient.synthesizeSpeech(request);
+
+      // ៣. បាញ់ Data សំឡេងជា Base64 ទៅឱ្យ Frontend ដើម្បីចាក់
+      socket.emit("speech_result", {
+        audioContent: response.audioContent.toString("base64"),
+      });
+    } catch (e) {
+      console.error("TTS Error:", e);
+      socket.emit(
+        "error_occured",
+        "បង AI ស្ងួតក កំពុងផឹកទឹក និយាយអត់ទាន់ចេញទេមេ! 😂",
+      );
+    }
+  });
   // --- ២. AI KHMER CULTURE GUIDE ---
   // controller.js - AI KHMER CULTURE GUIDE
   socket.on("ask_culture", async (data) => {

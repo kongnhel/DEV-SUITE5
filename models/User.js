@@ -37,7 +37,7 @@ const UserSchema = new mongoose.Schema({
   // ១. កំណត់ប្រភេទគម្រោងរបស់ User
   plan: { 
     type: String, 
-    enum: ["standard", "pro", "elite"], 
+    enum: ["standard", "plus", "pro"],
     default: "standard" 
   },
 

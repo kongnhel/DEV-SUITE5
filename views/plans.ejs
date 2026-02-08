@@ -1,0 +1,170 @@
+<%- include('partials/header') %>
+
+<style>
+  :root {
+    --primary: <%= theme || "#8b5cf6" %>;
+    --secondary: #06b6d4;
+    --bg-dark: #020617;
+    --card-bg: rgba(15, 23, 42, 0.6);
+    --border-glass: rgba(255, 255, 255, 0.05);
+  }
+
+  body { font-family: "Plus Jakarta Sans", "Kantumruy Pro", sans-serif; background: var(--bg-dark); color: #f1f5f9; }
+
+  /* --- Premium Layout --- */
+  .plans-container { padding: 80px 20px; position: relative; }
+  .grid-bg { position: fixed; inset: 0; background-image: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15) 0%, transparent 80%); z-index: -10; pointer-events: none; }
+
+  /* --- Pricing Card Engine --- */
+  .plan-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 35px;
+    border: 1px solid var(--border-glass);
+    padding: 45px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+  }
+
+  .plan-card:hover { transform: translateY(-15px) scale(1.02); border-color: var(--primary); box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.6); }
+  .plan-card.featured { border: 2px solid var(--primary); background: rgba(139, 92, 246, 0.05); transform: scale(1.05); }
+
+  .featured-badge { position: absolute; top: 20px; right: -35px; background: var(--primary); color: white; padding: 8px 40px; transform: rotate(45deg); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+
+  /* --- Typography & Features --- */
+  .plan-name { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: #94a3b8; margin-bottom: 20px; }
+  .plan-price { font-size: 3.5rem; font-weight: 900; color: white; margin-bottom: 10px; }
+  .plan-price span { font-size: 1rem; color: #64748b; font-weight: 500; }
+  
+  .feature-item { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: 0.95rem; color: #cbd5e1; }
+  .feature-icon { color: var(--primary); font-size: 1.2rem; }
+  .feature-disabled { opacity: 0.3; text-decoration: line-through; }
+
+  /* --- Action Buttons --- */
+  .btn-upgrade { margin-top: auto; padding: 18px; border-radius: 20px; font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; text-align: center; border: none; cursor: pointer; }
+  .btn-free { background: rgba(255, 255, 255, 0.05); color: white; }
+  .btn-plus { background: var(--primary); color: white; box-shadow: 0 10px 25px -5px rgba(139, 92, 246, 0.4); }
+  .btn-pro { background: linear-gradient(135deg, #06b6d4, #8b5cf6); color: white; }
+  .btn-upgrade:hover { filter: brightness(1.2); transform: scale(1.05); }
+
+  .shimmer-text { background: linear-gradient(90deg, #fff, var(--primary), #fff); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 6s linear infinite; }
+  @keyframes shine { to { background-position: 200% center; } }
+</style>
+
+<div class="grid-bg"></div>
+
+
+
+<main class="plans-container max-w-7xl mx-auto">
+  <header class="text-center mb-20 animate__animated animate__fadeIn">
+    <h2 class="text-5xl md:text-7xl font-black shimmer-text mb-6 uppercase italic tracking-tighter">Level Up Your AI</h2>
+    <p class="text-slate-400 text-lg md:text-xl font-light italic max-w-2xl mx-auto">
+      "ជ្រើសរើសគម្រោងដែលស័ក្តិសមនឹងមហិច្ឆតារបស់បង ដើម្បីបើកទ្វារទៅកាន់ <span class="text-white font-bold">Unlimited Neural Power</span>!"
+    </p>
+  </header>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <div class="plan-card animate__animated animate__fadeInUp">
+      <div class="plan-name">Standard</div>
+      <div class="plan-price">$0<span>/month</span></div>
+      <p class="text-sm text-slate-400 mb-8 leading-relaxed">សាកសមសម្រាប់អ្នកចាប់ផ្ដើមរៀនសូត្រ និងចង់តេស្តសមត្ថភាព AI តិចតួច។</p>
+      <div class="flex-1">
+        <div class="feature-item"><span class="feature-icon">✔</span> 5 AI Requests / ថ្ងៃ</div>
+        <div class="feature-item"><span class="feature-icon">✔</span> Basic Code Reviewer</div>
+        <div class="feature-item feature-disabled"><span>✘</span> គ្មានការរក្សាទុក History</div>
+      </div>
+      <button class="btn-upgrade btn-free mt-8 cursor-default">បច្ចុប្បន្នភាព</button>
+    </div>
+
+    <div class="plan-card featured animate__animated animate__fadeInUp" style="animation-delay: 0.1s">
+      <div class="featured-badge">Popular</div>
+      <div class="plan-name" style="color: var(--primary)">Architect Plus</div>
+      <div class="plan-price">$2.99<span>/month</span></div>
+      <p class="text-sm text-slate-400 mb-8 leading-relaxed">សម្រាប់ Senior Dev ដែលចង់បានល្បឿន និងសមត្ថភាពវិភាគកូដកម្រិតខ្ពស់។</p>
+      <div class="flex-1">
+        <div class="feature-item"><span class="feature-icon">✔</span> <strong>Unlimited</strong> Requests</div>
+        <div class="feature-item"><span class="feature-icon">✔</span> High-Speed Neural Engine</div>
+        <div class="feature-item"><span class="feature-icon">✔</span> បើកដំណើរការ Memory Vault (Archive)</div>
+        <div class="feature-item"><span class="feature-icon">✔</span> អាន PDF & Word បានមិនកំណត់</div>
+      </div>
+      <button 
+          onclick="<%= user.plan === 'plus' ? '' : "upgradePlan('plus')" %>" 
+          class="btn-upgrade <%= user.plan === 'plus' ? 'bg-emerald-500/20 text-emerald-400 cursor-default' : 'btn-plus' %> mt-8">
+          <%= user.plan === 'plus' ? '✅ Current Plan' : 'Get Plus 🔥' %>
+      </button>
+    </div>
+
+    <div class="plan-card animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+      <div class="plan-name">Enterprise Pro</div>
+      <div class="plan-price">$19<span>/month</span></div>
+      <p class="text-sm text-slate-400 mb-8 leading-relaxed">ដំណោះស្រាយដ៏ល្អបំផុតសម្រាប់ក្រុមការងារ និងការសាងសង់ចក្រភពឌីជីថលធំៗ។</p>
+      <div class="flex-1">
+        <div class="feature-item"><span class="feature-icon">🚀</span> គ្រប់យ៉ាងក្នុង Plus</div>
+        <div class="feature-item"><span class="feature-icon">🚀</span> Custom AI Training (សម្រាប់បង)</div>
+        <div class="feature-item"><span class="feature-icon">🚀</span> Support អាទិភាព ២៤/៧</div>
+        <div class="feature-item"><span class="feature-icon">🚀</span> អាចតភ្ជាប់ API ទៅក្រៅបាន</div>
+      </div>
+      <button 
+          onclick="<%= user.plan === 'pro' ? '' : "upgradePlan('pro')" %>" 
+          class="btn-upgrade <%= user.plan === 'pro' ? 'bg-indigo-500/20 text-indigo-400 cursor-default' : 'btn-pro' %> mt-8">
+          <%= user.plan === 'pro' ? '✅ Current Plan' : 'Get Pro ⚡' %>
+      </button>
+    </div>
+  </div>
+
+  <section class="mt-32 text-center">
+    <div class="magic-card p-12 inline-block">
+      <p class="text-sm text-slate-500 uppercase font-black tracking-widest mb-4">តើបងមានសំណួរមែនទេ?</p>
+      <p class="text-lg italic leading-relaxed text-slate-300">
+        "រាល់ការ Upgrade របស់បង គឺជាការជួយគាំទ្រឱ្យ **Dev Suite** បន្តវិវត្តន៍ទៅមុខជានិច្ច!"
+      </p>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+  async function upgradePlan(plan) {
+    const firebaseUid = "<%= user ? user.firebaseUid : '' %>";
+    if (!firebaseUid) return Swal.fire('Error!', 'សូមចូលគណនីសិនបង!', 'error');
+
+    const result = await Swal.fire({
+      title: `Upgrade ទៅ ${plan.toUpperCase()}?`,
+      text: "តើបងចង់បើកសមត្ថភាព Neural គ្មានដែនកំណត់មែនទេ?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#8b5cf6",
+      confirmButtonText: "បាទ! បង់លុយឥឡូវ 🔥",
+      cancelButtonText: "ចាំបន្តិច",
+      background: "#0f172a",
+      color: "#fff",
+      customClass: { popup: "rounded-[2rem] border border-white/10" },
+    });
+
+    if (result.isConfirmed) {
+      Swal.fire({ title: "Processing...", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        const response = await fetch("/api/payment/upgrade", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ planType: plan, firebaseUid }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          Swal.fire({ title: "Success! 🏆", text: data.message, icon: "success", timer: 3000, showConfirmButton: false })
+          .then(() => (window.location.href = "/dashboard"));
+        }
+      } catch (error) {
+        Swal.fire("Error!", "មានបញ្ហាបច្ចេកទេសបន្តិចបន្តួចបង...", "error");
+      }
+    }
+  }
+</script>

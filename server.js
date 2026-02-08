@@ -11,6 +11,7 @@ const viewRoutes = require("./routes/viewRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const historyRoutes = require("./routes/history");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 // ២. ចុះឈ្មោះផ្លូវមេ (Prefix)
 // បើប្អូនដាក់ '/history' នៅទីនេះ...
@@ -104,6 +105,7 @@ app.use("/", authRoutes);
 app.use("/user", userRoutes);
 app.use("/", viewRoutes);
 app.use("/history", historyRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // --- ៦. Socket Connection សម្រាប់ AI Tutor ---
 io.on("connection", (socket) => {

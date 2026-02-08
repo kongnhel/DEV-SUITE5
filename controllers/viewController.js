@@ -1,39 +1,159 @@
 
 const ChatHistory = require("../models/ChatHistory");
 const path = require("path");
+const User = require("../models/User");
 
-exports.getIndex = (req, res) => {
-    res.render("index", { title: "AI Reviewer", pageKey: "reviewer", theme: "#00f2ff" }); // ពណ៌ Cyan
+exports.getIndex = async (req, res) => {
+            const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') { 
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+
+    res.render("index", { title: "AI Reviewer", pageKey: "reviewer", theme: "#00f2ff", isLimitReached, limitMessage }); // ពណ៌ Cyan
 };
 
-exports.getCulture = (req, res) => {
-    res.render("culture", { title: "Khmer Culture", pageKey: "culture", theme: "#ffd700" }); // ពណ៌មាស
-};
-exports.getPlanner = (req, res) => {
-    res.render("architect", { title: "Architect AI", pageKey: "architect", theme: "#f97316" }); // ពណ៌ទឹកក្រូច
+exports.getCulture = async (req, res) => {
+
+    const  user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+    if (user && user.plan === 'standard') {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីចូលរួមវប្បធម៌ខ្មែរមិនកំណត់! 🇰🇭";
+        }
+        }
+    res.render("culture", { title: "Khmer Culture", pageKey: "culture", theme: "#ffd700", isLimitReached, limitMessage }); // ពណ៌មាស
+
 };
 
-exports.getVisualizer = (req, res) => {
-    res.render("visualizer", { title: "Logic Visualizer", pageKey: "visualizer", theme: "#a855f7" }); // ពណ៌ស្វាយ
+exports.getPlanner = async (req, res) => {
+        const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') { 
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("architect", { 
+        title: "Architect AI", 
+        pageKey: "architect", 
+        theme: "#f97316",
+        isLimitReached,
+        limitMessage
+    }); // ពណ៌ទឹកក្រូច
 };
 
-exports.getStudyBuddy = (req, res) => {
-    res.render("study-buddy", { title: "Study Buddy", pageKey: "study", theme: "#22c55e" }); // ពណ៌បៃតង
+exports.getVisualizer = async (req, res) => {
+            const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') { 
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("visualizer", { title: "Logic Visualizer", pageKey: "visualizer", theme: "#a855f7", isLimitReached, limitMessage }); // ពណ៌ស្វាយ
 };
 
-exports.getKida = (req, res) => {
-    res.render("kida", { title: "K-IDA AI", pageKey: "kida", theme: "#ef4444" }); // ពណ៌ក្រហម
+exports.getStudyBuddy = async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("study-buddy", { title: "Study Buddy", pageKey: "study", theme: "#22c55e", isLimitReached, limitMessage }); // ពណ៌បៃតង
 };
 
-exports.getTutor = (req, res) => {
-    res.render("tutor", { title: "AI Tutor", pageKey: "tutor", theme: "#38bdf8" }); // ពណ៌ Cyan ភ្លឺ
+exports.getKida = async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') { 
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("kida", { title: "K-IDA AI", pageKey: "kida", theme: "#ef4444", isLimitReached, limitMessage }); // ពណ៌ក្រហម
 };
 
-exports.getLoveGuru = (req, res) => {
-    res.render("love-guru", { title: "Love Guru", pageKey: "love", theme: "#f472b6" }); // ពណ៌ផ្កាឈូក
+exports.getTutor = async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("tutor", { title: "AI Tutor", pageKey: "tutor", theme: "#38bdf8", isLimitReached, limitMessage }); // ពណ៌ Cyan ភ្លឺ
+};
+
+exports.getLoveGuru = async (req, res) => {
+    const user = await User.findById(req.session.userId);
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    if (user && user.plan === 'standard') { 
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        // ឆែកមើល Quota ៥ ដង
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "បងប្រើដល់ដែនកំណត់ ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! Upgrade ទៅ Pro ដើម្បីគូរប្លង់មិនកំណត់! 🏗️";
+        }
+    }
+    res.render("love-guru", { title: "Love Guru", pageKey: "love", theme: "#f472b6", isLimitReached, limitMessage }); // ពណ៌ផ្កាឈូក
 };
 exports.getPlan = (req, res) => {
-    res.render("plan", { title: "Plan Generator", pageKey: "plan", theme: "#34d399" }); // ពណ៌បៃតងភ្លឺ
+    res.render("plans", { title: "Plan Generator", pageKey: "plan", theme: "#34d399" }); // ពណ៌បៃតងភ្លឺ
 };
 
 
@@ -73,3 +193,29 @@ exports.getHistory = async (req, res) => {
     }
 };
 
+// exports.getIndex = async (req, res) => {
+//     const userId = req.session.userId;
+//     const user = await User.findById(userId);
+    
+//     let isLimitReached = false;
+//     let limitMessage = "";
+
+//     if (user && user.plan === 'standard') {
+//         const today = new Date().setHours(0, 0, 0, 0);
+//         const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+//         // បើនៅថ្ងៃដដែល ហើយសួរអស់ ៥ ដងហើយ
+//         if (today === lastReqDate && user.requestCount >= 5) {
+//             isLimitReached = true;
+//             limitMessage = "បងប្រើអស់ Quota ៥ ដងសម្រាប់ថ្ងៃនេះហើយ! ចាំស្អែក ឬ Upgrade ឥឡូវហ្មងទៅមេ! 😂";
+//         }
+//     }
+
+//     res.render("index", { 
+//         title: "AI Reviewer", 
+//         pageKey: "reviewer", 
+//         theme: "#00f2ff",
+//         isLimitReached, // បោះតម្លៃនេះទៅ Frontend
+//         limitMessage
+//     });
+// };
