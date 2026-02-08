@@ -32,6 +32,9 @@ exports.getTutor = (req, res) => {
 exports.getLoveGuru = (req, res) => {
     res.render("love-guru", { title: "Love Guru", pageKey: "love", theme: "#f472b6" }); // ពណ៌ផ្កាឈូក
 };
+exports.getPlan = (req, res) => {
+    res.render("plan", { title: "Plan Generator", pageKey: "plan", theme: "#34d399" }); // ពណ៌បៃតងភ្លឺ
+};
 
 
 exports.getHistory = async (req, res) => {

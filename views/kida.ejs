@@ -442,4 +442,40 @@
       .getElementById("responseContainer")
       .scrollIntoView({ behavior: "smooth" });
   });
+
+    socket.on("error_occured", (msg) => {
+    // ១. បិទ Loading និងបើកប៊ូតុងឱ្យដើរវិញជាមុនសិន ដើម្បីឱ្យ User អាចចុចម្តងទៀតបាន
+    if (document.getElementById("loading")) {
+      document.getElementById("loading").classList.add("hidden");
+    }
+
+    const btn =
+      document.getElementById("btnAction") ||
+      document.getElementById("btnSend");
+    if (btn) btn.disabled = false;
+
+    // ២. ប្ដូរពី alert(msg) មកប្រើ Premium Popup វិញ
+    Swal.fire({
+      title: "Neural Limit Reached! 🚀",
+      text: msg,
+      icon: "warning",
+      background: "#0f172a", // ពណ៌ងងឹតស៊ីជាមួយ Theme បង
+      color: "#f1f5f9",
+      showCancelButton: true,
+      confirmButtonColor: "#8b5cf6", // ពណ៌ស្វាយ Premium
+      cancelButtonColor: "#475569",
+      confirmButtonText: "ទៅ Upgrade ឥឡូវ 🔥",
+      cancelButtonText: "ចាំពេលក្រោយ",
+      backdrop: `rgba(15, 23, 42, 0.8) blur(8px)`, // បន្ថែម Blur ឱ្យមើលទៅថ្លៃថ្នូរ
+      customClass: {
+        popup: "rounded-[2.5rem] border border-white/10 shadow-2xl",
+        title: "font-black uppercase tracking-widest text-indigo-400",
+      },
+    }).then((result) => {
+      // ៣. បើ User ដាច់ចិត្តចុច Upgrade យើងបាញ់គេទៅទំព័រ Plans ហ្មង!
+      if (result.isConfirmed) {
+        window.location.href = "/plans";
+      }
+    });
+  });
 </script>

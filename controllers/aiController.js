@@ -7,6 +7,7 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 const ttsClient = new textToSpeech.TextToSpeechClient();
 const aiModel = require("../config/gemini");
 const User = require("../models/User");
+const checkPlanLimit = require("../utils/planValidator");
 
 // --- ១. ប្រព័ន្ធការពារការ Spam (Rate Limiter) ---
 const userRateLimits = new Map();
@@ -76,7 +77,10 @@ module.exports = (socket) => {
     try {
       const user = await findUserByUid(firebaseUid);
       let historyContext = "";
-
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       if (user) {
         const previousChats = await ChatHistory.find({
           userId: user._id,
@@ -145,6 +149,11 @@ module.exports = (socket) => {
     const { question, image, type, firebaseUid } = data;
     try {
       const user = await findUserByUid(firebaseUid);
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
+
       socket.cultureHistory = socket.cultureHistory || [];
       const context = socket.cultureHistory.slice(-4).join("\n");
 
@@ -191,6 +200,12 @@ module.exports = (socket) => {
     if (isRateLimited(socket.id)) return;
     const { code, firebaseUid } = data;
     try {
+      const user = await findUserByUid(firebaseUid);
+
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       const prompt = `Convert this code into Mermaid.js flowchart syntax (graph TD).
                 STRICT RULES:
                 1. Use Khmer language for all labels inside the flowchart nodes.
@@ -198,12 +213,12 @@ module.exports = (socket) => {
                 Code: "${code}"`;
 
       const result = await aiModel.generateContent(prompt);
+
       const mermaidCode = result.response
         .text()
         .trim()
         .replace(/```mermaid|```/gi, "");
 
-      const user = await findUserByUid(firebaseUid);
       if (user) {
         await ChatHistory.create({
           toolName: "LOGIC_VISUALIZER",
@@ -225,7 +240,10 @@ module.exports = (socket) => {
 
     try {
       const user = await findUserByUid(firebaseUid);
-
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       // ១. ទាញ History មកវិញខ្លះដើម្បីឱ្យវាដឹងថាទើបរៀនដល់ណា
       const history = await ChatHistory.find({
         userId: user?._id,
@@ -288,6 +306,10 @@ module.exports = (socket) => {
     if (isRateLimited(socket.id)) return;
     const { userQuery, pages, firebaseUid } = data;
     try {
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       const context = pages
         .map((p) => `[PAGE_${p.page}]: ${p.text}`)
         .join("\n\n");
@@ -324,7 +346,10 @@ module.exports = (socket) => {
     try {
       const user = await findUserByUid(firebaseUid);
       if (!user) return socket.emit("error_occured", "សូម Login សិនបង!");
-
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       let finalTopic = topic;
 
       // ១. ប្រព័ន្ធបកប្រែស្វ័យប្រវត្តិ (Auto-Translate)
@@ -399,6 +424,11 @@ module.exports = (socket) => {
 
     try {
       const user = await findUserByUid(firebaseUid);
+
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       if (!user)
         return socket.emit("error_occured", "រកអ្នកប្រើប្រាស់មិនឃើញទេ!");
 
@@ -486,6 +516,11 @@ module.exports = (socket) => {
     try {
       // ១. ផ្ទៀងផ្ទាត់ User
       const user = await findUserByUid(firebaseUid);
+
+      // 🛡️ របងការពារ Plan Limit
+      const planStatus = await checkPlanLimit(user._id);
+      if (!planStatus.allowed)
+        return socket.emit("error_occured", planStatus.message);
       if (!user) {
         return socket.emit(
           "error_occured",
