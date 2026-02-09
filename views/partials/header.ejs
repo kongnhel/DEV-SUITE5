@@ -122,7 +122,15 @@
                 { name: 'Khmer Culture', path: '/culture', key: 'culture', desc: 'មគ្គុទ្ទេសក៍វប្បធម៌ខ្មែរ' },
                 { name: 'Love Guru', path: '/love-guru', key: 'love', desc: 'គ្រូពេទ្យស្នេហ៍ និងការតស៊ូ' }
             ]
+        },
+        {
+            title:'high school',
+            icon:'🎓',
+            items:[
+                { name: 'Student Assistant', path: '/student-assistant', key: 'student-assistant', desc: 'ជំនួយសិស្សក្នុងការរៀបចំ និងស្វែងរកព័ត៌មាន' } ,
+            ]
         }
+
     ];
     %>
 
@@ -234,8 +242,11 @@
             <a href="/history" class="<%= pageKey === 'history' ? 'text-indigo-400' : 'text-slate-500' %> whitespace-nowrap">Archive</a>
         </div>
     </nav>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
     <script>
+
     function checkAuthBeforeAI() {
         Swal.fire({
             title: 'អត់ទាន់ Login ហី? 😹',

@@ -664,6 +664,52 @@ module.exports = (socket) => {
     }
   });
 
+  socket.on("ask_student_assistant", async (data) => {
+    const { message, subject, firebaseUid } = data;
+
+    // ១. កំណត់ច្បាប់ឱ្យ AI ផ្តោតលើមុខវិជ្ជា និងបច្ចេកទេសបោះទិន្នន័យ
+    const subjectRules = {
+      math: "Focus on using LaTeX for formulas like $x = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$. Always use Step-by-Step logic.",
+      physics:
+        "Focus on physical laws, units (Newtons, Joules). Use LaTeX for equations like $F = m \\cdot a$.",
+      // 🛡️ បន្ថែមច្បាប់ការពារកុំឱ្យបាញ់កូដ \documentclass ក្នុងគីមី
+      chemistry:
+        "Focus on chemical reactions and molecular weights. Use LaTeX for chemical equations. DO NOT provide full LaTeX document structures.",
+      khmer:
+        "Focus on Khmer grammar, literature analysis, and deep cultural context.",
+      english:
+        "Focus on grammar rules, vocabulary, and conversational practice.",
+    };
+
+    const prompt = `You are a "Big Brother" Senior Tutor for Cambodian High Schoolers (Grade 10-12).
+    CURRENT SUBJECT: ${subject.toUpperCase()}.
+    SPECIAL RULE: ${subjectRules[subject]}
+    
+    STRICT FORMATTING RULES:
+    1. Answer EVERYTHING in Khmer language only.
+    2. Use Markdown (bold, lists, headings) for text structure.
+    3. Use LaTeX ONLY for math/science formulas inside $...$ (inline) or $$...$$ (display).
+    4. CRITICAL: NEVER use LaTeX document structures like \\documentclass, \\begin{document}, \\usepackage, or \\maketitle.
+    5. Keep the tone funny, supportive, and use modern Khmer student slang from 2026.
+    6. If the student is lazy, roast them gently in Khmer!
+
+    Student's Question: "${message}"`;
+
+    try {
+      // 🚀 ហៅទៅកាន់ Neural Engine របស់បង
+      const result = await aiModel.generateContent(prompt);
+      const responseText = result.response.text();
+
+      // បាញ់ Text ដែលបានសម្អាតរួចទៅឱ្យ Frontend
+      socket.emit("assistant_response", { response: responseText });
+    } catch (error) {
+      console.error("AI Assistant Error:", error);
+      socket.emit(
+        "error_occured",
+        "អាប្អូន AI វិលមុខបន្តិចហើយមេ! ប្រហែលវាចង់ឱ្យបង Upgrade ទៅ Pro Plan ដែរហ្នឹង! 😂",
+      );
+    }
+  });
   socket.on("disconnect", () => {
     userRateLimits.delete(socket.id); // សម្អាត memory ពេល user ចាកចេញ
     console.log("❌ Neural Connection Lost: " + socket.id);

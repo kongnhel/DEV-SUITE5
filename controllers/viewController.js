@@ -152,6 +152,32 @@ exports.getLoveGuru = async (req, res) => {
     }
     res.render("love-guru", { title: "Love Guru", pageKey: "love", theme: "#f472b6", isLimitReached, limitMessage }); // ពណ៌ផ្កាឈូក
 };
+exports.getStudentAssistant = async (req, res) => {
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+    
+    let isLimitReached = false;
+    let limitMessage = "";
+
+    // 🛡️ ឆែកមើល Quota ដូចក្នុង Dev Suite ដែរ
+    if (user && user.plan === 'standard') {
+        const today = new Date().setHours(0, 0, 0, 0);
+        const lastReqDate = new Date(user.lastRequestDate).setHours(0, 0, 0, 0);
+
+        if (today === lastReqDate && user.requestCount >= 5) {
+            isLimitReached = true;
+            limitMessage = "ប្អូនប្រើអស់ ៥ សំណួរសម្រាប់ថ្ងៃនេះហើយ! ប្រាប់ប៉ាម៉ាក់ឱ្យ Upgrade ឱ្យទៅមេ! 😂";
+        }
+    }
+
+    res.render("student-assistant", { 
+        title: "Student AI Tutor", 
+        pageKey: "student_assistant", 
+        theme: "#8b5cf6", // ពណ៌ស្វាយសម្រាប់ចំណេះដឹង
+        isLimitReached, 
+        limitMessage
+    });
+};
 exports.getPlan = (req, res) => {
     res.render("plans", { title: "Plan Generator", pageKey: "plan", theme: "#34d399" }); // ពណ៌បៃតងភ្លឺ
 };

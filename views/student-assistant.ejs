@@ -1,0 +1,444 @@
+<%- include('partials/header') %>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  :root {
+    --primary: #8b5cf6;
+    --primary-glow: rgba(139, 92, 246, 0.3);
+    --bg-dark: #070b14;
+    --card-bg: rgba(15, 23, 42, 0.7);
+  }
+  body {
+    background-color: var(--bg-dark);
+    color: #e2e8f0;
+    font-family: "Kantumruy Pro", sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* --- ១. Visual Enhancements --- */
+  .shimmer-text {
+    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 5s linear infinite;
+  }
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+
+  .magic-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(30px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
+  }
+
+  /* --- ២. Subject Grid UX --- */
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .sub-btn {
+    background: rgba(255, 255, 255, 0.03);
+    color: #94a3b8;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 15px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  .sub-btn:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--primary);
+  }
+  .sub-btn.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 10px 25px var(--primary-glow);
+    border-color: var(--primary);
+  }
+  .sub-btn .icon {
+    font-size: 1.5rem;
+  }
+
+  /* --- ៣. Advanced Chat Interface --- */
+  .chat-container {
+    height: 500px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+  }
+  .chat-container::-webkit-scrollbar {
+    width: 5px;
+  }
+  .chat-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+  .message {
+    margin-bottom: 25px;
+    max-width: 90%;
+    animation: fadeInUp 0.4s ease-out;
+    position: relative;
+  }
+  .message-ai {
+    align-self: flex-start;
+  }
+  .message-user {
+    align-self: flex-end;
+  }
+
+  .bubble {
+    padding: 16px 20px;
+    border-radius: 22px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+  }
+  .message-ai .bubble {
+    background: rgba(139, 92, 246, 0.1);
+    border-left: 4px solid var(--primary);
+    border-top-left-radius: 4px;
+  }
+  .message-user .bubble {
+    background: rgba(255, 255, 255, 0.06);
+    border-right: 4px solid #475569;
+    border-top-right-radius: 4px;
+    color: #e2e8f0;
+  }
+
+  .role-label {
+    font-size: 8px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 4px;
+    display: block;
+    padding: 0 10px;
+  }
+  .message-ai .role-label {
+    color: var(--primary);
+  }
+  .message-user .role-label {
+    color: #64748b;
+    text-align: right;
+  }
+
+  /* Thinking Indicator */
+  .typing {
+    display: flex;
+    gap: 4px;
+    padding: 10px 15px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 15px;
+    width: fit-content;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #8b5cf6;
+    rounded-full: 50%;
+    animation: bounce 1.4s infinite ease-in-out;
+  }
+  .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes bounce {
+    0%,
+    80%,
+    100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+
+<main class="max-w-5xl mx-auto py-12 px-6">
+  <header class="text-center mb-10">
+    <div
+      class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-6"
+    >
+      <span class="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse"></span>
+      <span class="text-white text-[10px] font-black uppercase tracking-widest"
+        >Bac II AI Buddy V2.5</span
+      >
+    </div>
+    <h2
+      class="text-6xl font-black shimmer-text mb-4 uppercase italic tracking-tighter"
+    >
+      AI Tutor
+    </h2>
+    <p class="text-slate-400 italic">
+      "ឈប់បែកថ្នាំជាមួយមេរៀនវិទ្យាល័យ! ឱ្យបង AI ជួយពន្យល់ឱ្យប្អូនឯងភ្លឺភ្នែក!"
+    </p>
+  </header>
+
+  <div class="subject-grid mb-10">
+    <button onclick="setSubject('math', this)" class="sub-btn active">
+      <span class="icon">📐</span> គណិតវិទ្យា
+    </button>
+    <button onclick="setSubject('physics', this)" class="sub-btn">
+      <span class="icon">⚡</span> រូបវិទ្យា
+    </button>
+    <button onclick="setSubject('chemistry', this)" class="sub-btn">
+      <span class="icon">🧪</span> គីមីវិទ្យា
+    </button>
+    <button onclick="setSubject('khmer', this)" class="sub-btn">
+      <span class="icon">🇰🇭</span> អក្សរសាស្ត្រខ្មែរ
+    </button>
+    <button onclick="setSubject('english', this)" class="sub-btn">
+      <span class="icon">🇬🇧</span> English
+    </button>
+  </div>
+
+  <div class="magic-card p-6 md:p-10 relative overflow-hidden">
+    <div
+      class="flex items-center justify-between mb-6 pb-4 border-b border-white/5"
+    >
+      <div class="flex items-center gap-3">
+        <span
+          id="activeSubjectIndicator"
+          class="w-2 h-2 rounded-full bg-primary animate-ping"
+        ></span>
+        <p
+          class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+        >
+          Mode:
+          <span id="activeSubjectText" class="text-white">Mathematics</span>
+        </p>
+      </div>
+      <button
+        onclick="clearChat()"
+        class="text-[10px] font-black text-slate-500 hover:text-red-400 transition-colors uppercase"
+      >
+        Clear Session
+      </button>
+    </div>
+
+    <div id="chatBox" class="chat-container mb-8">
+      <div class="message message-ai">
+        <span class="role-label">Big Brother AI</span>
+        <div class="bubble">
+          <p id="welcomeText">
+            តោះប្អូនប្រុស ប្អូនស្រី! ចង់ឱ្យបងជួយដោះស្រាយលំហាត់គណិតអីដែរ? បោះមក!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div id="thinking" class="hidden message message-ai mb-8">
+      <span class="role-label">AI Thinking...</span>
+      <div class="typing bubble">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+
+    <div class="relative mt-auto">
+      <div
+        class="flex items-center gap-4 bg-slate-950/50 border border-white/10 p-2 rounded-3xl focus-within:border-primary transition-all"
+      >
+        <input
+          type="text"
+          id="userInput"
+          onkeypress="handleEnter(event)"
+          class="bg-transparent flex-1 outline-none text-white text-sm px-4 py-2"
+          placeholder="សួរមេរៀនបងមក..."
+        />
+        <button
+          onclick="askAI()"
+          id="btnSend"
+          class="bg-primary text-white p-4 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/20"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+              d="M13 5l7 7-7 7M5 5l7 7-7 7"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let currentSubject = "math";
+
+  // ១. UI Helper Functions
+  window.setSubject = function(subject, btn) {
+      currentSubject = subject;
+      document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const subjectNames = { math: "Mathematics", physics: "Physics", chemistry: "Chemistry", khmer: "Khmer Literature", english: "English Language" };
+      document.getElementById("activeSubjectText").innerText = subjectNames[subject];
+
+      const welcomes = {
+          math: "តោះប្អូន! ចង់ដោះស្រាយសមីការ ឬដេរីវេ? បងចាំជួយឱ្យប្អូនឯងយល់ដល់ 'ឫស' ហ្មង! 😂",
+          physics: "ច្បាប់ញូតុន ឬអគ្គិសនី? បាញ់មកប្អូន! បងចាំជួយ!",
+          chemistry: "ចង់តុល្យការសមីការគីមី ឬស្គាល់ម៉ូលេគុល? បងជំនាញខាងហ្នឹង!",
+          khmer: "តោះមកវិភាគអត្ថបទ ឬតែងសេចក្តីឱ្យឡូយ ឱ្យសមជាកូនខ្មែរ!",
+          english: "Need help with Grammar or Vocabulary? Big Brother is here!"
+      };
+      document.getElementById("welcomeText").innerText = welcomes[subject];
+  };
+
+  window.handleEnter = function(e) { if (e.key === 'Enter') askAI(); };
+
+  window.clearChat = function() {
+      Swal.fire({
+          title: 'Clear Session?',
+          text: "រាល់ការ Chat នឹងត្រូវលុបចោល!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#8b5cf6',
+          confirmButtonText: 'Yes, clear it!',
+          background: '#0f172a',
+          color: '#f1f5f9'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              document.getElementById("chatBox").innerHTML = `
+                <div class="message message-ai">
+                    <span class="role-label">Big Brother AI</span>
+                    <div class="bubble">តោះចាប់ផ្ដើមសារជាថ្មី! មានអីចង់ឱ្យបងជួយ?</div>
+                </div>`;
+          }
+      });
+  };
+
+  // ២. Core AI Logic
+  window.askAI = function() {
+      const input = document.getElementById("userInput");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      appendMessage('user', msg);
+      input.value = "";
+
+      // បង្ហាញ Thinking Indicator
+      const thinking = document.getElementById("thinking");
+      thinking.classList.remove("hidden");
+      scrollToBottom();
+
+      socket.emit("ask_student_assistant", {
+          message: msg,
+          subject: currentSubject,
+          firebaseUid: "<%= user ? user.firebaseUid : '' %>"
+      });
+  };
+
+  socket.on("assistant_response", (data) => {
+      document.getElementById("thinking").classList.add("hidden");
+      appendMessage('ai', data.response);
+  });
+
+  socket.on("error_occured", (error) => {
+      document.getElementById("thinking").classList.add("hidden");
+      Swal.fire({ icon: 'error', title: 'Oops...', text: error, background: '#0f172a', color: '#f1f5f9' });
+  });
+
+  function appendMessage(role, text) {
+      const chatBox = document.getElementById("chatBox");
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message message-${role}`;
+
+      // --- 🛡️ Sanitization: លុបកូដ LaTeX Document Headers បើ AI ច្រឡំសរសេរមក ---
+      const cleanText = text.replace(/\\documentclass.*\\begin{document}/gs, '')
+                           .replace(/\\end{document}/g, '')
+                           .replace(/\\usepackage\{.*\}/g, '');
+
+      msgDiv.innerHTML = `
+        <span class="role-label">${role === 'ai' ? 'Big Brother AI' : 'ប្អូនសួរ'}</span>
+        <div class="bubble">${marked.parse(cleanText)}</div>
+      `;
+
+      chatBox.appendChild(msgDiv);
+
+      // 🚀 Render Math with KaTeX
+      renderMathInElement(msgDiv, {
+          delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false},
+              {left: '\\[', right: '\\]', display: true}
+          ],
+          throwOnError : false
+      });
+
+      scrollToBottom();
+  }
+
+  function scrollToBottom() {
+      const container = document.getElementById("chatBox");
+      container.scrollTop = container.scrollHeight;
+  }
+
+  // ៣. Quota Awareness
+  (function() {
+      const isLimitReached = <%= locals.isLimitReached || false %>;
+      if (isLimitReached) {
+          const btn = document.getElementById("btnSend");
+          if (btn) { btn.disabled = true; btn.innerHTML = "🔒"; btn.classList.add("opacity-40"); }
+
+          Swal.fire({
+              title: "អស់ Quota ហើយប្អូន! 🚀",
+              text: "ចង់រៀន Unlimited ទេ? ប្រាប់ប៉ាម៉ាក់ឱ្យ Upgrade ទៅ Plus/Pro ទៅ! 😂",
+              icon: "warning",
+              background: "#0f172a", color: "#f1f5f9",
+              confirmButtonColor: "#8b5cf6", confirmButtonText: "មើលគម្រោង 🔥"
+          }).then(r => { if(r.isConfirmed) window.location.href="/plans" });
+      }
+  })();
+</script>
