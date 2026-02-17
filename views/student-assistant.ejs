@@ -11,24 +11,50 @@
 <style>
   :root {
     --primary: #8b5cf6;
-    --primary-glow: rgba(139, 92, 246, 0.3);
-    --bg-dark: #070b14;
-    --card-bg: rgba(15, 23, 42, 0.7);
+    --primary-light: #a78bfa;
+    --bg-dark: #030712;
+    --card-bg: rgba(17, 24, 39, 0.8);
+    --user-bubble: rgba(31, 41, 55, 0.9);
+    --ai-bubble: rgba(139, 92, 246, 0.05);
   }
+
   body {
     background-color: var(--bg-dark);
-    color: #e2e8f0;
+    color: #f1f5f9;
     font-family: "Kantumruy Pro", sans-serif;
     overflow-x: hidden;
   }
 
-  /* --- ១. Visual Enhancements --- */
+  /* --- ១. Premium Scrollbar --- */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.2);
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+  }
+
+  /* --- ២. Layout & Background --- */
+  .magic-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(40px);
+    border-radius: 45px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8);
+  }
+
   .shimmer-text {
-    background: linear-gradient(90deg, #fff, var(--primary), #fff);
+    background: linear-gradient(135deg, #fff 0%, var(--primary) 50%, #fff 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 5s linear infinite;
+    animation: shine 6s linear infinite;
   }
   @keyframes shine {
     to {
@@ -36,73 +62,62 @@
     }
   }
 
-  .magic-card {
-    background: var(--card-bg);
-    backdrop-filter: blur(30px);
-    border-radius: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
-  }
-
-  /* --- ២. Subject Grid UX --- */
+  /* --- ៣. Subject Grid Enhanced --- */
   .subject-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
   }
   .sub-btn {
-    background: rgba(255, 255, 255, 0.03);
-    color: #94a3b8;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 15px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px 15px;
+    border-radius: 28px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     cursor: pointer;
   }
   .sub-btn:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(139, 92, 246, 0.1);
     border-color: var(--primary);
+    transform: translateY(-8px);
   }
   .sub-btn.active {
     background: var(--primary);
-    color: white;
-    box-shadow: 0 10px 25px var(--primary-glow);
     border-color: var(--primary);
+    box-shadow: 0 15px 30px rgba(139, 92, 246, 0.3);
   }
   .sub-btn .icon {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+  }
+  .sub-btn span:not(.icon) {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+  }
+  .sub-btn.active span {
+    color: white;
   }
 
-  /* --- ៣. Advanced Chat Interface --- */
+  /* --- ៤. Chat UX Redesign --- */
   .chat-container {
-    height: 500px;
+    height: 550px;
     overflow-y: auto;
-    scroll-behavior: smooth;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-  }
-  .chat-container::-webkit-scrollbar {
-    width: 5px;
-  }
-  .chat-container::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
+    padding: 20px;
+    gap: 30px;
   }
 
   .message {
-    margin-bottom: 25px;
-    max-width: 90%;
-    animation: fadeInUp 0.4s ease-out;
+    max-width: 85%;
     position: relative;
+    animation: messageIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .message-ai {
     align-self: flex-start;
@@ -111,57 +126,80 @@
     align-self: flex-end;
   }
 
+  /* Avatars */
+  .avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  .message-ai .avatar {
+    background: var(--primary);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  }
+  .message-user .avatar {
+    background: #334155;
+    margin-left: auto;
+  }
+
   .bubble {
-    padding: 16px 20px;
-    border-radius: 22px;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    word-wrap: break-word;
+    padding: 22px;
+    border-radius: 28px;
+    line-height: 1.8;
+    font-size: 0.98rem;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.03);
   }
   .message-ai .bubble {
-    background: rgba(139, 92, 246, 0.1);
-    border-left: 4px solid var(--primary);
-    border-top-left-radius: 4px;
+    background: var(--ai-bubble);
+    border-top-left-radius: 5px;
   }
   .message-user .bubble {
-    background: rgba(255, 255, 255, 0.06);
-    border-right: 4px solid #475569;
-    border-top-right-radius: 4px;
+    background: var(--user-bubble);
+    border-top-right-radius: 5px;
     color: #e2e8f0;
   }
 
-  .role-label {
-    font-size: 8px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 4px;
-    display: block;
-    padding: 0 10px;
+  /* Markdown & Math Styling */
+  .bubble h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--primary-light);
+    margin: 15px 0 10px;
+    border-left: 3px solid var(--primary);
+    padding-left: 10px;
   }
-  .message-ai .role-label {
-    color: var(--primary);
+  .bubble p {
+    margin-bottom: 12px;
   }
-  .message-user .role-label {
-    color: #64748b;
-    text-align: right;
+  .katex-display {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    border-radius: 15px;
+    margin: 15px 0;
+    overflow-x: auto;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
   }
 
-  /* Thinking Indicator */
-  .typing {
+  /* --- ៥. Typing Indicator --- */
+  .thinking-box {
     display: flex;
-    gap: 4px;
-    padding: 10px 15px;
+    gap: 6px;
+    padding: 12px 20px;
     background: rgba(139, 92, 246, 0.1);
-    border-radius: 15px;
+    border-radius: 20px;
     width: fit-content;
   }
   .dot {
     width: 6px;
     height: 6px;
-    background: #8b5cf6;
-    rounded-full: 50%;
-    animation: bounce 1.4s infinite ease-in-out;
+    background: var(--primary);
+    border-radius: 50%;
+    animation: dotPulse 1.5s infinite ease-in-out;
   }
   .dot:nth-child(2) {
     animation-delay: 0.2s;
@@ -169,129 +207,150 @@
   .dot:nth-child(3) {
     animation-delay: 0.4s;
   }
-
-  @keyframes bounce {
+  @keyframes dotPulse {
     0%,
-    80%,
     100% {
-      transform: scale(0);
+      transform: scale(0.8);
+      opacity: 0.4;
     }
-    40% {
-      transform: scale(1);
+    50% {
+      transform: scale(1.2);
+      opacity: 1;
     }
   }
-  @keyframes fadeInUp {
+
+  @keyframes messageIn {
     from {
       opacity: 0;
-      transform: translateY(15px);
+      transform: translateY(20px) scale(0.95);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 </style>
 
 <main class="max-w-5xl mx-auto py-12 px-6">
-  <header class="text-center mb-10">
+  <header class="text-center mb-12">
     <div
-      class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 mb-6"
+      class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 mb-8"
     >
       <span class="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse"></span>
-      <span class="text-white text-[10px] font-black uppercase tracking-widest"
+      <span class="text-white text-[10px] font-black uppercase tracking-[0.3em]"
         >Bac II AI Buddy V2.5</span
       >
     </div>
     <h2
-      class="text-6xl font-black shimmer-text mb-4 uppercase italic tracking-tighter"
+      class="text-6xl md:text-8xl font-black shimmer-text mb-6 uppercase italic tracking-tighter leading-none"
     >
       AI Tutor
     </h2>
-    <p class="text-slate-400 italic">
-      "ឈប់បែកថ្នាំជាមួយមេរៀនវិទ្យាល័យ! ឱ្យបង AI ជួយពន្យល់ឱ្យប្អូនឯងភ្លឺភ្នែក!"
+    <p class="text-slate-400 text-lg italic max-w-2xl mx-auto">
+      "បង្រៀនឱ្យប្អូនយល់ដល់ 'ឫស' ឈប់បែកថ្នាំជាមួយមេរៀនបាក់ឌុប!"
     </p>
   </header>
 
-  <div class="subject-grid mb-10">
+  <div class="subject-grid mb-12">
     <button onclick="setSubject('math', this)" class="sub-btn active">
-      <span class="icon">📐</span> គណិតវិទ្យា
+      <span class="icon">📐</span> <span>Mathematics</span>
     </button>
     <button onclick="setSubject('physics', this)" class="sub-btn">
-      <span class="icon">⚡</span> រូបវិទ្យា
+      <span class="icon">⚡</span> <span>Physics</span>
     </button>
     <button onclick="setSubject('chemistry', this)" class="sub-btn">
-      <span class="icon">🧪</span> គីមីវិទ្យា
+      <span class="icon">🧪</span> <span>Chemistry</span>
     </button>
     <button onclick="setSubject('khmer', this)" class="sub-btn">
-      <span class="icon">🇰🇭</span> អក្សរសាស្ត្រខ្មែរ
+      <span class="icon">🇰🇭</span> <span>Khmer Literature</span>
     </button>
     <button onclick="setSubject('english', this)" class="sub-btn">
-      <span class="icon">🇬🇧</span> English
+      <span class="icon">🇬🇧</span> <span>English</span>
     </button>
   </div>
 
-  <div class="magic-card p-6 md:p-10 relative overflow-hidden">
+  <div class="magic-card p-6 md:p-12 relative overflow-hidden">
     <div
-      class="flex items-center justify-between mb-6 pb-4 border-b border-white/5"
+      class="flex items-center justify-between mb-8 pb-5 border-b border-white/5"
     >
-      <div class="flex items-center gap-3">
-        <span
-          id="activeSubjectIndicator"
-          class="w-2 h-2 rounded-full bg-primary animate-ping"
-        ></span>
-        <p
-          class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+      <div class="flex items-center gap-4">
+        <div
+          class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center text-primary border border-purple-500/20"
         >
-          Mode:
-          <span id="activeSubjectText" class="text-white">Mathematics</span>
-        </p>
+          🎓
+        </div>
+        <div>
+          <p
+            class="text-[10px] font-black text-slate-500 uppercase tracking-widest"
+          >
+            Active Mode
+          </p>
+          <p
+            id="activeSubjectText"
+            class="text-white font-bold text-sm tracking-tight"
+          >
+            Mathematics Assistant
+          </p>
+        </div>
       </div>
       <button
         onclick="clearChat()"
-        class="text-[10px] font-black text-slate-500 hover:text-red-400 transition-colors uppercase"
+        class="p-3 rounded-xl bg-white/5 hover:bg-red-500/10 text-slate-500 hover:text-red-400 transition-all"
       >
-        Clear Session
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          ></path>
+        </svg>
       </button>
     </div>
 
-    <div id="chatBox" class="chat-container mb-8">
+    <div id="chatBox" class="chat-container">
       <div class="message message-ai">
-        <span class="role-label">Big Brother AI</span>
+        <div class="avatar">👨‍💻</div>
         <div class="bubble">
           <p id="welcomeText">
-            តោះប្អូនប្រុស ប្អូនស្រី! ចង់ឱ្យបងជួយដោះស្រាយលំហាត់គណិតអីដែរ? បោះមក!
+            តោះប្អូនប្រុស ប្អូនស្រី! ចង់ឱ្យបងជួយដោះស្រាយលំហាត់គណិតអីដែរ? បោះមក
+            បងពន្យល់មួយជួរៗឱ្យភ្លឺភ្នែក!
           </p>
         </div>
       </div>
     </div>
 
-    <div id="thinking" class="hidden message message-ai mb-8">
-      <span class="role-label">AI Thinking...</span>
-      <div class="typing bubble">
+    <div id="thinking" class="hidden message message-ai mt-6">
+      <div class="thinking-box">
         <div class="dot"></div>
         <div class="dot"></div>
         <div class="dot"></div>
       </div>
     </div>
 
-    <div class="relative mt-auto">
+    <div class="mt-10 pt-8 border-t border-white/5">
       <div
-        class="flex items-center gap-4 bg-slate-950/50 border border-white/10 p-2 rounded-3xl focus-within:border-primary transition-all"
+        class="flex items-center gap-4 bg-slate-900/50 border border-white/10 p-2.5 rounded-[30px] focus-within:border-primary transition-all shadow-inner"
       >
         <input
           type="text"
           id="userInput"
           onkeypress="handleEnter(event)"
-          class="bg-transparent flex-1 outline-none text-white text-sm px-4 py-2"
-          placeholder="សួរមេរៀនបងមក..."
+          class="bg-transparent flex-1 outline-none text-white text-sm px-6 py-3"
+          placeholder="សួរមេរៀនបងមក... (ឧ. រូបមន្តឌីផេរ៉ង់ស្យែល)"
         />
         <button
           onclick="askAI()"
           id="btnSend"
-          class="bg-primary text-white p-4 rounded-2xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/20"
+          class="bg-primary text-white p-4 rounded-[22px] hover:scale-105 active:scale-95 transition-all shadow-lg shadow-purple-500/30"
         >
           <svg
-            class="w-5 h-5"
+            class="w-6 h-6"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -299,7 +358,7 @@
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              stroke-width="2.5"
+              stroke-width="3"
               d="M13 5l7 7-7 7M5 5l7 7-7 7"
             ></path>
           </svg>
@@ -316,21 +375,21 @@
   const socket = io();
   let currentSubject = "math";
 
-  // ១. UI Helper Functions
+  // ១. UI Logic
   window.setSubject = function(subject, btn) {
       currentSubject = subject;
       document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const subjectNames = { math: "Mathematics", physics: "Physics", chemistry: "Chemistry", khmer: "Khmer Literature", english: "English Language" };
+      const subjectNames = { math: "Mathematics Assistant", physics: "Physics Assistant", chemistry: "Chemistry Assistant", khmer: "Khmer Literature Tutor", english: "English Language Tutor" };
       document.getElementById("activeSubjectText").innerText = subjectNames[subject];
 
       const welcomes = {
           math: "តោះប្អូន! ចង់ដោះស្រាយសមីការ ឬដេរីវេ? បងចាំជួយឱ្យប្អូនឯងយល់ដល់ 'ឫស' ហ្មង! 😂",
-          physics: "ច្បាប់ញូតុន ឬអគ្គិសនី? បាញ់មកប្អូន! បងចាំជួយ!",
-          chemistry: "ចង់តុល្យការសមីការគីមី ឬស្គាល់ម៉ូលេគុល? បងជំនាញខាងហ្នឹង!",
-          khmer: "តោះមកវិភាគអត្ថបទ ឬតែងសេចក្តីឱ្យឡូយ ឱ្យសមជាកូនខ្មែរ!",
-          english: "Need help with Grammar or Vocabulary? Big Brother is here!"
+          physics: "ច្បាប់ញូតុន ឬអគ្គិសនី? បាញ់មកប្អូន! បងចាំជួយឱ្យច្បាស់ៗ!",
+          chemistry: "ចង់តុល្យការសមីការគីមី ឬស្គាល់ម៉ូលេគុល? បងជំនាញខាងហ្នឹង! 🧪",
+          khmer: "តោះមកវិភាគអត្ថបទ ឬតែងសេចក្តីឱ្យឡូយ ឱ្យសមជាកូនខ្មែរ! 🇰🇭",
+          english: "Need help with Grammar or Vocabulary? Big Brother is here! 🇬🇧"
       };
       document.getElementById("welcomeText").innerText = welcomes[subject];
   };
@@ -339,21 +398,11 @@
 
   window.clearChat = function() {
       Swal.fire({
-          title: 'Clear Session?',
-          text: "រាល់ការ Chat នឹងត្រូវលុបចោល!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#8b5cf6',
-          confirmButtonText: 'Yes, clear it!',
-          background: '#0f172a',
-          color: '#f1f5f9'
+          title: 'លុបការសន្ទនា?', text: "រាល់ការ Chat នឹងត្រូវបាត់បង់! តោះចាប់ផ្ដើមមេរៀនថ្មី?",
+          icon: 'question', showCancelButton: true, confirmButtonColor: '#8b5cf6', confirmButtonText: 'Yes, clear it!', background: '#030712', color: '#f1f5f9'
       }).then((result) => {
           if (result.isConfirmed) {
-              document.getElementById("chatBox").innerHTML = `
-                <div class="message message-ai">
-                    <span class="role-label">Big Brother AI</span>
-                    <div class="bubble">តោះចាប់ផ្ដើមសារជាថ្មី! មានអីចង់ឱ្យបងជួយ?</div>
-                </div>`;
+              document.getElementById("chatBox").innerHTML = `<div class="message message-ai"><div class="avatar">👨‍💻</div><div class="bubble">តោះចាប់ផ្ដើមសារជាថ្មី! មានមេរៀនអីមិនយល់ សួរមកបងមកប្អូន!</div></div>`;
           }
       });
   };
@@ -366,16 +415,11 @@
 
       appendMessage('user', msg);
       input.value = "";
-
-      // បង្ហាញ Thinking Indicator
-      const thinking = document.getElementById("thinking");
-      thinking.classList.remove("hidden");
+      document.getElementById("thinking").classList.remove("hidden");
       scrollToBottom();
 
       socket.emit("ask_student_assistant", {
-          message: msg,
-          subject: currentSubject,
-          firebaseUid: "<%= user ? user.firebaseUid : '' %>"
+          message: msg, subject: currentSubject, firebaseUid: "<%= user ? user.firebaseUid : '' %>"
       });
   };
 
@@ -386,7 +430,7 @@
 
   socket.on("error_occured", (error) => {
       document.getElementById("thinking").classList.add("hidden");
-      Swal.fire({ icon: 'error', title: 'Oops...', text: error, background: '#0f172a', color: '#f1f5f9' });
+      Swal.fire({ icon: 'error', title: 'Oops...', text: error, background: '#030712', color: '#f1f5f9' });
   });
 
   function appendMessage(role, text) {
@@ -394,13 +438,11 @@
       const msgDiv = document.createElement("div");
       msgDiv.className = `message message-${role}`;
 
-      // --- 🛡️ Sanitization: លុបកូដ LaTeX Document Headers បើ AI ច្រឡំសរសេរមក ---
-      const cleanText = text.replace(/\\documentclass.*\\begin{document}/gs, '')
-                           .replace(/\\end{document}/g, '')
-                           .replace(/\\usepackage\{.*\}/g, '');
+      // --- 🛡️ Sanitization: លុបកូដ LaTeX Headers ---
+      const cleanText = text.replace(/\\documentclass.*\\begin\{document\}/gs, '').replace(/\\end\{document\}/g, '').replace(/\\usepackage\{.*\}/g, '');
 
       msgDiv.innerHTML = `
-        <span class="role-label">${role === 'ai' ? 'Big Brother AI' : 'ប្អូនសួរ'}</span>
+        <div class="avatar">${role === 'ai' ? '👨‍💻' : '🎓'}</div>
         <div class="bubble">${marked.parse(cleanText)}</div>
       `;
 
@@ -409,10 +451,8 @@
       // 🚀 Render Math with KaTeX
       renderMathInElement(msgDiv, {
           delimiters: [
-              {left: '$$', right: '$$', display: true},
-              {left: '$', right: '$', display: false},
-              {left: '\\(', right: '\\)', display: false},
-              {left: '\\[', right: '\\]', display: true}
+              {left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false}, {left: '\\[', right: '\\]', display: true}
           ],
           throwOnError : false
       });
@@ -422,7 +462,7 @@
 
   function scrollToBottom() {
       const container = document.getElementById("chatBox");
-      container.scrollTop = container.scrollHeight;
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
   }
 
   // ៣. Quota Awareness
@@ -431,13 +471,9 @@
       if (isLimitReached) {
           const btn = document.getElementById("btnSend");
           if (btn) { btn.disabled = true; btn.innerHTML = "🔒"; btn.classList.add("opacity-40"); }
-
           Swal.fire({
-              title: "អស់ Quota ហើយប្អូន! 🚀",
-              text: "ចង់រៀន Unlimited ទេ? ប្រាប់ប៉ាម៉ាក់ឱ្យ Upgrade ទៅ Plus/Pro ទៅ! 😂",
-              icon: "warning",
-              background: "#0f172a", color: "#f1f5f9",
-              confirmButtonColor: "#8b5cf6", confirmButtonText: "មើលគម្រោង 🔥"
+              title: "អស់ Quota ហើយប្អូន! 🚀", text: "ចង់រៀន Unlimited ទេ? ប្រាប់ប៉ាម៉ាក់ឱ្យ Upgrade ទៅ Plus/Pro ទៅ! 😂",
+              icon: 'warning', background: '#030712', color: '#f1f5f9', confirmButtonColor: '#8b5cf6', confirmButtonText: "Upgrade Now 🔥"
           }).then(r => { if(r.isConfirmed) window.location.href="/plans" });
       }
   })();
